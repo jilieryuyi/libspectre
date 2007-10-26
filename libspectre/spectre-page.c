@@ -44,7 +44,7 @@ _spectre_page_new (unsigned int     page_index,
 		return NULL;
 
 	page->index = page_index;
-	page->doc = doc;
+	page->doc = doc; /* FIXME: refcount? */
 
 	printf ("spectre_page_new\n");
 

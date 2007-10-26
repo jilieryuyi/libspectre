@@ -25,6 +25,8 @@ libspectre_la_SOURCES = 		\
 	spectre-status.c		\
 	spectre-document.h		\
 	spectre-document.c		\
+	spectre-device.h		\
+	spectre-device.c		\
 	spectre-page.h			\
 	spectre-page.c			\
 	$(gv_sources)
