@@ -13,6 +13,10 @@ libspectreinclude_HEADERS =		\
 	spectre-document.h		\
 	spectre-page.h
 
+gv_sources = 				\
+	ps.h				\
+	ps.c
+
 libspectre_la_SOURCES = 		\
 	spectre.h			\
 	spectre-private.h		\
@@ -22,6 +26,7 @@ libspectre_la_SOURCES = 		\
 	spectre-document.h		\
 	spectre-document.c		\
 	spectre-page.h			\
-	spectre-page.c
+	spectre-page.c			\
+	$(gv_sources)
 
 libspectre_la_LIBADD = $(LIB_GS)
