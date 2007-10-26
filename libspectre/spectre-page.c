@@ -2,16 +2,20 @@
 #include <stdlib.h>
 
 #include "spectre-page.h"
+#include "spectre-private.h"
 
 struct SpectrePage
 {
-	SpectreStatus status;
+	struct document *doc;
+	
+	SpectreStatus    status;
 
-	unsigned int  index;
+	unsigned int     index;
 };
 
 SpectrePage *
-_spectre_page_new (unsigned int page_index)
+_spectre_page_new (unsigned int     page_index,
+		   struct document *doc)
 {
 	SpectrePage *page;
 
@@ -20,6 +24,7 @@ _spectre_page_new (unsigned int page_index)
 		return NULL;
 
 	page->index = page_index;
+	page->doc = doc;
 
 	printf ("spectre_page_new\n");
 
@@ -46,7 +51,15 @@ spectre_page_get_size (SpectrePage *page,
 		       double      *width,
 		       double      *height)
 {
-	/* TODO */
+	int urx, ury, llx, lly;
+	
+	psgetpagebox (page->doc, page->index,
+		      &urx, &ury, &llx, &lly);
+
+	if (width)
+		*width = urx - llx;
+	if (height)
+		*height = ury - lly;
 }
 
 void

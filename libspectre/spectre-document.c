@@ -131,7 +131,7 @@ spectre_document_get_page (SpectreDocument *document,
 		return NULL;
 	}
 	
-	page = _spectre_page_new (page_index);
+	page = _spectre_page_new (page_index, document->doc);
 	if (!page) {
 		document->status = SPECTRE_STATUS_NO_MEMORY;
 		return NULL;

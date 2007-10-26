@@ -3,10 +3,12 @@
 
 #include "spectre-macros.h"
 #include "spectre-page.h"
+#include "ps.h"
 
 SPECTRE_BEGIN_DECLS
 
-SpectrePage *_spectre_page_new (unsigned int page_index);
+SpectrePage *_spectre_page_new (unsigned int     page_index,
+				struct document *doc);
 
 SPECTRE_END_DECLS
 

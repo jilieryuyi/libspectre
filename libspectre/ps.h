@@ -25,6 +25,13 @@
  *      FAX: (608)262-9777         Madison, WI   53706
 */
 
+#ifndef PS_H
+#define PS_H
+
+#include <libspectre/spectre-macros.h>
+
+SPECTRE_BEGIN_DECLS
+
 #ifndef NeedFunctionPrototypes
 #if defined(FUNCPROTO) || defined(__STDC__) || defined(__cplusplus) || defined(c_plusplus)
 #define NeedFunctionPrototypes 1
@@ -67,7 +74,6 @@ typedef struct documentmedia {
 	char *name;
 	int  width;
 	int  height;
-	//      int  used;
 } MediaStruct, *Media;
 
 
@@ -143,3 +149,18 @@ extern void				pscopydoc (
     char *
 #endif
 );
+
+void                                    psgetpagebox (
+#if NeedFunctionPrototypes
+    const struct document *,
+    int,
+    int *,
+    int *,
+    int *,
+    int *
+#endif
+);
+
+SPECTRE_END_DECLS
+
+#endif /* PS_H */
