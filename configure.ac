@@ -18,6 +18,21 @@ else
 fi
 AC_SUBST(LIB_GS)
 
+dnl Test
+AC_ARG_ENABLE(test,
+              [AC_HELP_STRING([--enable-test], [Compile tests])],enable_test="$enableval",enable_test=yes)
+
+if test "x$enable_test" = "xyes"; then
+    PKG_CHECK_MODULES(CAIRO, cairo cairo-png, enable_test=yes,enable_test=no)
+
+    if test "x$enable_test" != "xyes"; then
+        AC_MSG_WARN("Tests disabled since required cairo library was not found")
+    fi
+fi
+
+AM_CONDITIONAL(ENABLE_TEST, test x$enable_test = xyes)
+    
+
 AC_OUTPUT([
 Makefile
 libspectre/Makefile

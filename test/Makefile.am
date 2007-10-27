@@ -1,9 +1,11 @@
 INCLUDES = 				\
 	-I$(top_srcdir)			\
-	-I$(top_srcdir)/libspectre
+	-I$(top_srcdir)/libspectre	\
+	$(CAIRO_CFLAGS)
 
 noinst_PROGRAMS = spectre-test
 
 spectre_test_SOURCES = spectre-test.c
 spectre_test_LDADD =                         		\
-	$(top_builddir)/libspectre/libspectre.la
+	$(top_builddir)/libspectre/libspectre.la	\
+	$(CAIRO_LIBS)

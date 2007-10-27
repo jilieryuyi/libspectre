@@ -1,4 +1,8 @@
-SUBDIRS = libspectre test
+SUBDIRS = libspectre
+
+if ENABLE_TEST
+SUBDIRS += test
+endif
 
 EXTRA_DIST = libspectre.pc.in
 
