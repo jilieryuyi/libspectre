@@ -50,7 +50,7 @@ int main (int argc, char **argv)
 							       width, height,
 							       row_length);
 
-		filename = spectre_strdup_printf ("%s/page-%d.png", argv[2], i);
+		filename = _spectre_strdup_printf ("%s/page-%d.png", argv[2], i);
 		cairo_surface_write_to_png (surface, filename);
 		free (filename);
 

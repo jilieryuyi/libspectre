@@ -27,7 +27,7 @@
 
 SPECTRE_BEGIN_DECLS
 
-char *spectre_strdup_printf (const char *format, ...);
+char *_spectre_strdup_printf (const char *format, ...);
 
 SPECTRE_END_DECLS
 

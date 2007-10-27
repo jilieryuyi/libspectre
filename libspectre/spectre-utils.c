@@ -37,7 +37,7 @@ spectre_strdup_vprintf (const char *format,
 }
 
 char *
-spectre_strdup_printf (const char *format, ...)
+_spectre_strdup_printf (const char *format, ...)
 {
 	char *buffer;
 	va_list args;

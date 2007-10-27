@@ -238,23 +238,23 @@ spectre_device_render (SpectreDevice  *device,
 	args[arg++] = "-dNOPAGEPROMPT";
 	args[arg++] = "-dTextAlphaBits=4"; /* TODO let the user set it */
 	args[arg++] = "-dGraphicsAlphaBits=2"; /* TODO let the user set it */
-	args[arg++] = spectre_strdup_printf ("-g%dx%d", width, height);
-	args[arg++] = spectre_strdup_printf ("-r%fx%f", scale * x_dpi, scale * y_dpi);
-	args[arg++] = spectre_strdup_printf ("-dDisplayFormat=%d",
-					     DISPLAY_COLORS_RGB |
-					     DISPLAY_UNUSED_LAST |
-					     DISPLAY_DEPTH_8 |
-					     DISPLAY_LITTLEENDIAN |
-					     DISPLAY_TOPFIRST);
-	args[arg++] = spectre_strdup_printf ("-sDisplayHandle=16#%llx",
-					     (unsigned long long int)device);
+	args[arg++] = _spectre_strdup_printf ("-g%dx%d", width, height);
+	args[arg++] = _spectre_strdup_printf ("-r%fx%f", scale * x_dpi, scale * y_dpi);
+	args[arg++] = _spectre_strdup_printf ("-dDisplayFormat=%d",
+					      DISPLAY_COLORS_RGB |
+					      DISPLAY_UNUSED_LAST |
+					      DISPLAY_DEPTH_8 |
+					      DISPLAY_LITTLEENDIAN |
+					      DISPLAY_TOPFIRST);
+	args[arg++] = _spectre_strdup_printf ("-sDisplayHandle=16#%llx",
+					      (unsigned long long int)device);
 
 /*	if ( !plaformFonts )
 		internalArgs << "-dNOPLATFONTS";*/
 	error = gsapi_init_with_args (ghostscript_instance, GS_N_ARGS, args);
 	handle_error_code (error);
 	
-	set = spectre_strdup_printf ("<< /Orientation %1 >> setpagedevice .locksafe", rotation);
+	set = _spectre_strdup_printf ("<< /Orientation %1 >> setpagedevice .locksafe", rotation);
 	gsapi_run_string_with_length(ghostscript_instance, set, strlen (set), 0, &error);
 	handle_error_code (error);
 	
