@@ -22,8 +22,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "ps.h"
-
 #include "spectre-document.h"
 #include "spectre-private.h"
 
@@ -32,41 +30,40 @@ struct SpectreDocument
 	struct document *doc;
 	
 	SpectreStatus    status;
-
-	char            *filename;
 };
 
 SpectreDocument *
-spectre_document_new (const char *filename)
+spectre_document_new (void)
 {
 	SpectreDocument *doc;
 
 	doc = calloc (1, sizeof (SpectreDocument));
-	if (!doc)
-		return NULL;
-
-	doc->filename = filename ? strdup (filename) : NULL;
-
 	return doc;
 }
 
 void
-spectre_document_load (SpectreDocument *document)
+spectre_document_load (SpectreDocument *document,
+		       const char      *filename)
 {
 	FILE *fd;
 	
-	if (document->doc) {
+	if (document->doc && strcmp (filename, document->doc->filename) == 0) {
 		document->status = SPECTRE_STATUS_SUCCESS;
 		return;
 	}
 
-	fd = fopen (document->filename, "r");
+	if (document->doc) {
+		psfree (document->doc);
+		document->doc = NULL;
+	}
+	
+	fd = fopen (filename, "r");
 	if (!fd) {
 		document->status = SPECTRE_STATUS_LOAD_ERROR;
 		return;
 	}
 
-	document->doc = psscan (fd, document->filename, SCANSTYLE_NORMAL);
+	document->doc = psscan (fd, filename, SCANSTYLE_NORMAL);
 	if (!document->doc) {
 		/* FIXME: OOM | INVALID_PS */
 		document->status = SPECTRE_STATUS_LOAD_ERROR;
@@ -87,11 +84,6 @@ spectre_document_free (SpectreDocument *document)
 {
 	if (!document)
 		return;
-
-	if (document->filename) {
-		free (document->filename);
-		document->filename = NULL;
-	}
 
 	if (document->doc) {
 		psfree (document->doc);

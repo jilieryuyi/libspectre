@@ -28,19 +28,22 @@ SPECTRE_BEGIN_DECLS
 
 typedef struct SpectrePage SpectrePage;
 
-SpectreStatus spectre_page_status    (SpectrePage   *page);
-void          spectre_page_free      (SpectrePage   *page);
+SpectreStatus spectre_page_status    (SpectrePage    *page);
+void          spectre_page_free      (SpectrePage    *page);
 
-unsigned int  spectre_page_get_index (SpectrePage   *page);
-void          spectre_page_get_size  (SpectrePage   *page,
-				      double        *width,
-				      double        *height);
-void          spectre_page_render    (SpectrePage   *page,
-				      double         scale,
-				      unsigned int   rotation,
-				      double         x_dpi,
-				      double         y_dpi,
-				      unsigned char *page_data);
+unsigned int  spectre_page_get_index (SpectrePage    *page);
+void          spectre_page_get_size  (SpectrePage    *page,
+				      int            *width,
+				      int            *height);
+void          spectre_page_render    (SpectrePage    *page,
+				      double          scale,
+				      unsigned int    rotation,
+				      double          x_dpi,
+				      double          y_dpi,
+				      int             width,
+				      int             height,
+				      unsigned char **page_data,
+				      int            *row_length);
 
 SPECTRE_END_DECLS
 

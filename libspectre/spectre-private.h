@@ -22,7 +22,7 @@
 #define SPECTRE_PRIVATE_H
 
 #include "spectre-macros.h"
-#include "spectre-page.h"
+#include "spectre-status.h"
 #include "ps.h"
 
 SPECTRE_BEGIN_DECLS

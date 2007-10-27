@@ -29,6 +29,7 @@ libspectre_la_SOURCES = 		\
 	spectre-device.c		\
 	spectre-page.h			\
 	spectre-page.c			\
+	spectre-utils.c			\
 	$(gv_sources)
 
 libspectre_la_LIBADD = $(LIB_GS)

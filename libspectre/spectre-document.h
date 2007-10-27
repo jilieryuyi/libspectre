@@ -29,8 +29,9 @@ SPECTRE_BEGIN_DECLS
 
 typedef struct SpectreDocument SpectreDocument;
 
-SpectreDocument *spectre_document_new         (const char      *filename);
-void             spectre_document_load        (SpectreDocument *document);
+SpectreDocument *spectre_document_new         (void);
+void             spectre_document_load        (SpectreDocument *document,
+					       const char      *filename);
 SpectreStatus    spectre_document_status      (SpectreDocument *document);
 void             spectre_document_free        (SpectreDocument *document);
 

@@ -23,9 +23,25 @@
 
 #include <libspectre/spectre-macros.h>
 
+#include "ps.h"
+
 SPECTRE_BEGIN_DECLS
 
 typedef struct SpectreDevice SpectreDevice;
+
+SpectreDevice *spectre_device_new    (struct document *doc);
+void           spectre_device_render (SpectreDevice   *device,
+				      unsigned int     page,
+				      double           scale,
+				      unsigned int     rotation,
+				      double           x_dpi,
+				      double           y_dpi,
+				      int              width,
+				      int              height,
+				      unsigned char  **page_data,
+				      int             *row_length);
+void           spectre_device_free   (SpectreDevice   *device);
+
 
 SPECTRE_END_DECLS
 

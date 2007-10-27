@@ -22,6 +22,8 @@
 #include <stdlib.h>
 
 #include "spectre-page.h"
+
+#include "spectre-device.h"
 #include "spectre-private.h"
 
 struct SpectrePage
@@ -46,8 +48,6 @@ _spectre_page_new (unsigned int     page_index,
 	page->index = page_index;
 	page->doc = doc; /* FIXME: refcount? */
 
-	printf ("spectre_page_new\n");
-
 	return page;
 }
 
@@ -68,8 +68,8 @@ spectre_page_get_index (SpectrePage *page)
 
 void
 spectre_page_get_size (SpectrePage *page,
-		       double      *width,
-		       double      *height)
+		       int         *width,
+		       int         *height)
 {
 	int urx, ury, llx, lly;
 	
@@ -83,12 +83,30 @@ spectre_page_get_size (SpectrePage *page,
 }
 
 void
-spectre_page_render (SpectrePage   *page,
-		     double         scale,
-		     unsigned int   rotation,
-		     double         x_dpi,
-		     double         y_dpi,
-		     unsigned char *page_data)
+spectre_page_render (SpectrePage    *page,
+		     double          scale,
+		     unsigned int    rotation,
+		     double          x_dpi,
+		     double          y_dpi,
+		     int             width,
+		     int             height,
+		     unsigned char **page_data,
+		     int            *row_length)
 {
-	/* TODO */
+	SpectreDevice *device;
+
+	device = spectre_device_new (page->doc);
+	
+	spectre_device_render (device,
+			       page->index,
+			       scale,
+			       rotation,
+			       x_dpi,
+			       y_dpi,
+			       width,
+			       height,
+			       page_data,
+			       row_length);
+	
+	spectre_device_free (device);
 }

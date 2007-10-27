@@ -403,6 +403,7 @@ psscan(FILE *file, const char *filename, int scanstyle)
       sscanf(line, "%*s %256s", text);
       /*###jp###*/
       /*doc->epsf = iscomment(text, "EPSF-");*/
+      doc->filename = strdup (filename);
       doc->epsf = iscomment(text, "EPSF");
       doc->beginheader = position;
       section_len = line_len;
@@ -1204,6 +1205,7 @@ psfree(doc)
 	for (i=0; i<doc->nummedia; i++) {
 	    if (doc->media[i].name) PS_free(doc->media[i].name);
 	}
+	if (doc->filename) PS_free(doc->filename);
 	if (doc->title) PS_free(doc->title);
 	if (doc->date) PS_free(doc->date);
 	if (doc->pages) PS_free(doc->pages);
