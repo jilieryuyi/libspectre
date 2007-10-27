@@ -1209,6 +1209,7 @@ psfree(doc)
 	    if (doc->media[i].name) PS_free(doc->media[i].name);
 	}
 	if (doc->filename) PS_free(doc->filename);
+	if (doc->creator) PS_free(doc->creator);
 	if (doc->title) PS_free(doc->title);
 	if (doc->date) PS_free(doc->date);
 	if (doc->pages) PS_free(doc->pages);
