@@ -329,9 +329,10 @@ static char    *empty_string = "";
 /*###########################################################*/
 
 struct document *
-psscan(FILE *file, const char *filename, int scanstyle)
+psscan(const char *filename, int scanstyle)
 {
     struct document *doc;
+    FILE *file;
     int bb_set = NONE;
     int pages_set = NONE;
     int page_order_set = NONE;
@@ -384,11 +385,17 @@ psscan(FILE *file, const char *filename, int scanstyle)
       return(NULL);
     }
 
+    file = fopen (filename, "r");
+    if (!file) {
+	    return NULL;
+    }
+
     fd = ps_io_init(file);
     if (!readline(fd,&line, &position, &line_len)) {
 	fprintf(stderr, "Warning: empty file.\n");
         ENDMESSAGE(psscan)
         ps_io_exit(fd);
+	fclose (file);
 	return(NULL);
     }
 
@@ -411,6 +418,7 @@ psscan(FILE *file, const char *filename, int scanstyle)
       INFMESSAGE(unable to classify document)
       ENDMESSAGE(psscan)
       ps_io_exit(fd);
+      fclose (file);
       return(NULL);
     }
     
@@ -1182,6 +1190,7 @@ continuepage:
 #endif
     ENDMESSAGE(psscan)
     ps_io_exit(fd);
+    fclose (file);
     return doc;
 }
 

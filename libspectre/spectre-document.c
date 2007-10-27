@@ -45,8 +45,6 @@ void
 spectre_document_load (SpectreDocument *document,
 		       const char      *filename)
 {
-	FILE *fd;
-	
 	if (document->doc && strcmp (filename, document->doc->filename) == 0) {
 		document->status = SPECTRE_STATUS_SUCCESS;
 		return;
@@ -57,20 +55,9 @@ spectre_document_load (SpectreDocument *document,
 		document->doc = NULL;
 	}
 	
-	fd = fopen (filename, "r");
-	if (!fd) {
-		document->status = SPECTRE_STATUS_LOAD_ERROR;
-		return;
-	}
-
-	document->doc = psscan (fd, filename, SCANSTYLE_NORMAL);
+	document->doc = psscan (filename, SCANSTYLE_NORMAL);
 	if (!document->doc) {
 		/* FIXME: OOM | INVALID_PS */
-		document->status = SPECTRE_STATUS_LOAD_ERROR;
-		return;
-	}
-
-	if (!fclose (fd)) {
 		document->status = SPECTRE_STATUS_LOAD_ERROR;
 		return;
 	}
