@@ -197,7 +197,7 @@ spectre_device_new (struct document *doc)
 	if (!device)
 		return NULL;
 
-	device->doc = doc; /* FIXME: refcount */
+	device->doc = psdocreference (doc); 
 	
 	return device;
 }
@@ -286,6 +286,11 @@ spectre_device_free (SpectreDevice *device)
 {
 	if (!device)
 		return;
+
+	if (device->doc) {
+		psdocdestroy (device->doc);
+		device->doc = NULL;
+	}
 
 	free (device);
 }

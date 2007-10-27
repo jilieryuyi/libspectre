@@ -78,6 +78,8 @@ typedef struct documentmedia {
 
 
 typedef struct document {
+    unsigned int ref_count;
+	
 #ifdef GV_CODE
     int  structured;                    /* toc will be useful */ 
     int  labels_useful;                 /* page labels are distinguishable, hence useful */ 
@@ -135,7 +137,13 @@ Document				psscan (
 #endif
 );
 
-void					psfree (
+void					psdocdestroy (
+#if NeedFunctionPrototypes
+    struct document *
+#endif
+);
+
+Document                                psdocreference (
 #if NeedFunctionPrototypes
     struct document *
 #endif

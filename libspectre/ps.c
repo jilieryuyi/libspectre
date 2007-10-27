@@ -59,6 +59,7 @@
 #include <stdlib.h>
 
 #include <string.h>
+#include <assert.h>
 
 #ifndef SEEK_SET
 #define SEEK_SET 0
@@ -68,15 +69,7 @@
 #endif
 #include <ctype.h>
 
-//#include "paths.h"
-
-/*#include "types.h"
-#include "file.h"
-#include "misc.h"*/
 #include "ps.h"
-/*#include "note.h"
-  #include "d_memdebug.h"*/
-
 
 #ifdef BSD4_2
 #define memset(a,b,c) bzero(a,c)
@@ -410,6 +403,7 @@ psscan(const char *filename, int scanstyle)
       sscanf(line, "%*s %256s", text);
       /*###jp###*/
       /*doc->epsf = iscomment(text, "EPSF-");*/
+      doc->ref_count = 1;
       doc->filename = strdup (filename);
       doc->epsf = iscomment(text, "EPSF");
       doc->beginheader = position;
@@ -1200,7 +1194,7 @@ continuepage:
  */
 /*###########################################################*/
 
-void
+static void
 psfree(doc)
     struct document *doc;
 {
@@ -1222,6 +1216,34 @@ psfree(doc)
 	PS_free(doc);
     }
     ENDMESSAGE(psfree)
+}
+
+void
+psdocdestroy (struct document *doc)
+{
+    if (!doc)
+        return;
+
+    assert (doc->ref_count > 0);
+
+    doc->ref_count--;
+    if (doc->ref_count)
+        return;
+
+    psfree (doc);
+}
+
+struct document *
+psdocreference (struct document *doc)
+{
+    if (!doc)
+        return NULL;
+
+    assert (doc->ref_count > 0);
+
+    doc->ref_count++;
+
+    return doc;
 }
 
 /*----------------------------------------------------------*/

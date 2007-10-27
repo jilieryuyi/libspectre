@@ -46,7 +46,7 @@ _spectre_page_new (unsigned int     page_index,
 		return NULL;
 
 	page->index = page_index;
-	page->doc = doc; /* FIXME: refcount? */
+	page->doc = psdocreference (doc);
 
 	return page;
 }
@@ -57,6 +57,11 @@ spectre_page_free (SpectrePage *page)
 	if (!page)
 		return;
 
+	if (page->doc) {
+		psdocdestroy (page->doc);
+		page->doc = NULL;
+	}
+	
 	free (page);
 }
 

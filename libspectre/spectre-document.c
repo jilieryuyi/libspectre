@@ -51,7 +51,7 @@ spectre_document_load (SpectreDocument *document,
 	}
 
 	if (document->doc) {
-		psfree (document->doc);
+		psdocdestroy (document->doc);
 		document->doc = NULL;
 	}
 	
@@ -73,7 +73,7 @@ spectre_document_free (SpectreDocument *document)
 		return;
 
 	if (document->doc) {
-		psfree (document->doc);
+		psdocdestroy (document->doc);
 		document->doc = NULL;
 	}
 	
