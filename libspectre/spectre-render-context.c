@@ -39,7 +39,7 @@ spectre_render_context_new (void)
 	rc->height = -1;
 	rc->text_alpha_bits = 4;
 	rc->graphic_alpha_bits = 2;
-	rc->use_platform_fonts = 0;
+	rc->use_platform_fonts = TRUE;
 	
 	return rc;
 }
