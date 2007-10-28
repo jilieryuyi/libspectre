@@ -1,0 +1,8 @@
+[ ] Eps (unstructured doc) support
+[ ] Check input params in public methods
+[ ] API Documentation
+[ ] Printing API
+[ ] spectre_document_save if make sense
+[ ] Fill README file
+[ ] Makefile for ghostscript dir. It's not installale but it's distribuible
+
