@@ -212,10 +212,13 @@ spectre_device_render (SpectreDevice        *device,
 {
 	void *ghostscript_instance;
 	char **args;
-	char *set;
 	int n_args = 9;
 	int arg = 0;
 	int error;
+	char *text_alpha, *graph_alpha;
+	char *size = NULL;
+	char *resolution, *set;
+	char *dsp_format, *dsp_handle;
 	int has_size = (rc->width != -1 && rc->height != -1);
 	
 	device->user_image = page_data;
@@ -237,31 +240,42 @@ spectre_device_render (SpectreDevice        *device,
 	args[arg++] = "-dDELAYSAFER";
 	args[arg++] = "-dNOPAUSE";
 	args[arg++] = "-dNOPAGEPROMPT";
-	args[arg++] = _spectre_strdup_printf("-dTextAlphaBits=%d", rc->text_alpha_bits);
-	args[arg++] = _spectre_strdup_printf("-dGraphicsAlphaBits=%d", rc->graphic_alpha_bits);
+	args[arg++] = text_alpha =_spectre_strdup_printf("-dTextAlphaBits=%d",
+							 rc->text_alpha_bits);
+	args[arg++] = graph_alpha = _spectre_strdup_printf("-dGraphicsAlphaBits=%d",
+							   rc->graphic_alpha_bits);
 	if (has_size)
-		args[arg++] = _spectre_strdup_printf ("-g%dx%d", rc->width, rc->height);
-	args[arg++] = _spectre_strdup_printf ("-r%fx%f",
-					      rc->scale * rc->x_dpi,
-					      rc->scale * rc->y_dpi);
-	args[arg++] = _spectre_strdup_printf ("-dDisplayFormat=%d",
-					      DISPLAY_COLORS_RGB |
-					      DISPLAY_UNUSED_LAST |
-					      DISPLAY_DEPTH_8 |
-					      DISPLAY_LITTLEENDIAN |
-					      DISPLAY_TOPFIRST);
-	args[arg++] = _spectre_strdup_printf ("-sDisplayHandle=16#%llx",
-					      (unsigned long long int)device);
+		args[arg++] = size =_spectre_strdup_printf ("-g%dx%d", rc->width, rc->height);
+	args[arg++] = resolution = _spectre_strdup_printf ("-r%fx%f",
+							   rc->scale * rc->x_dpi,
+							   rc->scale * rc->y_dpi);
+	args[arg++] = dsp_format = _spectre_strdup_printf ("-dDisplayFormat=%d",
+							   DISPLAY_COLORS_RGB |
+							   DISPLAY_UNUSED_LAST |
+							   DISPLAY_DEPTH_8 |
+							   DISPLAY_LITTLEENDIAN |
+							   DISPLAY_TOPFIRST);
+	args[arg++] = dsp_handle = _spectre_strdup_printf ("-sDisplayHandle=16#%llx",
+							   (unsigned long long int)device);
 	if (rc->use_platform_fonts == FALSE)
 		args[arg++] = "-dNOPLATFONTS";
 
 	error = gsapi_init_with_args (ghostscript_instance, n_args, args);
 	handle_error_code (error);
+
+	free (text_alpha);
+	free (graph_alpha);
+	free (size);
+	free (resolution);
+	free (dsp_format);
+	free (dsp_handle);
+	free (args);
 	
 	set = _spectre_strdup_printf ("<< /Orientation %1 >> setpagedevice .locksafe",
 				      rc->rotation);
-	gsapi_run_string_with_length(ghostscript_instance, set, strlen (set), 0, &error);
+	gsapi_run_string_with_length (ghostscript_instance, set, strlen (set), 0, &error);
 	handle_error_code (error);
+	free (set);
 	
 	spectre_device_process (ghostscript_instance,
 				device->doc->filename,
