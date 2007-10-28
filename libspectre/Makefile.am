@@ -11,6 +11,7 @@ libspectreinclude_HEADERS =		\
 	spectre-macros.h		\
 	spectre-status.h		\
 	spectre-document.h		\
+	spectre-render-context.h	\
 	spectre-page.h
 
 gv_sources = 				\
@@ -25,6 +26,8 @@ libspectre_la_SOURCES = 		\
 	spectre-status.c		\
 	spectre-document.h		\
 	spectre-document.c		\
+	spectre-render-context.h	\
+	spectre-render-context.c	\
 	spectre-device.h		\
 	spectre-device.c		\
 	spectre-page.h			\
