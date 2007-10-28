@@ -88,30 +88,20 @@ spectre_page_get_size (SpectrePage *page,
 }
 
 void
-spectre_page_render (SpectrePage    *page,
-		     double          scale,
-		     unsigned int    rotation,
-		     double          x_dpi,
-		     double          y_dpi,
-		     int             width,
-		     int             height,
-		     unsigned char **page_data,
-		     int            *row_length)
+spectre_page_render (SpectrePage          *page,
+		     SpectreRenderContext *rc,
+		     unsigned char       **page_data,
+		     int                  *row_length)
 {
 	SpectreDevice *device;
 
+	if (!rc)
+		return;
+
 	device = spectre_device_new (page->doc);
 	
-	spectre_device_render (device,
-			       page->index,
-			       scale,
-			       rotation,
-			       x_dpi,
-			       y_dpi,
-			       width,
-			       height,
-			       page_data,
-			       row_length);
+	spectre_device_render (device, page->index, rc,
+			       page_data, row_length);
 	
 	spectre_device_free (device);
 }

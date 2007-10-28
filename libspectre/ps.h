@@ -29,6 +29,7 @@
 #define PS_H
 
 #include <libspectre/spectre-macros.h>
+#include <stdio.h>
 
 SPECTRE_BEGIN_DECLS
 

@@ -23,9 +23,22 @@
 
 #include "spectre-macros.h"
 #include "spectre-status.h"
+#include "spectre-page.h"
 #include "ps.h"
 
 SPECTRE_BEGIN_DECLS
+
+struct SpectreRenderContext {
+	double       scale;
+	unsigned int rotation;
+	double       x_dpi;
+	double       y_dpi;
+	int          width;
+	int          height;
+	int          text_alpha_bits;
+	int          graphic_alpha_bits;
+	int          use_platform_fonts;
+};
 
 SpectrePage *_spectre_page_new (unsigned int     page_index,
 				struct document *doc);

@@ -21,18 +21,7 @@
 #include <stdlib.h>
 
 #include "spectre-render-context.h"
-
-struct SpectreRenderContext {
-	double       scale;
-	unsigned int rotation;
-	double       x_dpi;
-	double       y_dpi;
-	int          width;
-	int          height;
-	int          text_alpha_bits;
-	int          graphic_alpha_bits;
-	int          use_platform_fonts;
-};
+#include "spectre-private.h"
 
 SpectreRenderContext *
 spectre_render_context_new (void)
@@ -48,8 +37,8 @@ spectre_render_context_new (void)
 	rc->y_dpi = 72.0;
 	rc->width = -1;
 	rc->height = -1;
-	rc->text_alpha_bits = 0;
-	rc->graphic_alpha_bits = 0;
+	rc->text_alpha_bits = 4;
+	rc->graphic_alpha_bits = 2;
 	rc->use_platform_fonts = 0;
 	
 	return rc;

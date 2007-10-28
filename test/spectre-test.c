@@ -9,8 +9,9 @@
 
 int main (int argc, char **argv)
 {
-	SpectreDocument *document;
-	int              i;
+	SpectreDocument      *document;
+	SpectreRenderContext *rc;
+	int                   i;
 
 	/* TODO: check argv */
 
@@ -23,6 +24,8 @@ int main (int argc, char **argv)
 		spectre_document_get_title (document));
 	printf ("Creator: %s\n",
 		spectre_document_get_creator (document));
+
+	rc = spectre_render_context_new ();
 
 	for (i = 0; i < spectre_document_get_n_pages (document); i++) {
 		SpectrePage     *page;
@@ -41,8 +44,9 @@ int main (int argc, char **argv)
 
 		spectre_page_get_size (page, &width, &height);
 		printf ("Page %d size: %d x %d\n", i, width, height);
-		
-		spectre_page_render (page, 1, 0, 72, 72, width, height, &data, &row_length);
+
+		spectre_render_context_set_page_size (rc, width, height);
+		spectre_page_render (page, rc, &data, &row_length);
 
 
 		surface = cairo_image_surface_create_for_data (data,
@@ -59,6 +63,7 @@ int main (int argc, char **argv)
 		spectre_page_free (page);
 	}
 
+	spectre_render_context_free (rc);
 	spectre_document_free (document);
 	
 	return 0;

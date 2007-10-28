@@ -23,5 +23,7 @@
 
 #include <libspectre/spectre-status.h>
 #include <libspectre/spectre-document.h>
+#include <libspectre/spectre-render-context.h>
+#include <libspectre/spectre-page.h>
 
 #endif /* SPECTRE_H */
