@@ -212,11 +212,11 @@ spectre_device_cleanup (void *ghostscript_instance, CleanupFlag flag)
 	if (ghostscript_instance == NULL)
 		return;
 
-	if (flag & CLEANUP_DELETE_INSTANCE)
-		gsapi_delete_instance (ghostscript_instance);
-
 	if (flag & CLEANUP_EXIT)
 		gsapi_exit (ghostscript_instance);
+
+	if (flag & CLEANUP_DELETE_INSTANCE)
+		gsapi_delete_instance (ghostscript_instance);
 }
 
 SpectreDevice *
