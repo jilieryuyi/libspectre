@@ -341,7 +341,8 @@ spectre_device_render (SpectreDevice        *device,
 		return status;
 	}
 
-	if (!device->doc->epsf) {
+	if ((!device->doc->epsf && device->doc->numpages > 0) ||
+	    (device->doc->epsf && device->doc->numpages > 1)) {
 		status = spectre_device_process (ghostscript_instance,
 						 device->doc->filename,
 						 device->doc->pages[page].begin,
