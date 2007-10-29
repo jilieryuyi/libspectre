@@ -65,6 +65,12 @@ spectre_page_free (SpectrePage *page)
 	free (page);
 }
 
+SpectreStatus
+spectre_page_status (SpectrePage *page)
+{
+	return page->status;
+}
+
 unsigned int
 spectre_page_get_index (SpectrePage *page)
 {

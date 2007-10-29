@@ -47,7 +47,13 @@ int main (int argc, char **argv)
 
 		spectre_render_context_set_page_size (rc, width, height);
 		spectre_page_render (page, rc, &data, &row_length);
-
+		if (spectre_page_status (page)) {
+			printf ("Error rendering page %d: %s\n", i,
+				spectre_status_to_string (spectre_page_status (page)));
+			free (data);
+			spectre_page_free (page);
+			continue;
+		}
 
 		surface = cairo_image_surface_create_for_data (data,
 							       CAIRO_FORMAT_RGB24,
