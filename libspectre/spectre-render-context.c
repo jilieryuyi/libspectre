@@ -162,3 +162,28 @@ spectre_render_context_get_use_platform_fonts (SpectreRenderContext *rc)
 	return rc->use_platform_fonts;
 }
 
+void
+spectre_render_context_set_antialias_bits (SpectreRenderContext *rc,
+					   int                   graphics_bits,
+					   int                   text_bits)
+{
+	if (!rc)
+		return;
+
+	rc->graphic_alpha_bits = graphics_bits;
+	rc->text_alpha_bits = text_bits;
+}
+
+void
+spectre_render_context_get_antialias_bits (SpectreRenderContext *rc,
+					   int                  *graphics_bits,
+					   int                  *text_bits)
+{
+	if (!rc)
+		return;
+
+	if (graphics_bits)
+		*graphics_bits = rc->graphic_alpha_bits;
+	if (text_bits)
+		*text_bits = rc->text_alpha_bits;
+}

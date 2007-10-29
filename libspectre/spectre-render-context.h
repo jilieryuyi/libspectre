@@ -51,6 +51,12 @@ void                  spectre_render_context_get_page_size          (SpectreRend
 void                  spectre_render_context_set_use_platform_fonts (SpectreRenderContext *rc,
 								     int                   use_platform_fonts);
 int                   spectre_render_context_get_use_platform_fonts (SpectreRenderContext *rc);
+void                  spectre_render_context_set_antialias_bits     (SpectreRenderContext *rc,
+								     int                   graphics_bits,
+								     int                   text_bits);
+void                  spectre_render_context_get_antialias_bits     (SpectreRenderContext *rc,
+								     int                  *graphics_bits,
+								     int                  *text_bits);
 
 SPECTRE_END_DECLS
 
