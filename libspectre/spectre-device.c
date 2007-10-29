@@ -340,15 +340,17 @@ spectre_device_render (SpectreDevice        *device,
 					CLEANUP_DELETE_INSTANCE | CLEANUP_EXIT);
 		return status;
 	}
-				
-	status = spectre_device_process (ghostscript_instance,
-					 device->doc->filename,
-					 device->doc->pages[page].begin,
-					 device->doc->pages[page].end);
-	if (status != SPECTRE_STATUS_SUCCESS) {
-		spectre_device_cleanup (ghostscript_instance,
-					CLEANUP_DELETE_INSTANCE | CLEANUP_EXIT);
-		return status;
+
+	if (!device->doc->epsf) {
+		status = spectre_device_process (ghostscript_instance,
+						 device->doc->filename,
+						 device->doc->pages[page].begin,
+						 device->doc->pages[page].end);
+		if (status != SPECTRE_STATUS_SUCCESS) {
+			spectre_device_cleanup (ghostscript_instance,
+						CLEANUP_DELETE_INSTANCE | CLEANUP_EXIT);
+			return status;
+		}
 	}
 	
 	*row_length = device->row_length;

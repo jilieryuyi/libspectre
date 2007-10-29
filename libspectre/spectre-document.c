@@ -30,6 +30,8 @@ struct SpectreDocument
 	struct document *doc;
 	
 	SpectreStatus    status;
+
+	int              structured;
 };
 
 SpectreDocument *
@@ -61,6 +63,9 @@ spectre_document_load (SpectreDocument *document,
 		document->status = SPECTRE_STATUS_LOAD_ERROR;
 		return;
 	}
+
+	document->structured = ((!document->doc->epsf && document->doc->numpages > 0) ||
+				(document->doc->epsf && document->doc->numpages > 1));
 
 	if (document->status != SPECTRE_STATUS_SUCCESS)
 		document->status = SPECTRE_STATUS_SUCCESS;
@@ -94,7 +99,7 @@ spectre_document_get_n_pages (SpectreDocument *document)
 		return 0;
 	}
 	
-	return document->doc->numpages;
+	return document->structured ? document->doc->numpages : 1;
 }
 
 const char *
@@ -125,7 +130,7 @@ spectre_document_get_page (SpectreDocument *document,
 {
 	SpectrePage *page;
 
-	if (page_index >= document->doc->numpages) {
+	if (page_index >= spectre_document_get_n_pages (document)) {
 		document->status = SPECTRE_STATUS_INVALID_PAGE;
 		return NULL;
 	}
