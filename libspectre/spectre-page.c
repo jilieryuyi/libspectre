@@ -77,6 +77,35 @@ spectre_page_get_index (SpectrePage *page)
 	return page->index;
 }
 
+SpectreOrientation
+spectre_page_get_orientation (SpectrePage *page)
+{
+	int page_orientation = NONE;
+
+	if ((!page->doc->epsf && page->doc->numpages > 0) ||
+	    (page->doc->epsf && page->doc->numpages > 1)) {
+		/* Structured doc */
+		page_orientation = page->doc->pages[page->index].orientation != NONE ?
+			page->doc->pages[page->index].orientation :
+			page->doc->default_page_orientation;
+	}
+
+	if (page_orientation == NONE)
+		page_orientation = page->doc->orientation;
+
+	switch (page_orientation) {
+	default:
+	case PORTRAIT:
+		return SPECTRE_ORIENTATION_PORTRAIT;
+	case LANDSCAPE:
+		return SPECTRE_ORIENTATION_LANDSCAPE;
+	case SEASCAPE:
+		return SPECTRE_ORIENTATION_REVERSE_LANDSCAPE;
+	case UPSIDEDOWN:
+		return SPECTRE_ORIENTATION_REVERSE_PORTRAIT;
+	}
+}
+
 void
 spectre_page_get_size (SpectrePage *page,
 		       int         *width,

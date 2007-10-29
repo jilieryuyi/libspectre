@@ -102,6 +102,32 @@ spectre_document_get_n_pages (SpectreDocument *document)
 	return document->structured ? document->doc->numpages : 1;
 }
 
+SpectreOrientation
+spectre_document_get_orientation (SpectreDocument *document)
+{
+	int doc_orientation;
+	
+	if (!document->doc) {
+		document->status = SPECTRE_STATUS_DOCUMENT_NOT_LOADED;
+		return SPECTRE_ORIENTATION_PORTRAIT;
+	}
+
+	doc_orientation = document->doc->orientation != NONE ?
+		document->doc->orientation : document->doc->default_page_orientation;
+	
+	switch (doc_orientation) {
+	default:
+	case PORTRAIT:
+		return SPECTRE_ORIENTATION_PORTRAIT;
+	case LANDSCAPE:
+		return SPECTRE_ORIENTATION_LANDSCAPE;
+	case SEASCAPE:
+		return SPECTRE_ORIENTATION_REVERSE_LANDSCAPE;
+	case UPSIDEDOWN:
+		return SPECTRE_ORIENTATION_REVERSE_PORTRAIT;
+	}
+}
+
 const char *
 spectre_document_get_title (SpectreDocument *document)
 {

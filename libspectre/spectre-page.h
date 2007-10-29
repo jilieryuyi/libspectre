@@ -27,19 +27,27 @@
 
 SPECTRE_BEGIN_DECLS
 
+typedef enum {
+	SPECTRE_ORIENTATION_PORTRAIT,
+	SPECTRE_ORIENTATION_LANDSCAPE,
+	SPECTRE_ORIENTATION_REVERSE_LANDSCAPE,
+	SPECTRE_ORIENTATION_REVERSE_PORTRAIT
+} SpectreOrientation;
+
 typedef struct SpectrePage SpectrePage;
 
-SpectreStatus spectre_page_status    (SpectrePage          *page);
-void          spectre_page_free      (SpectrePage          *page);
+SpectreStatus      spectre_page_status          (SpectrePage          *page);
+void               spectre_page_free            (SpectrePage          *page);
 
-unsigned int  spectre_page_get_index (SpectrePage          *page);
-void          spectre_page_get_size  (SpectrePage          *page,
-				      int                  *width,
-				      int                  *height);
-void          spectre_page_render    (SpectrePage          *page,
-				      SpectreRenderContext *rc,
-				      unsigned char       **page_data,
-				      int                  *row_length);
+unsigned int       spectre_page_get_index       (SpectrePage          *page);
+SpectreOrientation spectre_page_get_orientation (SpectrePage          *page);
+void               spectre_page_get_size        (SpectrePage          *page,
+						 int                  *width,
+						 int                  *height);
+void               spectre_page_render          (SpectrePage          *page,
+						 SpectreRenderContext *rc,
+						 unsigned char       **page_data,
+						 int                  *row_length);
 
 SPECTRE_END_DECLS
 

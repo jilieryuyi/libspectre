@@ -365,8 +365,6 @@ psscan(const char *filename, int scanstyle)
     int ignore_dsc;             /* Derived from scanstyle.
 				   If set the document structure will be ignored.
 				*/
-    unsigned char b[3];         /* The first 3 bytes of the input file */
-
     BEGINMESSAGE(psscan)
 
     respect_eof = (scanstyle & SCANSTYLE_IGNORE_EOF) ? 0 : 1;
@@ -509,7 +507,7 @@ psscan(const char *filename, int scanstyle)
 	} else if (orientation_set == NONE &&
 		   iscomment(line+2, "Orientation:")) {
 	    sscanf(line+length("%%Orientation:"), "%256s", text);
-	    if (strcmp(text, "(atend)") == 0) {
+	    if (strcmp(text, "(atend)") == 0 || strcmp(text, "atend") == 0) {
 		orientation_set = ATEND;
 	    } else if (strcmp(text, "Portrait") == 0) {
 		doc->orientation = PORTRAIT;
@@ -517,10 +515,16 @@ psscan(const char *filename, int scanstyle)
 	    } else if (strcmp(text, "Landscape") == 0) {
 		doc->orientation = LANDSCAPE;
 		orientation_set = 1;
+	    } else if (strcmp(text, "Seascape") == 0) {
+	        doc->orientation = SEASCAPE;
+		orientation_set = 1;
+	    } else if (strcmp(text, "UpsideDown") == 0) {
+	        doc->orientation = UPSIDEDOWN;
+		orientation_set = 1;
 	    }
 	} else if (page_order_set == NONE && iscomment(line+2, "PageOrder:")) {
 	    sscanf(line+length("%%PageOrder:"), "%256s", text);
-	    if (strcmp(text, "(atend)") == 0) {
+	    if (strcmp(text, "(atend)") == 0 || strcmp(text, "atend") == 0) {
 		page_order_set = ATEND;
 	    } else if (strcmp(text, "Ascend") == 0) {
 		doc->pageorder = ASCEND;
@@ -534,7 +538,7 @@ psscan(const char *filename, int scanstyle)
 	    }
 	} else if (pages_set == NONE && iscomment(line+2, "Pages:")) {
 	    sscanf(line+length("%%Pages:"), "%256s", text);
-	    if (strcmp(text, "(atend)") == 0) {
+	    if (strcmp(text, "(atend)") == 0 || strcmp(text, "atend") == 0) {
 		pages_set = ATEND;
 	    } else {
 		switch (sscanf(line+length("%%Pages:"), "%d %d",
@@ -758,6 +762,10 @@ psscan(const char *filename, int scanstyle)
 		    doc->default_page_orientation = PORTRAIT;
 		} else if (strcmp(text, "Landscape") == 0) {
 		    doc->default_page_orientation = LANDSCAPE;
+		} else if (strcmp(text, "Seascape") == 0) {
+		    doc->default_page_orientation = SEASCAPE;
+		} else if (strcmp(text, "UpsideDown") == 0) {
+		    doc->default_page_orientation = UPSIDEDOWN;
 		}
 	    } else if (page_media_set == NONE &&
 		       iscomment(line+2, "PageMedia:")) {
@@ -880,6 +888,10 @@ psscan(const char *filename, int scanstyle)
 		    doc->default_page_orientation = PORTRAIT;
 		} else if (strcmp(text, "Landscape") == 0) {
 		    doc->default_page_orientation = LANDSCAPE;
+		} else if (strcmp(text, "Seascape") == 0) {
+		    doc->default_page_orientation = SEASCAPE;
+		} else if (strcmp(text, "UpsideDown") == 0) {
+		    doc->default_page_orientation = UPSIDEDOWN;
 		}
 	    } else if (page_media_set == NONE &&
 		       iscomment(line+2, "PaperSize:")) {
@@ -1017,6 +1029,10 @@ continuepage:
 		    doc->pages[doc->numpages].orientation = PORTRAIT;
 		} else if (strcmp(text, "Landscape") == 0) {
 		    doc->pages[doc->numpages].orientation = LANDSCAPE;
+		} else if (strcmp(text, "Seascape") == 0) {
+		    doc->pages[doc->numpages].orientation = SEASCAPE;
+		} else if (strcmp(text, "UpsideDown") == 0) {
+		    doc->pages[doc->numpages].orientation = UPSIDEDOWN;
 		}
 	    } else if (doc->pages[doc->numpages].media == NULL &&
 		       iscomment(line+2, "PageMedia:")) {
@@ -1045,7 +1061,7 @@ continuepage:
 	    } else if ((page_bb_set == NONE || page_bb_set == ATEND) &&
 		       iscomment(line+2, "PageBoundingBox:")) {
 		sscanf(line+length("%%PageBoundingBox:"), "%256s", text);
-		if (strcmp(text, "(atend)") == 0) {
+		if (strcmp(text, "(atend)") == 0 || strcmp(text, "atend") == 0) {
 		    page_bb_set = ATEND;
 		} else {
 		    if (sscanf(line+length("%%PageBoundingBox:"), "%d %d %d %d",
@@ -1165,6 +1181,10 @@ continuepage:
 		doc->orientation = PORTRAIT;
 	    } else if (strcmp(text, "Landscape") == 0) {
 		doc->orientation = LANDSCAPE;
+	    } else if (strcmp(text, "Seascape") == 0) {
+	        doc->orientation = SEASCAPE;
+	    } else if (strcmp(text, "UpsideDown") == 0) {
+	        doc->orientation = UPSIDEDOWN;
 	    }
 	} else if (page_order_set == ATEND && iscomment(line+2, "PageOrder:")) {
 	    sscanf(line+length("%%PageOrder:"), "%256s", text);

@@ -7,6 +7,23 @@
 
 #include "../libspectre/spectre-utils.h"
 
+static const char *
+orientation_to_string (SpectreOrientation orientation)
+{
+	switch (orientation) {
+	case SPECTRE_ORIENTATION_PORTRAIT:
+		return "Portrait";
+	case SPECTRE_ORIENTATION_LANDSCAPE:
+		return "Landscape";
+	case SPECTRE_ORIENTATION_REVERSE_LANDSCAPE:
+		return "Reverse Landscape";
+	case SPECTRE_ORIENTATION_REVERSE_PORTRAIT:
+		return "Reverse Portrait";
+	}
+
+	return "Unknown Orientation";
+}
+
 int main (int argc, char **argv)
 {
 	SpectreDocument      *document;
@@ -24,6 +41,8 @@ int main (int argc, char **argv)
 		spectre_document_get_title (document));
 	printf ("Creator: %s\n",
 		spectre_document_get_creator (document));
+	printf ("Document Orientation: %s\n",
+		orientation_to_string (spectre_document_get_orientation (document)));
 
 	rc = spectre_render_context_new ();
 
@@ -44,6 +63,8 @@ int main (int argc, char **argv)
 
 		spectre_page_get_size (page, &width, &height);
 		printf ("Page %d size: %d x %d\n", i, width, height);
+		printf ("Page %d orientation: %s\n", i,
+			orientation_to_string (spectre_page_get_orientation (page)));
 
 		spectre_render_context_set_page_size (rc, width, height);
 		spectre_page_render (page, rc, &data, &row_length);
