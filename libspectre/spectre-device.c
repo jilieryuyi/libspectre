@@ -31,6 +31,13 @@
 #include "ghostscript/ierrors.h"
 #include "ghostscript/gdevdsp.h"
 
+#define BUFFER_SIZE 32768
+
+typedef enum {
+	CLEANUP_DELETE_INSTANCE = 1 << 0,
+	CLEANUP_EXIT            = 1 << 1
+} CleanupFlag;
+
 struct SpectreDevice {
 	struct document *doc;
 	
@@ -39,7 +46,6 @@ struct SpectreDevice {
 	unsigned char *gs_image; /*! Image buffer we received from Ghostscript library */
 	unsigned char **user_image;
 };
-
 
 static int
 spectre_open (void *handle, void *device)
@@ -118,39 +124,40 @@ static display_callback spectre_device = {
 	&spectre_page
 };
 
-static void
-handle_error_code (int code)
+static int
+critic_error_code (int code)
 {
 	if (code >= 0)
-		return;
+		return FALSE;
 	
 	if (code <= -100) {
 		switch (code) {
 			case e_Fatal:
-				printf ("fatal internal error %d", code);
+				fprintf (stderr, "fatal internal error %d", code);
+				return TRUE;
 				break;
 
 			case e_ExecStackUnderflow:
-				printf ("stack overflow %d", code);
+				fprintf (stderr, "stack overflow %d", code);
+				return TRUE;
 				break;
 
 			/* no error or not important */
 			default:
-				return;
+				return FALSE;
 		}
 	} else {
 		const char *errors[] = { "", ERROR_NAMES };
 		int x = (-1) * code;
 
 		if (x < sizeof (errors) / sizeof (const char*)) {
-			printf ("%s %d\n", errors[x], code);
+			fprintf (stderr, "%s %d\n", errors[x], code);
 		}
+		return TRUE;
 	}
 }
 
-#define BUFFER_SIZE 32768
-
-static void
+static SpectreStatus
 spectre_device_process (void       *ghostscript_instance,
 			const char *filename,
 			long        begin,
@@ -164,13 +171,19 @@ spectre_device_process (void       *ghostscript_instance,
 	size_t left = end - begin;
 	
 	fd = fopen (filename, "r");
-	/* FIXME: errors */
+	if (!fd) {
+		return SPECTRE_STATUS_RENDER_ERROR;
+	}
+	
 	fseek (fd, begin, SEEK_SET);
 
 	gsapi_run_string_begin (ghostscript_instance, 0, &error);
-	handle_error_code (error);
+	if (critic_error_code (error)) {
+		fclose (fd);
+		return SPECTRE_STATUS_RENDER_ERROR;
+	}
 
-	while (left > 0) {
+	while (left > 0 && !critic_error_code (error)) {
 		size_t to_read = BUFFER_SIZE;
 		
 		if (left < to_read)
@@ -179,14 +192,31 @@ spectre_device_process (void       *ghostscript_instance,
 		read = fread (buf, sizeof (char), to_read, fd);
 		wrote = gsapi_run_string_continue (ghostscript_instance,
 						   buf, read, 0, &error);
- 		handle_error_code (error);
 		left -= read;
 	}
 	
 	fclose (fd);
-	/* FIXME: errors */
+	if (critic_error_code (error))
+		return SPECTRE_STATUS_RENDER_ERROR;
+	
 	gsapi_run_string_end (ghostscript_instance, 0, &error);
-	handle_error_code (error);
+	if (critic_error_code (error))
+		return SPECTRE_STATUS_RENDER_ERROR;
+
+	return SPECTRE_STATUS_SUCCESS;
+}
+
+void
+spectre_device_cleanup (void *ghostscript_instance, CleanupFlag flag)
+{
+	if (ghostscript_instance == NULL)
+		return;
+
+	if (flag & CLEANUP_DELETE_INSTANCE)
+		gsapi_delete_instance (ghostscript_instance);
+
+	if (flag & CLEANUP_EXIT)
+		gsapi_exit (ghostscript_instance);
 }
 
 SpectreDevice *
@@ -203,7 +233,7 @@ spectre_device_new (struct document *doc)
 	return device;
 }
 
-void
+SpectreStatus
 spectre_device_render (SpectreDevice        *device,
 		       unsigned int          page,
 		       SpectreRenderContext *rc,
@@ -220,15 +250,22 @@ spectre_device_render (SpectreDevice        *device,
 	char *resolution, *set;
 	char *dsp_format, *dsp_handle;
 	int has_size = (rc->width != -1 && rc->height != -1);
+	SpectreStatus status;
 	
 	device->user_image = page_data;
 	
 	error = gsapi_new_instance (&ghostscript_instance, device);
-	handle_error_code (error);
+	if (critic_error_code (error)) {
+		spectre_device_cleanup (ghostscript_instance, CLEANUP_DELETE_INSTANCE);
+		return SPECTRE_STATUS_RENDER_ERROR;
+	}
 	
 	error = gsapi_set_display_callback (ghostscript_instance,
 					    &spectre_device);
-	handle_error_code (error);
+	if (critic_error_code (error)) {
+		spectre_device_cleanup (ghostscript_instance, CLEANUP_DELETE_INSTANCE);
+		return SPECTRE_STATUS_RENDER_ERROR;
+	}
 
 	if (has_size)
 		n_args++;
@@ -261,8 +298,6 @@ spectre_device_render (SpectreDevice        *device,
 		args[arg++] = "-dNOPLATFONTS";
 
 	error = gsapi_init_with_args (ghostscript_instance, n_args, args);
-	handle_error_code (error);
-
 	free (text_alpha);
 	free (graph_alpha);
 	free (size);
@@ -270,31 +305,61 @@ spectre_device_render (SpectreDevice        *device,
 	free (dsp_format);
 	free (dsp_handle);
 	free (args);
+	if (critic_error_code (error)) {
+		spectre_device_cleanup (ghostscript_instance,
+					CLEANUP_DELETE_INSTANCE | CLEANUP_EXIT);
+		return SPECTRE_STATUS_RENDER_ERROR;
+	}
 	
 	set = _spectre_strdup_printf ("<< /Orientation %1 >> setpagedevice .locksafe",
 				      rc->rotation);
 	gsapi_run_string_with_length (ghostscript_instance, set, strlen (set), 0, &error);
-	handle_error_code (error);
 	free (set);
+	if (critic_error_code (error)) {
+		spectre_device_cleanup (ghostscript_instance,
+					CLEANUP_DELETE_INSTANCE | CLEANUP_EXIT);
+		return SPECTRE_STATUS_RENDER_ERROR;
+	}
 	
-	spectre_device_process (ghostscript_instance,
-				device->doc->filename,
-				device->doc->beginprolog,
-				device->doc->endprolog);
-	spectre_device_process (ghostscript_instance,
-				device->doc->filename,
-				device->doc->beginsetup,
-				device->doc->endsetup);
-	spectre_device_process (ghostscript_instance,
-				device->doc->filename,
-				device->doc->pages[page].begin,
-				device->doc->pages[page].end);
+	status = spectre_device_process (ghostscript_instance,
+					 device->doc->filename,
+					 device->doc->beginprolog,
+					 device->doc->endprolog);
+	if (status != SPECTRE_STATUS_SUCCESS) {
+		spectre_device_cleanup (ghostscript_instance,
+					CLEANUP_DELETE_INSTANCE | CLEANUP_EXIT);
+		return status;
+	}
+	
+	status = spectre_device_process (ghostscript_instance,
+					 device->doc->filename,
+					 device->doc->beginsetup,
+					 device->doc->endsetup);
+	if (status != SPECTRE_STATUS_SUCCESS) {
+		spectre_device_cleanup (ghostscript_instance,
+					CLEANUP_DELETE_INSTANCE | CLEANUP_EXIT);
+		return status;
+	}
+				
+	status = spectre_device_process (ghostscript_instance,
+					 device->doc->filename,
+					 device->doc->pages[page].begin,
+					 device->doc->pages[page].end);
+	if (status != SPECTRE_STATUS_SUCCESS) {
+		spectre_device_cleanup (ghostscript_instance,
+					CLEANUP_DELETE_INSTANCE | CLEANUP_EXIT);
+		return status;
+	}
 	
 	*row_length = device->row_length;
 	
 	error = gsapi_exit (ghostscript_instance);
-	handle_error_code (error);
 	gsapi_delete_instance (ghostscript_instance);
+	
+	if (critic_error_code (error))
+		return SPECTRE_STATUS_RENDER_ERROR;
+
+	return SPECTRE_STATUS_SUCCESS;
 }
 
 void

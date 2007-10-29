@@ -23,6 +23,7 @@
 
 #include <libspectre/spectre-macros.h>
 #include <libspectre/spectre-render-context.h>
+#include <libspectre/spectre-status.h>
 
 #include "ps.h"
 
@@ -31,7 +32,7 @@ SPECTRE_BEGIN_DECLS
 typedef struct SpectreDevice SpectreDevice;
 
 SpectreDevice *spectre_device_new    (struct document      *doc);
-void           spectre_device_render (SpectreDevice        *device,
+SpectreStatus  spectre_device_render (SpectreDevice        *device,
 				      unsigned int          page,
 				      SpectreRenderContext *rc,
 				      unsigned char       **page_data,

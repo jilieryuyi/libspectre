@@ -30,7 +30,8 @@ typedef enum _SpectreStatus {
 	SPECTRE_STATUS_NO_MEMORY,
 	SPECTRE_STATUS_LOAD_ERROR,
 	SPECTRE_STATUS_DOCUMENT_NOT_LOADED,
-	SPECTRE_STATUS_INVALID_PAGE
+	SPECTRE_STATUS_INVALID_PAGE,
+	SPECTRE_STATUS_RENDER_ERROR
 } SpectreStatus;
 
 const char *spectre_status_to_string (SpectreStatus status);

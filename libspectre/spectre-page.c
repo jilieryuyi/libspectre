@@ -100,8 +100,8 @@ spectre_page_render (SpectrePage          *page,
 
 	device = spectre_device_new (page->doc);
 	
-	spectre_device_render (device, page->index, rc,
-			       page_data, row_length);
+	page->status = spectre_device_render (device, page->index, rc,
+					      page_data, row_length);
 	
 	spectre_device_free (device);
 }
