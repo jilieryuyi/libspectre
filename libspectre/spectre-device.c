@@ -35,8 +35,8 @@ struct SpectreDevice {
 	struct document *doc;
 	
 	int width, height;
-	int row_length; /* !Size of a horizontal row (y-line) in the image buffer */
-	unsigned char *gs_image; /* !Image buffer we received from Ghostscript library */
+	int row_length; /*! Size of a horizontal row (y-line) in the image buffer */
+	unsigned char *gs_image; /*! Image buffer we received from Ghostscript library */
 	unsigned char **user_image;
 };
 
