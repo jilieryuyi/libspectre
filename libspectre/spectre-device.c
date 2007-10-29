@@ -206,7 +206,7 @@ spectre_device_process (void       *ghostscript_instance,
 	return SPECTRE_STATUS_SUCCESS;
 }
 
-void
+static void
 spectre_device_cleanup (void *ghostscript_instance, CleanupFlag flag)
 {
 	if (ghostscript_instance == NULL)
