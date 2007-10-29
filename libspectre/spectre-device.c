@@ -353,6 +353,16 @@ spectre_device_render (SpectreDevice        *device,
 		}
 	}
 	
+	status = spectre_device_process (ghostscript_instance,
+					 device->doc->filename,
+					 device->doc->begintrailer,
+					 device->doc->endtrailer);
+	if (status != SPECTRE_STATUS_SUCCESS) {
+		spectre_device_cleanup (ghostscript_instance,
+					CLEANUP_DELETE_INSTANCE | CLEANUP_EXIT);
+		return status;
+	}
+	
 	*row_length = device->row_length;
 	
 	error = gsapi_exit (ghostscript_instance);
