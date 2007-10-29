@@ -392,14 +392,39 @@ psscan(const char *filename, int scanstyle)
 	return(NULL);
     }
 
-    /* Header comments */
+    /* HP printer job language data follows. Some printer drivers add pjl
+     * commands to switch a pjl printer to postscript mode. If no PS header
+     * follows, this seems to be a real pjl file. */
+    if(iscomment(line, "\033%-12345X@PJL")) {
+        /* read until first DSC comment */
+        while(readline(fd, &line, &position, &line_len) && (line[0] != '%')) ;
+	if(line[0] != '%') {
+	    fprintf(stderr, "psscan error: input files seems to be a PJL file.\n");
+	    ENDMESSAGE(psscan)
+	    ps_io_exit(fd);
+	    fclose (file);
+	    return (NULL);
+	}
+    }
 
-    if (line_len>1 && (iscomment(line,"%!PS-Adobe-") || iscomment(line + 1,"%!PS-Adobe-"))) {
+    /* Header comments */
+    
+    /* Header should start with "%!PS-Adobe-", but some programms omit
+     * parts of this or add a ^D at the beginning. */
+    if ((iscomment(line,"%!PS") || iscomment(line, "\004%!PS"))) {
       INFMESSAGE(found "PS-Adobe-" comment)
 
       doc = (struct document *) PS_malloc(sizeof(struct document));
       CHECK_MALLOCED(doc);
       memset(doc, 0, sizeof(struct document));
+
+      /* ignore possible leading ^D */
+      if (*line == '\004') {
+	  position++;
+	  line_len--;
+      }
+
+      text[0] = '\0';
       sscanf(line, "%*s %256s", text);
       /*###jp###*/
       /*doc->epsf = iscomment(text, "EPSF-");*/
@@ -409,11 +434,28 @@ psscan(const char *filename, int scanstyle)
       doc->beginheader = position;
       section_len = line_len;
     } else {
-      INFMESSAGE(unable to classify document)
-      ENDMESSAGE(psscan)
-      ps_io_exit(fd);
-      fclose (file);
-      return(NULL);
+	/* There are postscript documents that do not have
+	   %PS at the beginning, usually unstructured. We should GS decide
+	   For instance, the tech reports at this university:
+
+	   http://svrc.it.uq.edu.au/Bibliography/svrc-tr.html?94-45
+
+	   add ugly PostScript before the actual document. 
+
+	   GS and gv is
+	   able to display them correctly as unstructured PS.
+
+	   In a way, this makes sense, a program PostScript does not need
+	   the !PS at the beginning.
+	*/
+	doc = (struct document *) PS_malloc(sizeof(struct document));
+	CHECK_MALLOCED(doc);
+	memset(doc, 0, sizeof(struct document));
+	doc->default_page_orientation = NONE;
+	doc->orientation = NONE;
+	ps_io_exit(fd);
+	fclose (file);
+	return (doc);
     }
     
     preread = 0;
@@ -1357,9 +1399,9 @@ ps_gettext(line, next_char)
 	    }
         }
         /* Delete trailing ')' */
-        if (*line)
+        if (*line == ')')
           {
-            *line++;
+            line++;
           }
     } else {
         while (*line && !(*line == ' ' || *line == '\t' || *line == '\n')) {
