@@ -449,6 +449,7 @@ psscan(const char *filename, int scanstyle)
 	doc = (struct document *) PS_malloc(sizeof(struct document));
 	CHECK_MALLOCED(doc);
 	memset(doc, 0, sizeof(struct document));
+	doc->ref_count = 1;
 	doc->default_page_orientation = NONE;
 	doc->orientation = NONE;
 	ps_io_exit(fd);
