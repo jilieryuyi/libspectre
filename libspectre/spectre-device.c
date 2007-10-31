@@ -160,6 +160,8 @@ critic_error_code (int code)
 static SpectreStatus
 spectre_device_process (void       *ghostscript_instance,
 			const char *filename,
+			int         x,
+			int         y,
 			long        begin,
 			long        end)
 {
@@ -181,6 +183,19 @@ spectre_device_process (void       *ghostscript_instance,
 	if (critic_error_code (error)) {
 		fclose (fd);
 		return SPECTRE_STATUS_RENDER_ERROR;
+	}
+
+	if (x != 0 && y != 0) {
+		char *set;
+		
+		set = _spectre_strdup_printf ("%d %d translate\n", -x, -y);
+		gsapi_run_string_continue (ghostscript_instance, set, strlen (set),
+					   0, &error);
+		free (set);
+		if (critic_error_code (error)) {
+			fclose (fd);
+			return SPECTRE_STATUS_RENDER_ERROR;
+		}
 	}
 
 	while (left > 0 && !critic_error_code (error)) {
@@ -250,6 +265,7 @@ spectre_device_render (SpectreDevice        *device,
 	char *resolution, *set;
 	char *dsp_format, *dsp_handle;
 	int has_size = (rc->width != -1 && rc->height != -1);
+	int urx, ury, llx, lly;
 	SpectreStatus status;
 	
 	device->user_image = page_data;
@@ -310,8 +326,8 @@ spectre_device_render (SpectreDevice        *device,
 					CLEANUP_DELETE_INSTANCE | CLEANUP_EXIT);
 		return SPECTRE_STATUS_RENDER_ERROR;
 	}
-	
-	set = _spectre_strdup_printf ("<< /Orientation %1 >> setpagedevice .locksafe",
+
+	set = _spectre_strdup_printf ("<< /Orientation %d >> setpagedevice .locksafe",
 				      rc->rotation);
 	gsapi_run_string_with_length (ghostscript_instance, set, strlen (set), 0, &error);
 	free (set);
@@ -320,9 +336,13 @@ spectre_device_render (SpectreDevice        *device,
 					CLEANUP_DELETE_INSTANCE | CLEANUP_EXIT);
 		return SPECTRE_STATUS_RENDER_ERROR;
 	}
+
+	psgetpagebox (device->doc, page,
+		      &urx, &ury, &llx, &lly);
 	
 	status = spectre_device_process (ghostscript_instance,
 					 device->doc->filename,
+					 llx, lly,
 					 device->doc->beginprolog,
 					 device->doc->endprolog);
 	if (status != SPECTRE_STATUS_SUCCESS) {
@@ -333,6 +353,7 @@ spectre_device_render (SpectreDevice        *device,
 	
 	status = spectre_device_process (ghostscript_instance,
 					 device->doc->filename,
+					 0, 0,
 					 device->doc->beginsetup,
 					 device->doc->endsetup);
 	if (status != SPECTRE_STATUS_SUCCESS) {
@@ -345,6 +366,7 @@ spectre_device_render (SpectreDevice        *device,
 	    (device->doc->epsf && device->doc->numpages > 1)) {
 		status = spectre_device_process (ghostscript_instance,
 						 device->doc->filename,
+						 0, 0,
 						 device->doc->pages[page].begin,
 						 device->doc->pages[page].end);
 		if (status != SPECTRE_STATUS_SUCCESS) {
@@ -356,6 +378,7 @@ spectre_device_render (SpectreDevice        *device,
 	
 	status = spectre_device_process (ghostscript_instance,
 					 device->doc->filename,
+					 0, 0,
 					 device->doc->begintrailer,
 					 device->doc->endtrailer);
 	if (status != SPECTRE_STATUS_SUCCESS) {
