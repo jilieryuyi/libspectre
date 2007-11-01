@@ -82,9 +82,7 @@ spectre_page_get_orientation (SpectrePage *page)
 {
 	int page_orientation = NONE;
 
-	if ((!page->doc->epsf && page->doc->numpages > 0) ||
-	    (page->doc->epsf && page->doc->numpages > 1)) {
-		/* Structured doc */
+	if (page->doc->numpages > 0) {
 		page_orientation = page->doc->pages[page->index].orientation != NONE ?
 			page->doc->pages[page->index].orientation :
 			page->doc->default_page_orientation;
