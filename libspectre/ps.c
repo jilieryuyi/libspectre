@@ -453,9 +453,6 @@ psscan(const char *filename, int scanstyle)
 	doc->filename = strdup (filename);
 	doc->default_page_orientation = NONE;
 	doc->orientation = NONE;
-	ps_io_exit(fd);
-	fclose (file);
-	return (doc);
     }
     
     preread = 0;
