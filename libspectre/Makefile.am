@@ -5,7 +5,7 @@ INCLUDES = 			\
 
 lib_LTLIBRARIES = libspectre.la
 
-libspectreincludedir = $(includedir)/libscpectre
+libspectreincludedir = $(includedir)/libspectre
 libspectreinclude_HEADERS =		\
 	spectre.h			\
 	spectre-macros.h		\
