@@ -29,15 +29,15 @@
 SPECTRE_BEGIN_DECLS
 
 struct SpectreRenderContext {
-	double       scale;
-	unsigned int rotation;
-	double       x_dpi;
-	double       y_dpi;
-	int          width;
-	int          height;
-	int          text_alpha_bits;
-	int          graphic_alpha_bits;
-	int          use_platform_fonts;
+	double             scale;
+	SpectreOrientation orientation;
+	double             x_dpi;
+	double             y_dpi;
+	int                width;
+	int                height;
+	int                text_alpha_bits;
+	int                graphic_alpha_bits;
+	int                use_platform_fonts;
 };
 
 SpectrePage *_spectre_page_new (unsigned int     page_index,

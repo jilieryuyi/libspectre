@@ -21,6 +21,7 @@
 #include <stdlib.h>
 
 #include "spectre-render-context.h"
+#include "spectre-page.h"
 #include "spectre-private.h"
 
 SpectreRenderContext *
@@ -32,7 +33,7 @@ spectre_render_context_new (void)
 
 	/* TODO: document default values */
 	rc->scale = 1.0;
-	rc->rotation = 0;
+	rc->orientation = 0;
 	rc->x_dpi = 72.0;
 	rc->y_dpi = 72.0;
 	rc->width = -1;
@@ -79,7 +80,16 @@ spectre_render_context_set_rotation (SpectreRenderContext *rc,
 	if (!rc)
 		return;
 
-	rc->rotation = rotation;
+	rotation %= 360;
+
+	if (rotation >= 0 && rotation < 90)
+		rc->orientation = SPECTRE_ORIENTATION_PORTRAIT;
+	else if (rotation >= 90 && rotation < 180)
+		rc->orientation = SPECTRE_ORIENTATION_LANDSCAPE;
+	else if (rotation >= 180 && rotation < 270)
+		rc->orientation = SPECTRE_ORIENTATION_REVERSE_PORTRAIT;
+	else if (rotation >= 270 && rotation < 360)
+		rc->orientation = SPECTRE_ORIENTATION_REVERSE_LANDSCAPE;
 }
 	
 unsigned int
@@ -88,7 +98,19 @@ spectre_render_context_get_rotation (SpectreRenderContext *rc)
 	if (!rc)
 		return 0;
 
-	return rc->rotation;
+	switch (rc->orientation) {
+	default:
+	case SPECTRE_ORIENTATION_PORTRAIT:
+		return 0;
+	case SPECTRE_ORIENTATION_LANDSCAPE:
+		return 90;
+	case SPECTRE_ORIENTATION_REVERSE_PORTRAIT:
+		return 180;
+	case SPECTRE_ORIENTATION_REVERSE_LANDSCAPE:
+		return 270;
+	}
+	
+	return 0;
 }
 
 void

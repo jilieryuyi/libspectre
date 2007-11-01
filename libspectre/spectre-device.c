@@ -187,7 +187,7 @@ spectre_device_process (void       *ghostscript_instance,
 
 	if (x != 0 && y != 0) {
 		char *set;
-		
+
 		set = _spectre_strdup_printf ("%d %d translate\n", -x, -y);
 		gsapi_run_string_continue (ghostscript_instance, set, strlen (set),
 					   0, &error);
@@ -257,15 +257,15 @@ spectre_device_render (SpectreDevice        *device,
 {
 	void *ghostscript_instance;
 	char **args;
-	int n_args = 9;
+	int n_args = 10;
 	int arg = 0;
 	int error;
 	char *text_alpha, *graph_alpha;
 	char *size = NULL;
 	char *resolution, *set;
 	char *dsp_format, *dsp_handle;
-	int has_size = (rc->width != -1 && rc->height != -1);
 	int urx, ury, llx, lly;
+	int width, height;
 	SpectreStatus status;
 	
 	device->user_image = page_data;
@@ -283,8 +283,26 @@ spectre_device_render (SpectreDevice        *device,
 		return SPECTRE_STATUS_RENDER_ERROR;
 	}
 
-	if (has_size)
-		n_args++;
+	psgetpagebox (device->doc, page,
+		      &urx, &ury, &llx, &lly);
+
+	if (rc->width == -1 || rc->height == -1) {
+		switch (rc->orientation) {
+		case SPECTRE_ORIENTATION_PORTRAIT:
+		case SPECTRE_ORIENTATION_REVERSE_PORTRAIT:
+			width = (urx - llx) * rc->scale;
+			height = (ury - lly) * rc->scale;
+			break;
+		case SPECTRE_ORIENTATION_LANDSCAPE:
+		case SPECTRE_ORIENTATION_REVERSE_LANDSCAPE:
+			width = (ury - lly) * rc->scale;
+			height = (urx - llx) * rc->scale;
+		}
+	} else {
+		width = rc->width;
+		height = rc->height;
+	}
+
 	if (rc->use_platform_fonts == FALSE)
 		n_args++;
 	
@@ -297,8 +315,7 @@ spectre_device_render (SpectreDevice        *device,
 							 rc->text_alpha_bits);
 	args[arg++] = graph_alpha = _spectre_strdup_printf("-dGraphicsAlphaBits=%d",
 							   rc->graphic_alpha_bits);
-	if (has_size)
-		args[arg++] = size =_spectre_strdup_printf ("-g%dx%d", rc->width, rc->height);
+	args[arg++] = size =_spectre_strdup_printf ("-g%dx%d", width, height);
 	args[arg++] = resolution = _spectre_strdup_printf ("-r%fx%f",
 							   rc->scale * rc->x_dpi,
 							   rc->scale * rc->y_dpi);
@@ -328,7 +345,7 @@ spectre_device_render (SpectreDevice        *device,
 	}
 
 	set = _spectre_strdup_printf ("<< /Orientation %d >> setpagedevice .locksafe",
-				      rc->rotation);
+				      rc->orientation);
 	gsapi_run_string_with_length (ghostscript_instance, set, strlen (set), 0, &error);
 	free (set);
 	if (critic_error_code (error)) {
@@ -337,9 +354,6 @@ spectre_device_render (SpectreDevice        *device,
 		return SPECTRE_STATUS_RENDER_ERROR;
 	}
 
-	psgetpagebox (device->doc, page,
-		      &urx, &ury, &llx, &lly);
-	
 	status = spectre_device_process (ghostscript_instance,
 					 device->doc->filename,
 					 llx, lly,
