@@ -45,6 +45,7 @@ struct SpectreDevice {
 	int row_length; /*! Size of a horizontal row (y-line) in the image buffer */
 	unsigned char *gs_image; /*! Image buffer we received from Ghostscript library */
 	unsigned char **user_image;
+	int page_called;
 };
 
 static int
@@ -106,6 +107,7 @@ spectre_page (void *handle, void * device, int copies, int flush)
 		return 0;
 	
 	sd = (SpectreDevice *)handle;
+	sd->page_called = TRUE;
 	memcpy (*sd->user_image, sd->gs_image, sd->row_length * sd->height);
 	
 	return 0;
@@ -121,7 +123,7 @@ spectre_update (void *handle, void *device, int x, int y, int w, int h)
 		return 0;
 
 	sd = (SpectreDevice *)handle;
-	if (!sd->gs_image)
+	if (!sd->gs_image || sd->page_called)
 		return 0;
 	
 	for (i = y; i < y + h; ++i) {
