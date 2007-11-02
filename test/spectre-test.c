@@ -24,6 +24,67 @@ orientation_to_string (SpectreOrientation orientation)
 	return "Unknown Orientation";
 }
 
+static void
+test_rotation (SpectreDocument *document,
+	       const char      *output)
+{
+	SpectrePage          *page;
+	SpectreRenderContext *rc;
+	int                   i;
+	int                   width_points;
+	int                   height_points;
+
+	page = spectre_document_get_page (document, 0);
+
+	spectre_page_get_size (page, &width_points, &height_points);
+
+	rc = spectre_render_context_new ();
+	
+	for (i = 0; i < 4; i++) {
+		cairo_surface_t *surface;
+		char            *filename;
+		int              rotation;
+		int              width, height;
+		unsigned char   *data = NULL;
+		int              row_length;
+
+		rotation = 90 * i;
+
+		if (rotation == 90 || rotation == 270) {
+			width = height_points;
+			height = width_points;
+		} else {
+			width = width_points;
+			height = height_points;
+		}
+
+		spectre_render_context_set_rotation (rc, rotation);
+		spectre_page_render (page, rc, &data, &row_length);
+		if (spectre_page_status (page)) {
+			printf ("Error rendering page %d at rotation %d: %s\n", i, rotation, 
+				spectre_status_to_string (spectre_page_status (page)));
+			free (data);
+			continue;
+		}
+
+		surface = cairo_image_surface_create_for_data (data,
+							       CAIRO_FORMAT_RGB24,
+							       width, height,
+							       row_length);
+
+		filename = _spectre_strdup_printf ("%s/page-rotated-%d.png", output, rotation);
+		cairo_surface_write_to_png (surface, filename);
+		free (filename);
+
+		cairo_surface_destroy (surface);
+		free (data);
+	}
+
+	spectre_render_context_free (rc);
+	spectre_page_free (page);
+}
+	
+
 int main (int argc, char **argv)
 {
 	SpectreDocument      *document;
@@ -91,6 +152,9 @@ int main (int argc, char **argv)
 	}
 
 	spectre_render_context_free (rc);
+
+	test_rotation (document, argv[2]);
+	
 	spectre_document_free (document);
 	
 	return 0;

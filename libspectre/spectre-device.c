@@ -70,6 +70,18 @@ static int
 spectre_presize (void *handle, void *device, int width, int height,
 		 int raster, unsigned int format)
 {
+	SpectreDevice *sd;
+
+	if (!handle)
+		return 0;
+
+	sd = (SpectreDevice *)handle;
+	sd->width = width;
+	sd->height = height;
+	sd->row_length = raster;
+	sd->gs_image = NULL;
+	*sd->user_image = malloc (sd->row_length * sd->height);
+	
 	return 0;
 }
 
@@ -78,16 +90,12 @@ spectre_size (void *handle, void *device, int width, int height, int raster,
 	      unsigned int format, unsigned char *pimage)
 {
 	SpectreDevice *sd;
-	
+
 	if (!handle)
 		return 0;
-	
+
 	sd = (SpectreDevice *)handle;
-	sd->width = width;
-	sd->height = height;
-	sd->row_length = raster;
 	sd->gs_image = pimage;
-	*sd->user_image = malloc (sd->row_length * sd->height);
 
 	return 0;
 }
@@ -102,7 +110,7 @@ static int
 spectre_page (void *handle, void * device, int copies, int flush)
 {
 	SpectreDevice *sd;
-	
+
 	if (!handle)
 		return 0;
 	
@@ -118,14 +126,14 @@ spectre_update (void *handle, void *device, int x, int y, int w, int h)
 {
 	SpectreDevice *sd;
 	int i;
-	
+
 	if (!handle)
 		return 0;
 
 	sd = (SpectreDevice *)handle;
-	if (!sd->gs_image || sd->page_called)
+	if (!sd->gs_image || sd->page_called || !*sd->user_image)
 		return 0;
-	
+
 	for (i = y; i < y + h; ++i) {
 		memcpy (*sd->user_image + sd->row_length * i + x * 4,
 			sd->gs_image + sd->row_length * i + x * 4, w * 4);
@@ -311,17 +319,8 @@ spectre_device_render (SpectreDevice        *device,
 		      &urx, &ury, &llx, &lly);
 
 	if (rc->width == -1 || rc->height == -1) {
-		switch (rc->orientation) {
-		case SPECTRE_ORIENTATION_PORTRAIT:
-		case SPECTRE_ORIENTATION_REVERSE_PORTRAIT:
-			width = (urx - llx) * rc->scale;
-			height = (ury - lly) * rc->scale;
-			break;
-		case SPECTRE_ORIENTATION_LANDSCAPE:
-		case SPECTRE_ORIENTATION_REVERSE_LANDSCAPE:
-			width = (ury - lly) * rc->scale;
-			height = (urx - llx) * rc->scale;
-		}
+		width = (urx - llx) * rc->scale;
+		height = (ury - lly) * rc->scale;
 	} else {
 		width = rc->width;
 		height = rc->height;
