@@ -86,6 +86,7 @@ spectre_size (void *handle, void *device, int width, int height, int raster,
 	sd->height = height;
 	sd->row_length = raster;
 	sd->gs_image = pimage;
+	*sd->user_image = malloc (sd->row_length * sd->height);
 
 	return 0;
 }
@@ -105,8 +106,28 @@ spectre_page (void *handle, void * device, int copies, int flush)
 		return 0;
 	
 	sd = (SpectreDevice *)handle;
-	*sd->user_image = malloc (sd->row_length * sd->height);
 	memcpy (*sd->user_image, sd->gs_image, sd->row_length * sd->height);
+	
+	return 0;
+}
+
+static int
+spectre_update (void *handle, void *device, int x, int y, int w, int h)
+{
+	SpectreDevice *sd;
+	int i;
+	
+	if (!handle)
+		return 0;
+
+	sd = (SpectreDevice *)handle;
+	if (!sd->gs_image)
+		return 0;
+	
+	for (i = y; i < y + h; ++i) {
+		memcpy (*sd->user_image + sd->row_length * i + x * 4,
+			sd->gs_image + sd->row_length * i + x * 4, w * 4);
+	}
 	
 	return 0;
 }
@@ -121,7 +142,8 @@ static display_callback spectre_device = {
 	&spectre_presize,
 	&spectre_size,
 	&spectre_sync,
-	&spectre_page
+	&spectre_page,
+	&spectre_update
 };
 
 static int
@@ -243,7 +265,7 @@ spectre_device_new (struct document *doc)
 	if (!device)
 		return NULL;
 
-	device->doc = psdocreference (doc); 
+	device->doc = psdocreference (doc);
 	
 	return device;
 }
