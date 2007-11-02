@@ -44,7 +44,7 @@ struct SpectreDevice {
 	int width, height;
 	int row_length; /*! Size of a horizontal row (y-line) in the image buffer */
 	unsigned char *gs_image; /*! Image buffer we received from Ghostscript library */
-	unsigned char **user_image;
+	unsigned char *user_image;
 	int page_called;
 };
 
@@ -80,7 +80,7 @@ spectre_presize (void *handle, void *device, int width, int height,
 	sd->height = height;
 	sd->row_length = raster;
 	sd->gs_image = NULL;
-	*sd->user_image = malloc (sd->row_length * sd->height);
+	sd->user_image = malloc (sd->row_length * sd->height);
 	
 	return 0;
 }
@@ -101,7 +101,7 @@ spectre_size (void *handle, void *device, int width, int height, int raster,
 }
 
 static int
-spectre_sync (void *handle, void *device )
+spectre_sync (void *handle, void *device)
 {
 	return 0;
 }
@@ -116,7 +116,7 @@ spectre_page (void *handle, void * device, int copies, int flush)
 	
 	sd = (SpectreDevice *)handle;
 	sd->page_called = TRUE;
-	memcpy (*sd->user_image, sd->gs_image, sd->row_length * sd->height);
+	memcpy (sd->user_image, sd->gs_image, sd->row_length * sd->height);
 	
 	return 0;
 }
@@ -131,11 +131,11 @@ spectre_update (void *handle, void *device, int x, int y, int w, int h)
 		return 0;
 
 	sd = (SpectreDevice *)handle;
-	if (!sd->gs_image || sd->page_called || !*sd->user_image)
+	if (!sd->gs_image || sd->page_called || !sd->user_image)
 		return 0;
 
 	for (i = y; i < y + h; ++i) {
-		memcpy (*sd->user_image + sd->row_length * i + x * 4,
+		memcpy (sd->user_image + sd->row_length * i + x * 4,
 			sd->gs_image + sd->row_length * i + x * 4, w * 4);
 	}
 	
@@ -297,10 +297,10 @@ spectre_device_render (SpectreDevice        *device,
 	char *resolution, *set;
 	char *dsp_format, *dsp_handle;
 	int urx, ury, llx, lly;
+	int page_width, page_height;
+	double x_scale, y_scale;
 	int width, height;
 	SpectreStatus status;
-	
-	device->user_image = page_data;
 	
 	error = gsapi_new_instance (&ghostscript_instance, device);
 	if (critic_error_code (error)) {
@@ -318,12 +318,22 @@ spectre_device_render (SpectreDevice        *device,
 	psgetpagebox (device->doc, page,
 		      &urx, &ury, &llx, &lly);
 
+	page_width = (urx - llx);
+	page_height = (ury - lly);
+
 	if (rc->width == -1 || rc->height == -1) {
-		width = (urx - llx) * rc->scale;
-		height = (ury - lly) * rc->scale;
+		width = page_width * rc->scale;
+		height = page_height * rc->scale;
 	} else {
 		width = rc->width;
 		height = rc->height;
+	}
+
+	if (rc->scale == 1.0 && (width != page_width || height != page_height)) {
+		x_scale = width / (double)page_width;
+		y_scale = height / (double)page_height;
+	} else {
+		x_scale = y_scale = rc->scale;
 	}
 
 	if (rc->use_platform_fonts == FALSE)
@@ -340,8 +350,8 @@ spectre_device_render (SpectreDevice        *device,
 							   rc->graphic_alpha_bits);
 	args[arg++] = size =_spectre_strdup_printf ("-g%dx%d", width, height);
 	args[arg++] = resolution = _spectre_strdup_printf ("-r%fx%f",
-							   rc->scale * rc->x_dpi,
-							   rc->scale * rc->y_dpi);
+							   x_scale * rc->x_dpi,
+							   y_scale * rc->y_dpi);
 	args[arg++] = dsp_format = _spectre_strdup_printf ("-dDisplayFormat=%d",
 							   DISPLAY_COLORS_RGB |
 							   DISPLAY_UNUSED_LAST |
@@ -422,9 +432,10 @@ spectre_device_render (SpectreDevice        *device,
 					CLEANUP_DELETE_INSTANCE | CLEANUP_EXIT);
 		return status;
 	}
-	
+
+	*page_data = device->user_image;
 	*row_length = device->row_length;
-	
+
 	error = gsapi_exit (ghostscript_instance);
 	gsapi_delete_instance (ghostscript_instance);
 	
