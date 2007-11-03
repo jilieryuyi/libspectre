@@ -287,7 +287,7 @@ spectre_device_render (SpectreDevice        *device,
 		       unsigned char       **page_data,
 		       int                  *row_length)
 {
-	void *ghostscript_instance;
+	void *ghostscript_instance = NULL;
 	char **args;
 	int n_args = 10;
 	int arg = 0;
