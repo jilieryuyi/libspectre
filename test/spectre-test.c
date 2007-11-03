@@ -42,6 +42,8 @@ test_metadata (SpectreDocument *document)
 		spectre_document_get_title (document));
 	printf ("Creator: %s\n",
 		spectre_document_get_creator (document));
+	printf ("Creation date: %s\n",
+		spectre_document_get_creation_date (document));
 	printf ("Document Orientation: %s\n",
 		orientation_to_string (spectre_document_get_orientation (document)));
 }

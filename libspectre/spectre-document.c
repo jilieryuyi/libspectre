@@ -81,7 +81,7 @@ spectre_document_free (SpectreDocument *document)
 		psdocdestroy (document->doc);
 		document->doc = NULL;
 	}
-	
+
 	free (document);
 }
 
@@ -148,6 +148,17 @@ spectre_document_get_creator (SpectreDocument *document)
 	}
 
 	return document->doc->creator;
+}
+
+const char *
+spectre_document_get_creation_date (SpectreDocument *document)
+{
+	if (!document->doc) {
+		document->status = SPECTRE_STATUS_DOCUMENT_NOT_LOADED;
+		return NULL;
+	}
+	
+	return document->doc->date;
 }
 
 const char *

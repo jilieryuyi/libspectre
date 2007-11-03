@@ -39,6 +39,7 @@ unsigned int       spectre_document_get_n_pages        (SpectreDocument *documen
 SpectreOrientation spectre_document_get_orientation    (SpectreDocument *document);
 const char        *spectre_document_get_title          (SpectreDocument *document);
 const char        *spectre_document_get_creator        (SpectreDocument *document);
+const char        *spectre_document_get_creation_date  (SpectreDocument *document);
 const char        *spectre_document_get_format         (SpectreDocument *document);
 int                spectre_document_is_eps             (SpectreDocument *document);
 unsigned int       spectre_document_get_language_level (SpectreDocument *document);
