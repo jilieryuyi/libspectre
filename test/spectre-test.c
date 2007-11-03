@@ -27,6 +27,11 @@ orientation_to_string (SpectreOrientation orientation)
 static void
 test_metadata (SpectreDocument *document)
 {
+	const char *format;
+
+	format = spectre_document_get_format (document);
+	printf ("Document format: %s\n",
+		format ? format : "Unknown");
 	printf ("Postscript language level: %d\n",
 		spectre_document_get_language_level (document));
 	printf ("Encapsulated PostScript: %s\n",

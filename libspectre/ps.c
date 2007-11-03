@@ -422,15 +422,18 @@ psscan(const char *filename, int scanstyle)
 	  line_len--;
       }
 
-      text[0] = '\0';
-      sscanf(line, "%*s %256s", text);
-      /*###jp###*/
-      /*doc->epsf = iscomment(text, "EPSF-");*/
       doc->ref_count = 1;
       doc->filename = strdup (filename);
-      doc->epsf = iscomment(text, "EPSF");
       doc->beginheader = position;
       section_len = line_len;
+
+      text[0] = '\0';
+      sscanf(line, "%%!%256s %*s", text);
+      doc->format = strdup (text);
+      
+      text[0] = '\0';
+      sscanf(line, "%*s %256s", text);
+      doc->epsf = iscomment(text, "EPSF");
     } else {
 	/* There are postscript documents that do not have
 	   %PS at the beginning, usually unstructured. We should GS decide
@@ -1271,6 +1274,7 @@ psfree(doc)
 	for (i=0; i<doc->nummedia; i++) {
 	    if (doc->media[i].name) PS_free(doc->media[i].name);
 	}
+	if (doc->format) PS_free(doc->format);
 	if (doc->filename) PS_free(doc->filename);
 	if (doc->creator) PS_free(doc->creator);
 	if (doc->title) PS_free(doc->title);

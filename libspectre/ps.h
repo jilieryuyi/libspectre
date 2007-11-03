@@ -85,6 +85,7 @@ typedef struct document {
     int  structured;                    /* toc will be useful */ 
     int  labels_useful;                 /* page labels are distinguishable, hence useful */ 
 #endif
+    char *format;                       /* Postscript format */
     char *filename;                     /* Document filename */
     int  epsf;				/* Encapsulated PostScript flag. */
     char *title;			/* Title of document. */

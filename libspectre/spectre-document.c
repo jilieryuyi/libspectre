@@ -150,6 +150,17 @@ spectre_document_get_creator (SpectreDocument *document)
 	return document->doc->creator;
 }
 
+const char *
+spectre_document_get_format (SpectreDocument *document)
+{
+	if (!document->doc) {
+		document->status = SPECTRE_STATUS_DOCUMENT_NOT_LOADED;
+		return NULL;
+	}
+
+	return document->doc->format;
+}
+
 int
 spectre_document_is_eps (SpectreDocument *document)
 {
