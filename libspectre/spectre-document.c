@@ -150,6 +150,17 @@ spectre_document_get_creator (SpectreDocument *document)
 	return document->doc->creator;
 }
 
+int
+spectre_document_is_eps (SpectreDocument *document)
+{
+	if (!document->doc) {
+		document->status = SPECTRE_STATUS_DOCUMENT_NOT_LOADED;
+		return FALSE;
+	}
+
+	return document->doc->epsf;
+}
+
 SpectrePage *
 spectre_document_get_page (SpectreDocument *document,
 			   unsigned int     page_index)
