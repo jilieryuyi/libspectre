@@ -29,19 +29,20 @@ SPECTRE_BEGIN_DECLS
 
 typedef struct SpectreDocument SpectreDocument;
 
-SpectreDocument   *spectre_document_new             (void);
-void               spectre_document_load            (SpectreDocument *document,
-						     const char      *filename);
-SpectreStatus      spectre_document_status          (SpectreDocument *document);
-void               spectre_document_free            (SpectreDocument *document);
+SpectreDocument   *spectre_document_new                (void);
+void               spectre_document_load               (SpectreDocument *document,
+							const char      *filename);
+SpectreStatus      spectre_document_status             (SpectreDocument *document);
+void               spectre_document_free               (SpectreDocument *document);
 
-unsigned int       spectre_document_get_n_pages     (SpectreDocument *document);
-SpectreOrientation spectre_document_get_orientation (SpectreDocument *document);
-const char        *spectre_document_get_title       (SpectreDocument *document);
-const char        *spectre_document_get_creator     (SpectreDocument *document);
-int                spectre_document_is_eps          (SpectreDocument *document);
-SpectrePage       *spectre_document_get_page        (SpectreDocument *document,
-						     unsigned int     page_index);
+unsigned int       spectre_document_get_n_pages        (SpectreDocument *document);
+SpectreOrientation spectre_document_get_orientation    (SpectreDocument *document);
+const char        *spectre_document_get_title          (SpectreDocument *document);
+const char        *spectre_document_get_creator        (SpectreDocument *document);
+int                spectre_document_is_eps             (SpectreDocument *document);
+unsigned int       spectre_document_get_language_level (SpectreDocument *document);
+SpectrePage       *spectre_document_get_page           (SpectreDocument *document,
+							unsigned int     page_index);
 
 SPECTRE_END_DECLS
 

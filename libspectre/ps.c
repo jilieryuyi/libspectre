@@ -470,6 +470,8 @@ psscan(const char *filename, int scanstyle)
 	    doc->title = gettextline(line+length("%%Title:"));
 	} else if (doc->date == NULL && iscomment(line+2, "CreationDate:")) {
 	    doc->date = gettextline(line+length("%%CreationDate:"));
+	} else if (doc->languagelevel == NULL && iscomment(line+2, "LanguageLevel:")) {
+	    doc->languagelevel = gettextline(line+length("%%LanguageLevel:"));
 	} else if(doc->creator == NULL && iscomment(line + 2, "Creator:")) {
 	    doc->creator = gettextline(line + length("%%Creator:"));
 	} else if (bb_set == NONE && iscomment(line+2, "BoundingBox:")) {
@@ -1275,6 +1277,7 @@ psfree(doc)
 	if (doc->date) PS_free(doc->date);
 	if (doc->pages) PS_free(doc->pages);
 	if (doc->media) PS_free(doc->media);
+	if (doc->languagelevel) PS_free(doc->languagelevel);
 	PS_free(doc);
     }
     ENDMESSAGE(psfree)

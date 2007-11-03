@@ -161,6 +161,17 @@ spectre_document_is_eps (SpectreDocument *document)
 	return document->doc->epsf;
 }
 
+unsigned int 
+spectre_document_get_language_level (SpectreDocument *document)
+{
+	if (!document->doc) {
+		document->status = SPECTRE_STATUS_DOCUMENT_NOT_LOADED;
+		return 0;
+	}
+
+	return document->doc->languagelevel ? atoi (document->doc->languagelevel) : 0;
+}
+
 SpectrePage *
 spectre_document_get_page (SpectreDocument *document,
 			   unsigned int     page_index)
