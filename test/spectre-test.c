@@ -25,6 +25,23 @@ orientation_to_string (SpectreOrientation orientation)
 }
 
 static void
+test_metadata (SpectreDocument *document)
+{
+	printf ("Postscript language level: %d\n",
+		spectre_document_get_language_level (document));
+	printf ("Encapsulated PostScript: %s\n",
+		spectre_document_is_eps (document) ? "Yes" : "No");
+	printf ("Number of pages: %d\n",
+		spectre_document_get_n_pages (document));
+	printf ("Title: %s\n",
+		spectre_document_get_title (document));
+	printf ("Creator: %s\n",
+		spectre_document_get_creator (document));
+	printf ("Document Orientation: %s\n",
+		orientation_to_string (spectre_document_get_orientation (document)));
+}
+
+static void
 test_rotation (SpectreDocument *document,
 	       const char      *output)
 {
@@ -83,7 +100,6 @@ test_rotation (SpectreDocument *document,
 	spectre_render_context_free (rc);
 	spectre_page_free (page);
 }
-	
 
 int main (int argc, char **argv)
 {
@@ -96,14 +112,7 @@ int main (int argc, char **argv)
 	document = spectre_document_new ();
 	spectre_document_load (document, argv[1]);
 
-	printf ("Number of pages: %d\n",
-		spectre_document_get_n_pages (document));
-	printf ("Title: %s\n",
-		spectre_document_get_title (document));
-	printf ("Creator: %s\n",
-		spectre_document_get_creator (document));
-	printf ("Document Orientation: %s\n",
-		orientation_to_string (spectre_document_get_orientation (document)));
+	test_metadata (document);
 
 	rc = spectre_render_context_new ();
 
