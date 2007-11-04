@@ -12,7 +12,8 @@ libspectreinclude_HEADERS =		\
 	spectre-status.h		\
 	spectre-document.h		\
 	spectre-render-context.h	\
-	spectre-page.h
+	spectre-page.h			\
+	spectre-exporter.h
 
 gv_sources = 				\
 	ps.h				\
@@ -26,12 +27,18 @@ libspectre_la_SOURCES = 		\
 	spectre-status.c		\
 	spectre-document.h		\
 	spectre-document.c		\
+	spectre-gs.h			\
+	spectre-gs.c			\
 	spectre-render-context.h	\
 	spectre-render-context.c	\
 	spectre-device.h		\
 	spectre-device.c		\
 	spectre-page.h			\
 	spectre-page.c			\
+	spectre-exporter.h		\
+	spectre-exporter.c		\
+	spectre-exporter-pdf.c		\
+	spectre-exporter-ps.c		\
 	spectre-utils.h			\
 	spectre-utils.c			\
 	$(gv_sources)

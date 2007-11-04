@@ -41,7 +41,9 @@ typedef enum _SpectreStatus {
 	                                         is not in the document page
 	                                         range */,
 	SPECTRE_STATUS_RENDER_ERROR          /*! There has been a problem
-	                                         rendering the page */
+					         rendering the page */,
+	SPECTRE_STATUS_EXPORTER_ERROR        /*! There has been a problem
+					         exporting the document */
 } SpectreStatus;
 
 /*! Gets a textual description of the given status

@@ -1946,6 +1946,86 @@ static int blank(line)
    return *cp == '\n' || *cp== '\r' || (*cp == '%' && (line[0] != '%' || line[1] != '%'));
 }
 
+void
+pscopyheaders (FILE *from, FILE *to, Document d)
+{
+    char *comment;
+    Boolean pages_written = False;
+    int here;
+    FileData fd;
+
+    fd = ps_io_init(from);
+
+    here = d->beginheader;
+    while ((comment=pscopyuntil(fd,to,here,d->endheader,"%%Pages:"))) {
+       SMESSAGE(comment)
+       here = ps_io_ftell(fd);
+       if (pages_written) {
+          PS_free(comment);
+          continue;
+       }
+       fputs("%%Pages: (atend)\n", to);
+       pages_written = True;
+       PS_free(comment);
+    }
+
+    if (!pages_written && !d->epsf)
+        fputs("%%Pages: (atend)\n", to);
+
+    pscopyuntil(fd, to, d->beginpreview, d->endpreview,NULL);
+    pscopyuntil(fd, to, d->begindefaults, d->enddefaults,NULL);
+    pscopyuntil(fd, to, d->beginprolog, d->endprolog,NULL);
+    pscopyuntil(fd, to, d->beginsetup, d->endsetup,NULL);
+
+    ps_io_exit(fd);
+}
+
+void
+pscopypage (FILE *from, FILE *to, Document d, unsigned int page, unsigned int n_page)
+{
+    FileData fd;
+    char *comment;
+
+    fd = ps_io_init(from);
+
+    comment = pscopyuntil(fd,to,d->pages[page].begin,d->pages[page].end, "%%Page:");
+    fprintf(to, "%%%%Page: %s %d\n",d->pages[page].label, n_page);
+    PS_free(comment);
+    pscopyuntil(fd, to, -1, d->pages[page].end,NULL);
+
+    ps_io_exit(fd);
+}
+
+void
+pscopytrailer (FILE *from, FILE *to, Document d, unsigned int n_pages)
+{
+    FileData fd;
+    Boolean pages_written = False;
+    char *comment;
+    int here;
+
+    fd = ps_io_init(from);
+    
+    here = d->begintrailer;
+    if (!d->epsf) {
+        pscopyuntil(fd, to, here, here + strlen ("%%Trailer") + 1, NULL);
+	here = ps_io_ftell(fd);
+	fprintf(to, "%%%%Pages: %d\n",n_pages);
+    }
+    
+    while ((comment = pscopyuntil(fd, to, here, d->endtrailer, "%%Pages:"))) {
+        here = ps_io_ftell(fd);
+	if (pages_written) {
+          PS_free(comment);
+	  continue;
+	}
+	pages_written = True;
+	PS_free(comment);
+    }
+
+    ps_io_exit(fd);
+}
+
 /*##########################################################*/
 /* pscopydoc */
 /* Copy the headers, marked pages, and trailer to fp */

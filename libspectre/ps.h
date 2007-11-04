@@ -173,6 +173,33 @@ void                                    psgetpagebox (
 #endif
 );
 
+void                                    pscopyheaders (
+#if NeedFunctionPrototypes
+    FILE *,
+    FILE *,
+    Document
+#endif
+);
+
+void                                    pscopypage (
+#if NeedFunctionPrototypes
+    FILE *,
+    FILE *,
+    Document,
+    unsigned int,
+    unsigned int
+#endif
+);
+
+void                                    pscopytrailer (
+#if NeedFunctionPrototypes
+    FILE *,
+    FILE *,
+    Document,
+    unsigned int
+#endif
+);
+
 SPECTRE_END_DECLS
 
 #endif /* PS_H */

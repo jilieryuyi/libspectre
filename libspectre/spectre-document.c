@@ -227,3 +227,9 @@ spectre_document_get_page (SpectreDocument *document,
 	
 	return page;
 }
+
+struct document *
+_spectre_document_get_doc (SpectreDocument *document)
+{
+	return document->doc;
+}

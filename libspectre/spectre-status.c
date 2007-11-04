@@ -36,6 +36,8 @@ spectre_status_to_string (SpectreStatus status)
 		return "page is invalid";
 	case SPECTRE_STATUS_RENDER_ERROR:
 		return "render error";
+	case SPECTRE_STATUS_EXPORTER_ERROR:
+		return "exporter error";
 	}
 
 	return "unknown error status";

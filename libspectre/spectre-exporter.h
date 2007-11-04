@@ -1,5 +1,5 @@
 /* This file is part of Libspectre.
- * 
+ *
  * Copyright (C) 2007 Albert Astals Cid <aacid@kde.org>
  * Copyright (C) 2007 Carlos Garcia Campos <carlosgc@gnome.org>
  *
@@ -18,13 +18,32 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
 
-#ifndef SPECTRE_H
-#define SPECTRE_H
+#ifndef SPECTRE_EXPORTER_H
+#define SPECTRE_EXPORTER_H
 
-#include <libspectre/spectre-status.h>
+#include <libspectre/spectre-macros.h>
 #include <libspectre/spectre-document.h>
-#include <libspectre/spectre-render-context.h>
-#include <libspectre/spectre-page.h>
-#include <libspectre/spectre-exporter.h>
+#include <libspectre/spectre-status.h>
 
-#endif /* SPECTRE_H */
+SPECTRE_BEGIN_DECLS
+
+typedef enum {
+	SPECTRE_EXPORTER_FORMAT_PS,
+	SPECTRE_EXPORTER_FORMAT_PDF
+} SpectreExporterFormat;
+
+typedef struct SpectreExporter SpectreExporter;
+
+SpectreExporter *spectre_exporter_new     (SpectreDocument      *document,
+					   SpectreExporterFormat format);
+void             spectre_exporter_free    (SpectreExporter      *exporter);
+SpectreStatus    spectre_exporter_begin   (SpectreExporter      *exporter,
+					   const char           *filename);
+SpectreStatus    spectre_exporter_do_page (SpectreExporter      *exporter,
+					   unsigned int          page_index);
+SpectreStatus    spectre_exporter_end     (SpectreExporter      *exporter);
+
+
+SPECTRE_END_DECLS
+
+#endif /* SPECTRE_EXPORTER_H */

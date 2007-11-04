@@ -23,7 +23,10 @@
 
 #include "spectre-macros.h"
 #include "spectre-status.h"
+#include "spectre-document.h"
 #include "spectre-page.h"
+#include "spectre-exporter.h"
+#include "spectre-gs.h"
 #include "ps.h"
 
 SPECTRE_BEGIN_DECLS
@@ -40,8 +43,30 @@ struct SpectreRenderContext {
 	int                use_platform_fonts;
 };
 
-SpectrePage *_spectre_page_new (unsigned int     page_index,
-				struct document *doc);
+struct SpectreExporter {
+	struct document *doc;
+
+	/* PDF specific */
+	SpectreGS       *gs;
+
+	/* PS specific */
+	FILE            *from;
+	FILE            *to;
+	int              n_pages;
+
+	
+	SpectreStatus (* begin)   (SpectreExporter *exporter,
+				   const char      *filename);
+	SpectreStatus (* do_page) (SpectreExporter *exporter,
+				   unsigned int     page_index);
+	SpectreStatus (* end)     (SpectreExporter *exporter);
+};
+
+SpectrePage     *_spectre_page_new         (unsigned int     page_index,
+					    struct document *doc);
+struct document *_spectre_document_get_doc (SpectreDocument *document);
+SpectreExporter *_spectre_exporter_ps_new  (struct document *doc);
+SpectreExporter *_spectre_exporter_pdf_new (struct document *doc);
 
 SPECTRE_END_DECLS
 

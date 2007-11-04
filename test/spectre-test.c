@@ -110,6 +110,48 @@ test_rotation (SpectreDocument *document,
 	spectre_page_free (page);
 }
 
+static void
+test_export (SpectreDocument      *document,
+	     SpectreExporterFormat format,
+	     const char           *output_dir)
+{
+	SpectreExporter *exporter;
+	SpectreStatus status;
+	char *filename;
+	const char *format_str = format == SPECTRE_EXPORTER_FORMAT_PS ? "ps" : "pdf";
+	int i;
+
+	exporter = spectre_exporter_new (document, format);
+
+	filename = _spectre_strdup_printf ("%s/output.%s", output_dir, format_str);
+	status = spectre_exporter_begin (exporter, filename);
+	free (filename);
+
+	if (status) {
+		printf ("Error exporting document as %s: %s\n", format_str,
+			spectre_status_to_string (status));
+		spectre_exporter_free (exporter);
+		
+		return;
+	}
+
+	/* Export even pages in reverse order */
+	for (i = spectre_document_get_n_pages (document) - 1; i >= 0; i--) {
+		if (i % 2 != 0)
+			continue;
+		
+		status = spectre_exporter_do_page (exporter, i);
+		if (status) {
+			printf ("Error exporting page %d as %s: %s\n", i, format_str,
+				spectre_status_to_string (status));
+			continue;
+		}
+	}
+			
+	spectre_exporter_end (exporter);
+	spectre_exporter_free (exporter);
+}
+	
 int main (int argc, char **argv)
 {
 	SpectreDocument      *document;
@@ -121,6 +163,8 @@ int main (int argc, char **argv)
 	document = spectre_document_new ();
 	spectre_document_load (document, argv[1]);
 
+	test_export (document, SPECTRE_EXPORTER_FORMAT_PDF, argv[2]);
+	test_export (document, SPECTRE_EXPORTER_FORMAT_PS, argv[2]);
 	test_metadata (document);
 
 	rc = spectre_render_context_new ();
