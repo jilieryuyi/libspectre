@@ -31,7 +31,6 @@ spectre_render_context_new (void)
 
 	rc = malloc (sizeof (SpectreRenderContext));
 
-	/* TODO: document default values */
 	rc->scale = 1.0;
 	rc->orientation = 0;
 	rc->x_dpi = 72.0;

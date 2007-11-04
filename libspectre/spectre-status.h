@@ -25,15 +25,28 @@
 
 SPECTRE_BEGIN_DECLS
 
+/*! Defines the error status of a Spectre object */
 typedef enum _SpectreStatus {
-	SPECTRE_STATUS_SUCCESS = 0,
-	SPECTRE_STATUS_NO_MEMORY,
-	SPECTRE_STATUS_LOAD_ERROR,
-	SPECTRE_STATUS_DOCUMENT_NOT_LOADED,
-	SPECTRE_STATUS_INVALID_PAGE,
-	SPECTRE_STATUS_RENDER_ERROR
+	SPECTRE_STATUS_SUCCESS               /*! No error */  = 0,
+	SPECTRE_STATUS_NO_MEMORY             /*! There has been a problem 
+	                                         allocating memory */,
+	SPECTRE_STATUS_LOAD_ERROR            /*! There has been a problem 
+	                                         loading the postcript file */,
+	SPECTRE_STATUS_DOCUMENT_NOT_LOADED   /*! A function that needs the 
+	                                         document to be loaded has been 
+	                                         called and the document has not
+	                                         been loaded or there was an 
+	                                         error when loading it */,
+	SPECTRE_STATUS_INVALID_PAGE          /*! The request page number
+	                                         is not in the document page
+	                                         range */,
+	SPECTRE_STATUS_RENDER_ERROR          /*! There has been a problem
+	                                         rendering the page */
 } SpectreStatus;
 
+/*! Gets a textual description of the given status
+    @param status the status whose textual description will be returned
+*/
 const char *spectre_status_to_string (SpectreStatus status);
 
 SPECTRE_END_DECLS
