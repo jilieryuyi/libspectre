@@ -477,6 +477,8 @@ psscan(const char *filename, int scanstyle)
 	    doc->languagelevel = gettextline(line+length("%%LanguageLevel:"));
 	} else if(doc->creator == NULL && iscomment(line + 2, "Creator:")) {
 	    doc->creator = gettextline(line + length("%%Creator:"));
+	} else if(doc->fortext == NULL && iscomment(line + 2, "For:")) {
+	    doc->fortext = gettextline(line + length("%%For:"));
 	} else if (bb_set == NONE && iscomment(line+2, "BoundingBox:")) {
 	    sscanf(line+length("%%BoundingBox:"), "%256s", text);
 	    if (strcmp(text, "(atend)") == 0) {
@@ -1277,6 +1279,7 @@ psfree(doc)
 	if (doc->format) PS_free(doc->format);
 	if (doc->filename) PS_free(doc->filename);
 	if (doc->creator) PS_free(doc->creator);
+	if (doc->fortext) PS_free(doc->fortext);
 	if (doc->title) PS_free(doc->title);
 	if (doc->date) PS_free(doc->date);
 	if (doc->pages) PS_free(doc->pages);

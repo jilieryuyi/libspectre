@@ -151,6 +151,17 @@ spectre_document_get_creator (SpectreDocument *document)
 }
 
 const char *
+spectre_document_get_for (SpectreDocument *document)
+{
+	if (!document->doc) {
+		document->status = SPECTRE_STATUS_DOCUMENT_NOT_LOADED;
+		return NULL;
+	}
+
+	return document->doc->fortext;
+}
+
+const char *
 spectre_document_get_creation_date (SpectreDocument *document)
 {
 	if (!document->doc) {

@@ -91,6 +91,7 @@ typedef struct document {
     char *title;			/* Title of document. */
     char *date;				/* Creation date. */
     char *creator;                      /* Program that created the file */
+    char *fortext;
     char *languagelevel;
     int  pageorder;			/* ASCEND, DESCEND, SPECIAL */
     long beginheader, endheader;	/* offsets into file */
