@@ -28,6 +28,12 @@
 SPECTRE_BEGIN_DECLS
 
 char *_spectre_strdup_printf (const char *format, ...);
+char *_spectre_strdup        (const char *str);
+int   _spectre_strncasecmp   (const char *s1,
+			      const char *s2,
+			      size_t      n);
+int   _spectre_strcasecmp    (const char *s1,
+			      const char *s2);
 
 SPECTRE_END_DECLS
 
