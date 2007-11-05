@@ -61,7 +61,7 @@ critic_error_code (int code)
 		const char *errors[] = { "", ERROR_NAMES };
 		int x = (-1) * code;
 
-		if (x < sizeof (errors) / sizeof (const char*)) {
+		if (x < (int) (sizeof (errors) / sizeof (const char*))) {
 			fprintf (stderr, "%s %d\n", errors[x], code);
 		}
 		return TRUE;

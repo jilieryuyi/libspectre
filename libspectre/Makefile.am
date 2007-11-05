@@ -1,7 +1,8 @@
 INCLUDES = 			\
 	-I$(top_builddir)	\
 	-I$(srcdir)		\
-	-I$(top_srcdir)
+	-I$(top_srcdir)		\
+	$(SPECTRE_CFLAGS)
 
 lib_LTLIBRARIES = libspectre.la
 
@@ -44,3 +45,4 @@ libspectre_la_SOURCES = 		\
 	$(gv_sources)
 
 libspectre_la_LIBADD = $(LIB_GS)
+
