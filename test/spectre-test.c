@@ -144,7 +144,7 @@ test_export (SpectreDocument      *document,
 		if (status) {
 			printf ("Error exporting page %d as %s: %s\n", i, format_str,
 				spectre_status_to_string (status));
-			continue;
+			break;
 		}
 	}
 			
