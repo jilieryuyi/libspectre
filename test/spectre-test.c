@@ -167,6 +167,21 @@ test_save (SpectreDocument *document,
 	free (filename);
 }
 
+void
+test_save_to_pdf (SpectreDocument *document,
+		  const char      *output_dir)
+{
+	char *filename;
+
+	filename = _spectre_strdup_printf ("%s/document-copy.pdf", output_dir);
+	spectre_document_save_to_pdf (document, filename);
+	if (spectre_document_status (document)) {
+		printf ("Error saving document as %s: %s\n", filename,
+			spectre_status_to_string (spectre_document_status (document)));
+	}
+	free (filename);
+}
+
 int main (int argc, char **argv)
 {
 	SpectreDocument      *document;
@@ -177,10 +192,18 @@ int main (int argc, char **argv)
 
 	document = spectre_document_new ();
 	spectre_document_load (document, argv[1]);
+	if (spectre_document_status (document)) {
+		printf ("Error loading document %s: %s\n", argv[1],
+			spectre_status_to_string (spectre_document_status (document)));
+		spectre_document_free (document);
+
+		return 1;
+	}
 
 	test_export (document, SPECTRE_EXPORTER_FORMAT_PDF, argv[2]);
 	test_export (document, SPECTRE_EXPORTER_FORMAT_PS, argv[2]);
 	test_save (document, argv[2]);
+	test_save_to_pdf (document, argv[2]);
 	test_metadata (document);
 
 	rc = spectre_render_context_new ();

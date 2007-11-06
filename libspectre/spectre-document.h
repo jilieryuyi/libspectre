@@ -125,7 +125,13 @@ SpectrePage       *spectre_document_get_page           (SpectreDocument *documen
 */
 void               spectre_document_save               (SpectreDocument *document,
 							const char      *filename);
-
+/* Save document as a pdf document. This function can fail
+   @param document the document that will be saved
+   @param filename the path where document will be saved as pdf
+   @see spectre_document_status
+*/
+void               spectre_document_save_to_pdf        (SpectreDocument *document,
+							const char      *filename);
 SPECTRE_END_DECLS
 
 #endif /* SPECTRE_DOCUMENT_H */

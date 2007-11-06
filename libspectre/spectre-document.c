@@ -29,6 +29,7 @@
 
 #include "spectre-document.h"
 #include "spectre-private.h"
+#include "spectre-exporter.h"
 
 struct SpectreDocument
 {
@@ -264,8 +265,53 @@ spectre_document_save (SpectreDocument *document,
 	fclose (from);
 	fclose (to);
 
-	if (document->status != SPECTRE_STATUS_SUCCESS)
+	document->status = SPECTRE_STATUS_SUCCESS;
+}
+
+void
+spectre_document_save_to_pdf (SpectreDocument *document,
+			      const char      *filename)
+{
+	SpectreExporter *exporter;
+	SpectreStatus    status;
+	unsigned int     i;
+
+	exporter = spectre_exporter_new (document, SPECTRE_EXPORTER_FORMAT_PDF);
+	if (!exporter) {
+		document->status = SPECTRE_STATUS_NO_MEMORY;
+		return;
+	}
+
+	status = spectre_exporter_begin (exporter, filename);
+	if (status) {
+		document->status = status == SPECTRE_STATUS_NO_MEMORY ?
+			SPECTRE_STATUS_NO_MEMORY : SPECTRE_STATUS_SAVE_ERROR;
+		spectre_exporter_free (exporter);
+		return;
+	}
+
+	for (i = 0; i < spectre_document_get_n_pages (document); i++) {
+		status = spectre_exporter_do_page (exporter, i);
+		if (status)
+			break;
+	}
+
+	if (status) {
+		document->status = status == SPECTRE_STATUS_NO_MEMORY ?
+			SPECTRE_STATUS_NO_MEMORY : SPECTRE_STATUS_SAVE_ERROR;
+		spectre_exporter_free (exporter);
+		return;
+	}
+		
+	status = spectre_exporter_end (exporter);
+	spectre_exporter_free (exporter);
+
+	if (status) {
+		document->status = status == SPECTRE_STATUS_NO_MEMORY ?
+			SPECTRE_STATUS_NO_MEMORY : SPECTRE_STATUS_SAVE_ERROR;
+	} else {
 		document->status = SPECTRE_STATUS_SUCCESS;
+	}
 }
 
 struct document *
