@@ -1,8 +1,9 @@
 [X] Eps (unstructured doc) support
 [ ] Check input params in public methods
 [/] API Documentation
-[ ] Printing API
-[ ] spectre_document_save if make sense
+[X] Printing API (Exporter)
+[X] spectre_document_save if make sense
 [ ] Fill README file
 [ ] Makefile for ghostscript dir. It's not installale but it's distribuible
-
+[ ] spectre_document_load_from_stream
+[ ] spectre_document_save_to_stream

@@ -43,7 +43,9 @@ typedef enum _SpectreStatus {
 	SPECTRE_STATUS_RENDER_ERROR          /*! There has been a problem
 					         rendering the page */,
 	SPECTRE_STATUS_EXPORTER_ERROR        /*! There has been a problem
-					         exporting the document */
+					         exporting the document */,
+	SPECTRE_STATUS_SAVE_ERROR            /*! There has been a problem
+					         saving the document */
 } SpectreStatus;
 
 /*! Gets a textual description of the given status

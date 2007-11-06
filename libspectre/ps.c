@@ -1945,6 +1945,16 @@ static int blank(line)
 }
 
 void
+pscopy (FILE *from, FILE *to, Document d, long begin, long end)
+{
+    FileData fd;
+
+    fd = ps_io_init(from);
+    pscopyuntil(fd, to, begin, end, NULL);
+    ps_io_exit(fd);
+}
+
+void
 pscopyheaders (FILE *from, FILE *to, Document d)
 {
     char *comment;

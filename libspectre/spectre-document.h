@@ -118,6 +118,13 @@ unsigned int       spectre_document_get_language_level (SpectreDocument *documen
 */
 SpectrePage       *spectre_document_get_page           (SpectreDocument *document,
 							unsigned int     page_index);
+/*! Save document as filename. This function can fail
+    @param document the document that will be saved
+    @param filename the path where document will be saved
+    @see spectre_document_status
+*/
+void               spectre_document_save               (SpectreDocument *document,
+							const char      *filename);
 
 SPECTRE_END_DECLS
 

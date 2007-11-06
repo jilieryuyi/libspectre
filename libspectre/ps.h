@@ -173,6 +173,16 @@ void                                    psgetpagebox (
 #endif
 );
 
+void                                    pscopy (
+#if NeedFunctionPrototypes
+    FILE *,
+    FILE *,
+    Document,
+    long,
+    long
+#endif
+);
+
 void                                    pscopyheaders (
 #if NeedFunctionPrototypes
     FILE *,

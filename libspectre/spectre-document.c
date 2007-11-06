@@ -22,6 +22,11 @@
 #include <stdlib.h>
 #include <string.h>
 
+/* For stat */
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+
 #include "spectre-document.h"
 #include "spectre-private.h"
 
@@ -226,6 +231,41 @@ spectre_document_get_page (SpectreDocument *document,
 		document->status = SPECTRE_STATUS_SUCCESS;
 	
 	return page;
+}
+
+void
+spectre_document_save (SpectreDocument *document,
+		       const char      *filename)
+{
+	struct stat stat_buf;
+	FILE *from;
+	FILE *to;
+	
+	if (stat (document->doc->filename, &stat_buf) != 0) {
+		document->status = SPECTRE_STATUS_SAVE_ERROR;
+		return;
+	}
+
+	from = fopen (document->doc->filename, "r");
+	if (!from) {
+		document->status = SPECTRE_STATUS_SAVE_ERROR;
+		return;
+	}
+
+	to = fopen (filename, "w");
+	if (!to) {
+		document->status = SPECTRE_STATUS_SAVE_ERROR;
+		fclose (from);
+		return;
+	}
+
+	pscopy (from, to, document->doc, 0, stat_buf.st_size - 1);
+
+	fclose (from);
+	fclose (to);
+
+	if (document->status != SPECTRE_STATUS_SUCCESS)
+		document->status = SPECTRE_STATUS_SUCCESS;
 }
 
 struct document *

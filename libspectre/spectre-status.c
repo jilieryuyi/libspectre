@@ -38,6 +38,8 @@ spectre_status_to_string (SpectreStatus status)
 		return "render error";
 	case SPECTRE_STATUS_EXPORTER_ERROR:
 		return "exporter error";
+	case SPECTRE_STATUS_SAVE_ERROR:
+		return "save error";
 	}
 
 	return "unknown error status";
