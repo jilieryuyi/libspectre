@@ -27,8 +27,16 @@ spectre_exporter_ps_begin (SpectreExporter *exporter,
 			   const char      *filename)
 {
 	exporter->from = fopen (exporter->doc->filename, "r");
+	if (!exporter->from)
+		return SPECTRE_STATUS_EXPORTER_ERROR;
+	
 	exporter->to = fopen (filename, "w");
-
+	if (!exporter->to) {
+		fclose (exporter->from);
+		exporter->from = NULL;
+		return SPECTRE_STATUS_EXPORTER_ERROR;
+	}
+		
 	pscopyheaders (exporter->from, exporter->to, exporter->doc);
 	
 	return SPECTRE_STATUS_SUCCESS;
