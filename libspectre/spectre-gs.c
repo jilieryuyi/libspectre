@@ -216,7 +216,7 @@ spectre_gs_send_page (SpectreGS       *gs,
 	if (doc->numpages > 0) {
 		if (!spectre_gs_process (gs,
 					 doc->filename,
-					 0, 0,
+					 llx, lly,
 					 doc->pages[page_index].begin,
 					 doc->pages[page_index].end))
 			return FALSE;
