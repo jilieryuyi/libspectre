@@ -209,7 +209,7 @@ int main (int argc, char **argv)
 	rc = spectre_render_context_new ();
 
 	for (i = 0; i < spectre_document_get_n_pages (document); i++) {
-		SpectrePage     *page;
+		SpectrePage     *page, *page2;
 		cairo_surface_t *surface;
 		char            *filename;
 		int              width, height;
@@ -229,6 +229,15 @@ int main (int argc, char **argv)
 		printf ("\tPage size: %d x %d\n", width, height);
 		printf ("\tPage orientation: %s\n", 
 			orientation_to_string (spectre_page_get_orientation (page)));
+
+		page2 = spectre_document_get_page_by_label (document, spectre_page_get_label (page));
+		if (!page2 || spectre_document_status (document)) {
+			printf ("Error getting page %d by its label %s: %s\n", i,
+				spectre_page_get_label (page),
+				spectre_status_to_string (spectre_document_status (document)));
+		}
+		spectre_page_free (page2);
+		
 
 		spectre_render_context_set_page_size (rc, width, height);
 		spectre_page_render (page, rc, &data, &row_length);
