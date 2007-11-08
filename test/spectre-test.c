@@ -224,8 +224,10 @@ int main (int argc, char **argv)
 		}
 
 		spectre_page_get_size (page, &width, &height);
-		printf ("Page %d size: %d x %d\n", i, width, height);
-		printf ("Page %d orientation: %s\n", i,
+		printf ("Page %d\n", i);
+		printf ("\tPage label: %s\n", spectre_page_get_label (page));
+		printf ("\tPage size: %d x %d\n", width, height);
+		printf ("\tPage orientation: %s\n", 
 			orientation_to_string (spectre_page_get_orientation (page)));
 
 		spectre_render_context_set_page_size (rc, width, height);
