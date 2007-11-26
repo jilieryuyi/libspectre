@@ -13,5 +13,5 @@ DISTCLEANFILES = $(pkgconfig_DATA)
 
 dist-hook: ChangeLog
 
-ChangeLog: .git/HEAD
+ChangeLog: $(top_srcdir)/.git/HEAD
 	git log --stat > ChangeLog

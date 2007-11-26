@@ -26,8 +26,8 @@
 #include "spectre-utils.h"
 
 /* ghostscript stuff */
-#include "ghostscript/iapi.h"
-#include "ghostscript/ierrors.h"
+#include <ghostscript/iapi.h>
+#include <ghostscript/ierrors.h>
 
 #define BUFFER_SIZE 32768
 

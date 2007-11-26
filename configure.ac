@@ -105,6 +105,7 @@ AC_SUBST(SPECTRE_CFLAGS)
 AC_OUTPUT([
 Makefile
 libspectre/Makefile
+libspectre/ghostscript/Makefile
 test/Makefile
 libspectre.pc
 ])

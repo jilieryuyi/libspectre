@@ -1,3 +1,5 @@
+SUBDIRS = ghostscript
+
 INCLUDES = 			\
 	-I$(top_builddir)	\
 	-I$(srcdir)		\

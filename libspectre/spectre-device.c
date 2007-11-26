@@ -28,7 +28,7 @@
 #include "spectre-private.h"
 
 /* ghostscript stuff */
-#include "ghostscript/gdevdsp.h"
+#include <ghostscript/gdevdsp.h>
 
 struct SpectreDevice {
 	struct document *doc;
