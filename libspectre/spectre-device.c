@@ -246,7 +246,8 @@ spectre_device_render (SpectreDevice        *device,
 							   DISPLAY_DEPTH_8 |
 							   DISPLAY_LITTLEENDIAN |
 							   DISPLAY_TOPFIRST);
-	args[arg++] = dsp_handle = _spectre_strdup_printf ("-sDisplayHandle=%d", device);
+	args[arg++] = dsp_handle = _spectre_strdup_printf ("-sDisplayHandle=16#%llx",
+							   (unsigned long long int)device);
 	if (rc->use_platform_fonts == FALSE)
 		args[arg++] = "-dNOPLATFONTS";
 
