@@ -25,6 +25,125 @@
 
 #include "spectre-utils.h"
 
+#ifdef HAVE_SYS_TYPES_H
+#include <sys/types.h>
+#endif
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>
+#endif
+
+static unsigned long
+_spectre_get_pid (void)
+{
+#if defined(HAVE_SYS_TYPES_H) && defined(HAVE_UNISTD_H)
+	return getpid ();
+#else
+	/* TODO */
+#endif
+}
+
+static int warn_initted = FALSE;
+static int fatal_warnings = FALSE;
+static int fatal_warnings_on_check_failed = FALSE;
+
+static void
+init_warnings (void)
+{
+	const char *s;
+	
+	if (warn_initted)
+		return;
+
+	warn_initted = TRUE;
+	
+	s = getenv ("SPECTRE_FATAL_WARNINGS");
+	if (!s || !(*s))
+		return;
+
+	if (*s == '0') {
+		fatal_warnings = FALSE;
+		fatal_warnings_on_check_failed = FALSE;
+	} else if (*s == '1') {
+		fatal_warnings = TRUE;
+		fatal_warnings_on_check_failed = TRUE;
+	} else {
+		fprintf (stderr,
+			 "SPECTRE_FATAL_WARNINGS should be set to 0 or 1 if set, not '%s'",
+			 s);
+	}
+}
+
+/**
+ * Prints a warning message to stderr. Can optionally be made to exit
+ * fatally by setting SPECTRE_FATAL_WARNINGS, but this is rarely
+ * used. This function should be considered pretty much equivalent to
+ * fprintf(stderr). _spectre_warn_check_failed() on the other hand is
+ * suitable for use when a programming mistake has been made.
+ */
+void
+_spectre_warn (const char *format,
+            ...)
+{
+	va_list args;
+
+	if (!warn_initted)
+		init_warnings ();
+  
+	va_start (args, format);
+	vfprintf (stderr, format, args);
+	va_end (args);
+
+	if (fatal_warnings) {
+		fflush (stderr);
+		abort ();
+	}
+}
+
+/**
+ * Prints a "critical" warning to stderr when an assertion fails;
+ * differs from _spectre_warn primarily in that it prefixes the pid and
+ * defaults to fatal. This should be used only when a programming
+ * error has been detected. (NOT for unavoidable errors that an app
+ * might handle. Calling this means "there is a bug"
+ */
+void
+_spectre_warn_check_failed (const char *format,
+			    ...)
+{
+	va_list args;
+
+	if (!warn_initted)
+		init_warnings ();
+
+	fprintf (stderr, "process %lu: ", _spectre_get_pid ());
+
+	va_start (args, format);
+	vfprintf (stderr, format, args);
+	va_end (args);
+
+	if (fatal_warnings_on_check_failed) {
+		fflush (stderr);
+		abort ();
+	}
+}
+
+#ifndef SPECTRE_DISABLE_ASSERT
+void
+_spectre_real_assert (int          condition,
+		      const char  *condition_text,
+		      const char  *file,
+		      int          line,
+		      const char  *func)
+{
+	if (_SPECTRE_UNLIKELY (!condition)) {
+		_spectre_warn ("%lu: assertion failed \"%s\" file \"%s\" line %d function %s\n",
+			       _spectre_get_pid (), condition_text, file, line, func);
+		abort ();
+	}
+}
+
+#endif /* SPECTRE_DISABLE_ASSERT */
+
 static char *
 spectre_strdup_vprintf (const char *format,
 			va_list     args)

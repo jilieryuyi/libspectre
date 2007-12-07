@@ -58,7 +58,6 @@
 #include <stdlib.h>
 
 #include <string.h>
-#include <assert.h>
 
 #ifndef SEEK_SET
 #define SEEK_SET 0
@@ -1296,7 +1295,7 @@ psdocdestroy (struct document *doc)
     if (!doc)
         return;
 
-    assert (doc->ref_count > 0);
+    _spectre_assert (doc->ref_count > 0);
 
     doc->ref_count--;
     if (doc->ref_count)
@@ -1311,7 +1310,7 @@ psdocreference (struct document *doc)
     if (!doc)
         return NULL;
 
-    assert (doc->ref_count > 0);
+    _spectre_assert (doc->ref_count > 0);
 
     doc->ref_count++;
 

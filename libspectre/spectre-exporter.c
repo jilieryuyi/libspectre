@@ -22,6 +22,7 @@
 
 #include "spectre-exporter.h"
 #include "spectre-private.h"
+#include "spectre-utils.h"
 
 SpectreExporter *
 spectre_exporter_new (SpectreDocument      *document,
@@ -29,8 +30,7 @@ spectre_exporter_new (SpectreDocument      *document,
 {
 	struct document *doc;
 	
-	if (!document)
-		return NULL;
+	_spectre_return_val_if_fail (document != NULL, NULL);
 
 	doc = _spectre_document_get_doc (document);
 	
@@ -77,6 +77,9 @@ SpectreStatus
 spectre_exporter_begin (SpectreExporter *exporter,
 			const char      *filename)
 {
+	_spectre_return_val_if_fail (exporter != NULL, SPECTRE_STATUS_EXPORTER_ERROR);
+	_spectre_return_val_if_fail (filename != NULL, SPECTRE_STATUS_EXPORTER_ERROR);
+	
 	if (exporter->begin)
 		return exporter->begin (exporter, filename);
 
@@ -87,12 +90,16 @@ SpectreStatus
 spectre_exporter_do_page (SpectreExporter *exporter,
 			  unsigned int     page_index)
 {
+	_spectre_return_val_if_fail (exporter != NULL, SPECTRE_STATUS_EXPORTER_ERROR);
+	
 	return exporter->do_page (exporter, page_index);
 }
 
 SpectreStatus
 spectre_exporter_end (SpectreExporter *exporter)
 {
+	_spectre_return_val_if_fail (exporter != NULL, SPECTRE_STATUS_EXPORTER_ERROR);
+	
 	if (exporter->end)
 		return exporter->end (exporter);
 	

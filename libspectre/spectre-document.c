@@ -30,6 +30,7 @@
 #include "spectre-document.h"
 #include "spectre-private.h"
 #include "spectre-exporter.h"
+#include "spectre-utils.h"
 
 struct SpectreDocument
 {
@@ -53,6 +54,9 @@ void
 spectre_document_load (SpectreDocument *document,
 		       const char      *filename)
 {
+	_spectre_return_if_fail (document != NULL);
+	_spectre_return_if_fail (filename != NULL);
+	
 	if (document->doc && strcmp (filename, document->doc->filename) == 0) {
 		document->status = SPECTRE_STATUS_SUCCESS;
 		return;
@@ -94,12 +98,16 @@ spectre_document_free (SpectreDocument *document)
 SpectreStatus
 spectre_document_status (SpectreDocument *document)
 {
+	_spectre_return_val_if_fail (document != NULL, SPECTRE_STATUS_DOCUMENT_NOT_LOADED);
+	
 	return document->status;
 }
 
 unsigned int
 spectre_document_get_n_pages (SpectreDocument *document)
 {
+	_spectre_return_val_if_fail (document != NULL, 0);
+	
 	if (!document->doc) {
 		document->status = SPECTRE_STATUS_DOCUMENT_NOT_LOADED;
 		return 0;
@@ -112,6 +120,8 @@ SpectreOrientation
 spectre_document_get_orientation (SpectreDocument *document)
 {
 	int doc_orientation;
+
+	_spectre_return_val_if_fail (document != NULL, SPECTRE_ORIENTATION_PORTRAIT);
 	
 	if (!document->doc) {
 		document->status = SPECTRE_STATUS_DOCUMENT_NOT_LOADED;
@@ -137,6 +147,8 @@ spectre_document_get_orientation (SpectreDocument *document)
 const char *
 spectre_document_get_title (SpectreDocument *document)
 {
+	_spectre_return_val_if_fail (document != NULL, NULL);
+	
 	if (!document->doc) {
 		document->status = SPECTRE_STATUS_DOCUMENT_NOT_LOADED;
 		return NULL;
@@ -148,6 +160,8 @@ spectre_document_get_title (SpectreDocument *document)
 const char *
 spectre_document_get_creator (SpectreDocument *document)
 {
+	_spectre_return_val_if_fail (document != NULL, NULL);
+	
 	if (!document->doc) {
 		document->status = SPECTRE_STATUS_DOCUMENT_NOT_LOADED;
 		return NULL;
@@ -159,6 +173,8 @@ spectre_document_get_creator (SpectreDocument *document)
 const char *
 spectre_document_get_for (SpectreDocument *document)
 {
+	_spectre_return_val_if_fail (document != NULL, NULL);
+	
 	if (!document->doc) {
 		document->status = SPECTRE_STATUS_DOCUMENT_NOT_LOADED;
 		return NULL;
@@ -170,6 +186,8 @@ spectre_document_get_for (SpectreDocument *document)
 const char *
 spectre_document_get_creation_date (SpectreDocument *document)
 {
+	_spectre_return_val_if_fail (document != NULL, NULL);
+	
 	if (!document->doc) {
 		document->status = SPECTRE_STATUS_DOCUMENT_NOT_LOADED;
 		return NULL;
@@ -181,6 +199,8 @@ spectre_document_get_creation_date (SpectreDocument *document)
 const char *
 spectre_document_get_format (SpectreDocument *document)
 {
+	_spectre_return_val_if_fail (document != NULL, NULL);
+	
 	if (!document->doc) {
 		document->status = SPECTRE_STATUS_DOCUMENT_NOT_LOADED;
 		return NULL;
@@ -192,6 +212,8 @@ spectre_document_get_format (SpectreDocument *document)
 int
 spectre_document_is_eps (SpectreDocument *document)
 {
+	_spectre_return_val_if_fail (document != NULL, FALSE);
+	
 	if (!document->doc) {
 		document->status = SPECTRE_STATUS_DOCUMENT_NOT_LOADED;
 		return FALSE;
@@ -203,6 +225,8 @@ spectre_document_is_eps (SpectreDocument *document)
 unsigned int 
 spectre_document_get_language_level (SpectreDocument *document)
 {
+	_spectre_return_val_if_fail (document != NULL, 0);
+	
 	if (!document->doc) {
 		document->status = SPECTRE_STATUS_DOCUMENT_NOT_LOADED;
 		return 0;
@@ -217,8 +241,15 @@ spectre_document_get_page (SpectreDocument *document,
 {
 	SpectrePage *page;
 
+	_spectre_return_val_if_fail (document != NULL, NULL);
+
 	if (page_index >= spectre_document_get_n_pages (document)) {
 		document->status = SPECTRE_STATUS_INVALID_PAGE;
+		return NULL;
+	}
+
+	if (!document->doc) {
+		document->status = SPECTRE_STATUS_DOCUMENT_NOT_LOADED;
 		return NULL;
 	}
 	
@@ -240,9 +271,16 @@ spectre_document_get_page_by_label (SpectreDocument *document,
 {
 	unsigned int i;
 	int page_index = -1;
+
+	_spectre_return_val_if_fail (document != NULL, NULL);
 	
 	if (!label) {
 		document->status = SPECTRE_STATUS_INVALID_PAGE;
+		return NULL;
+	}
+
+	if (!document->doc) {
+		document->status = SPECTRE_STATUS_DOCUMENT_NOT_LOADED;
 		return NULL;
 	}
 
@@ -268,6 +306,14 @@ spectre_document_save (SpectreDocument *document,
 	struct stat stat_buf;
 	FILE *from;
 	FILE *to;
+
+	_spectre_return_if_fail (document != NULL);
+	_spectre_return_if_fail (filename != NULL);
+
+	if (!document->doc) {
+		document->status = SPECTRE_STATUS_DOCUMENT_NOT_LOADED;
+		return;
+	}
 	
 	if (stat (document->doc->filename, &stat_buf) != 0) {
 		document->status = SPECTRE_STATUS_SAVE_ERROR;
@@ -302,6 +348,14 @@ spectre_document_save_to_pdf (SpectreDocument *document,
 	SpectreExporter *exporter;
 	SpectreStatus    status;
 	unsigned int     i;
+
+	_spectre_return_if_fail (document != NULL);
+	_spectre_return_if_fail (filename != NULL);
+
+	if (!document->doc) {
+		document->status = SPECTRE_STATUS_DOCUMENT_NOT_LOADED;
+		return;
+	}
 
 	exporter = spectre_exporter_new (document, SPECTRE_EXPORTER_FORMAT_PDF);
 	if (!exporter) {

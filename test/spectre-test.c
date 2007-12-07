@@ -190,6 +190,8 @@ int main (int argc, char **argv)
 
 	/* TODO: check argv */
 
+	spectre_document_load (NULL, argv[1]);
+
 	document = spectre_document_new ();
 	spectre_document_load (document, argv[1]);
 	if (spectre_document_status (document)) {

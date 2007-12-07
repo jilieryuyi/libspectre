@@ -23,6 +23,7 @@
 #include "spectre-render-context.h"
 #include "spectre-page.h"
 #include "spectre-private.h"
+#include "spectre-utils.h"
 
 SpectreRenderContext *
 spectre_render_context_new (void)
@@ -30,6 +31,8 @@ spectre_render_context_new (void)
 	SpectreRenderContext *rc;
 
 	rc = malloc (sizeof (SpectreRenderContext));
+	if (!rc)
+		return NULL;
 
 	rc->scale = 1.0;
 	rc->orientation = 0;
@@ -57,8 +60,7 @@ void
 spectre_render_context_set_scale (SpectreRenderContext *rc,
 				  double                scale)
 {
-	if (!rc)
-		return;
+	_spectre_return_if_fail (rc != NULL);
 
 	rc->scale = scale;
 }
@@ -66,8 +68,7 @@ spectre_render_context_set_scale (SpectreRenderContext *rc,
 double
 spectre_render_context_get_scale (SpectreRenderContext *rc)
 {
-	if (!rc)
-		return 1.0;
+	_spectre_return_val_if_fail (rc != NULL, 1.0);
 
 	return rc->scale;
 }
@@ -76,8 +77,7 @@ void
 spectre_render_context_set_rotation (SpectreRenderContext *rc,
 				     unsigned int          rotation)
 {
-	if (!rc)
-		return;
+	_spectre_return_if_fail (rc != NULL);
 
 	rotation %= 360;
 
@@ -94,8 +94,7 @@ spectre_render_context_set_rotation (SpectreRenderContext *rc,
 unsigned int
 spectre_render_context_get_rotation (SpectreRenderContext *rc)
 {
-	if (!rc)
-		return 0;
+	_spectre_return_val_if_fail (rc != NULL, 0);
 
 	switch (rc->orientation) {
 	default:
@@ -117,8 +116,7 @@ spectre_render_context_set_resolution (SpectreRenderContext *rc,
 				       double                x_dpi,
 				       double                y_dpi)
 {
-	if (!rc)
-		return;
+	_spectre_return_if_fail (rc != NULL);
 
 	rc->x_dpi = x_dpi;
 	rc->y_dpi = y_dpi;
@@ -129,8 +127,7 @@ spectre_render_context_get_resolution (SpectreRenderContext *rc,
 				       double               *x_dpi,
 				       double               *y_dpi)
 {
-	if (!rc)
-		return;
+	_spectre_return_if_fail (rc != NULL);
 
 	if (x_dpi)
 		*x_dpi = rc->x_dpi;
@@ -143,9 +140,8 @@ spectre_render_context_set_page_size (SpectreRenderContext *rc,
 				      int                   width,
 				      int                   height)
 {
-	if (!rc)
-		return;
-
+	_spectre_return_if_fail (rc != NULL);
+		
 	rc->width = width;
 	rc->height = height;
 }
@@ -155,8 +151,7 @@ spectre_render_context_get_page_size (SpectreRenderContext *rc,
 				      int                  *width,
 				      int                  *height)
 {
-	if (!rc)
-		return;
+	_spectre_return_if_fail (rc != NULL);
 
 	if (width)
 		*width = rc->width;
@@ -168,8 +163,7 @@ void
 spectre_render_context_set_use_platform_fonts (SpectreRenderContext *rc,
 					       int                   use_platform_fonts)
 {
-	if (!rc)
-		return;
+	_spectre_return_if_fail (rc != NULL);
 
 	rc->use_platform_fonts = use_platform_fonts;
 }
@@ -177,8 +171,7 @@ spectre_render_context_set_use_platform_fonts (SpectreRenderContext *rc,
 int
 spectre_render_context_get_use_platform_fonts (SpectreRenderContext *rc)
 {
-	if (!rc)
-		return 0;
+	_spectre_return_val_if_fail (rc != NULL, FALSE);
 
 	return rc->use_platform_fonts;
 }
@@ -188,8 +181,7 @@ spectre_render_context_set_antialias_bits (SpectreRenderContext *rc,
 					   int                   graphics_bits,
 					   int                   text_bits)
 {
-	if (!rc)
-		return;
+	_spectre_return_if_fail (rc != NULL);
 
 	rc->graphic_alpha_bits = graphics_bits;
 	rc->text_alpha_bits = text_bits;
@@ -200,8 +192,7 @@ spectre_render_context_get_antialias_bits (SpectreRenderContext *rc,
 					   int                  *graphics_bits,
 					   int                  *text_bits)
 {
-	if (!rc)
-		return;
+	_spectre_return_if_fail (rc != NULL);
 
 	if (graphics_bits)
 		*graphics_bits = rc->graphic_alpha_bits;

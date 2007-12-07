@@ -21,13 +21,92 @@
 #ifndef SPECTRE_UTILS_H
 #define SPECTRE_UTILS_H
 
+#include <config.h>
+
 #include <stdarg.h>
 
 #include <libspectre/spectre-macros.h>
 
 SPECTRE_BEGIN_DECLS
 
-char *_spectre_strdup_printf (const char *format, ...);
+/* Checks. Based on dbus-internals */
+void _spectre_warn               (const char *format,
+				  ...);
+void _spectre_warn_check_failed  (const char *format,
+				  ...);
+
+#if defined (__STDC_VERSION__) && (__STDC_VERSION__ >= 199901L)
+#define _SPECTRE_FUNCTION_NAME __func__
+#elif defined(__GNUC__) || defined(_MSC_VER)
+#define _SPECTRE_FUNCTION_NAME __FUNCTION__
+#else
+#define _SPECTRE_FUNCTION_NAME "unknown function"
+#endif
+
+/*
+ * (code from GLib)
+ * 
+ * The _SPECTRE_LIKELY and _SPECTRE_UNLIKELY macros let the programmer give hints to 
+ * the compiler about the expected result of an expression. Some compilers
+ * can use this information for optimizations.
+ *
+ * The _SPECTRE_BOOLEAN_EXPR macro is intended to trigger a gcc warning when
+ * putting assignments in the macro arg
+ */
+#if defined(__GNUC__) && (__GNUC__ > 2) && defined(__OPTIMIZE__)
+#define _SPECTRE_BOOLEAN_EXPR(expr)                \
+	__extension__ ({			   \
+		int _spectre_boolean_var_;	   \
+		if (expr)		           \
+			_spectre_boolean_var_ = 1; \
+		else				   \
+			_spectre_boolean_var_ = 0; \
+		_spectre_boolean_var_;		   \
+	})
+#define _SPECTRE_LIKELY(expr) (__builtin_expect (_SPECTRE_BOOLEAN_EXPR(expr), 1))
+#define _SPECTRE_UNLIKELY(expr) (__builtin_expect (_SPECTRE_BOOLEAN_EXPR(expr), 0))
+#else
+#define _SPECTRE_LIKELY(expr) (expr)
+#define _SPECTRE_UNLIKELY(expr) (expr)
+#endif
+
+
+#ifdef SPECTRE_DISABLE_ASSERT
+#define _spectre_assert(condition)
+#else
+void _spectre_real_assert (int          condition,
+			   const char  *condition_text,
+			   const char  *file,
+			   int          line,
+			   const char  *func);
+#define _spectre_assert(condition)                                         \
+	_spectre_real_assert ((condition) != 0, #condition, __FILE__, __LINE__, _SPECTRE_FUNCTION_NAME)
+#endif /* SPECTRE_DISABLE_ASSERT */
+
+#ifdef SPECTRE_DISABLE_CHECKS
+#define _spectre_return_if_fail(condition)
+#define _spectre_return_val_if_fail(condition, val)
+#else /* SPECTRE_DISABLE_CHECKS */
+#define _spectre_return_if_fail(condition) do {				                             \
+	_spectre_assert ((*(const char*)_SPECTRE_FUNCTION_NAME) != '_');                             \
+	if (!(condition)) {                                                                          \
+		_spectre_warn_check_failed ("%s: assertion `%s' failed (%s:%d)\n",                   \
+					    _SPECTRE_FUNCTION_NAME, #condition, __FILE__, __LINE__); \
+		return;                                                                              \
+	} } while (0)
+
+#define _spectre_return_val_if_fail(condition, val) do {                                             \
+	_spectre_assert ((*(const char*)_SPECTRE_FUNCTION_NAME) != '_');                             \
+	if (!(condition)) {                                                                          \
+		_spectre_warn_check_failed ("%s: assertion `%s' failed (%s:%d)\n",                   \
+					    _SPECTRE_FUNCTION_NAME, #condition, __FILE__, __LINE__); \
+		return (val);                                                                        \
+	} } while (0)
+#endif /* SPECTRE_DISABLE_CHECKS */
+
+/* String handling helpers */
+char *_spectre_strdup_printf (const char *format,
+			      ...);
 char *_spectre_strdup        (const char *str);
 int   _spectre_strncasecmp   (const char *s1,
 			      const char *s2,

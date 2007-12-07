@@ -25,6 +25,7 @@
 
 #include "spectre-device.h"
 #include "spectre-private.h"
+#include "spectre-utils.h"
 
 struct SpectrePage
 {
@@ -68,18 +69,24 @@ spectre_page_free (SpectrePage *page)
 SpectreStatus
 spectre_page_status (SpectrePage *page)
 {
+	_spectre_return_val_if_fail (page != NULL, SPECTRE_STATUS_INVALID_PAGE);
+	
 	return page->status;
 }
 
 unsigned int
 spectre_page_get_index (SpectrePage *page)
 {
+	_spectre_return_val_if_fail (page != NULL, 0);
+	
 	return page->index;
 }
 
 const char *
 spectre_page_get_label (SpectrePage *page)
 {
+	_spectre_return_val_if_fail (page != NULL, NULL);
+	
 	return page->doc->numpages > 0 ? page->doc->pages[page->index].label : NULL;
 }
 
@@ -87,6 +94,8 @@ SpectreOrientation
 spectre_page_get_orientation (SpectrePage *page)
 {
 	int page_orientation = NONE;
+
+	_spectre_return_val_if_fail (page != NULL, SPECTRE_ORIENTATION_PORTRAIT);
 
 	if (page->doc->numpages > 0) {
 		page_orientation = page->doc->pages[page->index].orientation != NONE ?
@@ -116,6 +125,8 @@ spectre_page_get_size (SpectrePage *page,
 		       int         *height)
 {
 	int urx, ury, llx, lly;
+
+	_spectre_return_if_fail (page != NULL);
 	
 	psgetpagebox (page->doc, page->index,
 		      &urx, &ury, &llx, &lly);
@@ -134,8 +145,8 @@ spectre_page_render (SpectrePage          *page,
 {
 	SpectreDevice *device;
 
-	if (!rc)
-		return;
+	_spectre_return_if_fail (page != NULL);
+	_spectre_return_if_fail (rc != NULL);
 
 	device = spectre_device_new (page->doc);
 	

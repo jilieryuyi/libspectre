@@ -18,6 +18,24 @@ else
 fi
 AC_SUBST(LIB_GS)
 
+AC_ARG_ENABLE(asserts,
+	AS_HELP_STRING([--enable-asserts],[include assertion checks]),
+	enable_asserts=$enableval,
+	enable_asserts=$USE_MAINTAINER_MODE)
+
+if test x$enable_asserts = xno; then
+   AC_DEFINE(SPECTRE_DISABLE_ASSERT,[1],[Disable assertion checking])
+fi
+	
+AC_ARG_ENABLE(checks,
+	AS_HELP_STRING([--enable-checks],[include sanity checks on public API]),
+	enable_checks=$enableval,
+	enable_checks=yes)
+
+if test x$enable_checks = xno; then
+   AC_DEFINE(SPECTRE_DISABLE_CHECKS,[1],[Disable public API sanity checking])
+fi
+	
 dnl Test
 AC_ARG_ENABLE(test,
               [AC_HELP_STRING([--enable-test], [Compile tests])],enable_test="$enableval",enable_test=yes)
