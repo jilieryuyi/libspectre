@@ -69,6 +69,12 @@ critic_error_code (int code)
 }
 
 static int
+spectre_gs_stdout (void *handler, const char *out, int len)
+{
+	return len;
+}
+
+static int
 spectre_gs_process (SpectreGS  *gs,
 		    const char *filename,
 		    int         x,
@@ -150,8 +156,15 @@ spectre_gs_create_instance (SpectreGS *gs,
 	int error;
 	
 	error = gsapi_new_instance (&gs->ghostscript_instance, caller_handle);
+	if (!critic_error_code (error)) {
+		gsapi_set_stdio (gs->ghostscript_instance,
+				 NULL,
+				 spectre_gs_stdout,
+				 NULL);
+		return TRUE;
+	}
 	
-	return !critic_error_code (error);
+	return FALSE;
 }
 
 int
