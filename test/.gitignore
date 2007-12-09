@@ -1,0 +1,4 @@
+.deps
+.libs
+spectre-test
+spectre-test.o
