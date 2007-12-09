@@ -1,8 +1,51 @@
 AC_PREREQ(2.59)
-AC_INIT(libspectre, 0.0.1)
+
+m4_define([spectre_major_version], [0])
+m4_define([spectre_minor_version], [0])
+m4_define([spectre_micro_version], [1])
+m4_define([spectre_version],
+          [spectre_major_version.spectre_minor_version.spectre_micro_version])
+
+AC_INIT(libspectre, [spectre_version])
 AC_CONFIG_HEADERS(config.h)
 
 AM_INIT_AUTOMAKE([1.7])
+
+AM_MAINTAINER_MODE
+
+# libtool versioning
+#
+# See http://sources.redhat.com/autobook/autobook/autobook_91.html#SEC91 for details
+#
+
+## increment if the interface has additions, changes, removals.
+LT_CURRENT=1
+
+## increment any time the source changes; set to
+##  0 if you increment CURRENT
+LT_REVISION=0
+
+## increment if any interfaces have been added; set to 0
+## if any interfaces have been changed or removed. removal has
+## precedence over adding, so set to 0 if both happened.
+LT_AGE=0
+
+VERSION_INFO="$LT_CURRENT:$LT_REVISION:$LT_AGE"
+AC_SUBST(VERSION_INFO)
+
+AC_SUBST(LT_CURRENT)
+AC_SUBST(LT_REVISION)
+AC_SUBST(LT_AGE)
+
+SPECTRE_MAJOR_VERSION=spectre_major_version
+SPECTRE_MINOR_VERSION=spectre_minor_version
+SPECTRE_MICRO_VERSION=spectre_micro_version
+SPECTRE_VERSION=spectre_major_version.spectre_minor_version.spectre_micro_version
+
+AC_SUBST(SPECTRE_MAJOR_VERSION)
+AC_SUBST(SPECTRE_MINOR_VERSION)
+AC_SUBST(SPECTRE_MICRO_VERSION)
+AC_SUBST(SPECTRE_VERSION)
 
 AC_PROG_LIBTOOL
 AC_PROG_CC
