@@ -6,6 +6,8 @@ INCLUDES = 			\
 	-I$(top_srcdir)		\
 	$(SPECTRE_CFLAGS)
 
+EXTRA_DIST=spectre-version.h.in
+
 lib_LTLIBRARIES = libspectre.la
 
 libspectreincludedir = $(includedir)/libspectre
@@ -16,7 +18,8 @@ libspectreinclude_HEADERS =		\
 	spectre-document.h		\
 	spectre-render-context.h	\
 	spectre-page.h			\
-	spectre-exporter.h
+	spectre-exporter.h		\
+	spectre-version.h
 
 gv_sources = 				\
 	ps.h				\

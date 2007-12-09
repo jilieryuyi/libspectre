@@ -190,6 +190,8 @@ int main (int argc, char **argv)
 
 	/* TODO: check argv */
 
+	printf ("Testing libspectre version: %s\n", SPECTRE_VERSION_STRING);
+
 	spectre_document_load (NULL, argv[1]);
 
 	document = spectre_document_new ();
