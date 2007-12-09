@@ -1768,6 +1768,23 @@ static char * readline (fd, lineP, positionP, line_lenP)
    }
    else
 #endif
+   if ((line[0] == '%') &&
+       positionP && *positionP > 0 &&
+       (iscomment(line,"%!PS") || iscomment(line, "\004%!PS"))) {
+       nesting_level=1;
+       line = ps_io_fgetchars(fd,-1);
+       if (line) *line_lenP += FD_LINE_LEN;
+       while (line) {
+           if ((line[0] == '%') &&
+	       (iscomment(line,"%!PS") || iscomment(line, "\004%!PS")))
+	       nesting_level++;
+	   else if (IS_COMMENT("EOF"))
+	       nesting_level--;
+	   line = ps_io_fgetchars(fd,-1);
+	   if (line) *line_lenP += FD_LINE_LEN;
+	   if (nesting_level == 0) break;
+       }
+   } else 
    if  (!IS_COMMENT("Begin"))     {} /* Do nothing */
    else if IS_BEGIN("Document:")  {  /* Skip the EPS without handling its content */
        nesting_level=1;

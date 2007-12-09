@@ -29,10 +29,10 @@ SPECTRE_BEGIN_DECLS
 
 typedef enum {
 	SPECTRE_ORIENTATION_PORTRAIT /*! Vertical orientation */,
-	SPECTRE_ORIENTATION_LANDSCAPE /*! Horizontal orientation */,
-	SPECTRE_ORIENTATION_REVERSE_PORTRAIT /*! Inverse vertical orientation */,
 	SPECTRE_ORIENTATION_REVERSE_LANDSCAPE /*! Inverse horizontal orientation,
-	                                          also known as Seascape */
+						also known as Seascape */,
+	SPECTRE_ORIENTATION_REVERSE_PORTRAIT /*! Inverse vertical orientation */,
+	SPECTRE_ORIENTATION_LANDSCAPE /*! Horizontal orientation */
 } SpectreOrientation;
 
 /*! This is the object that represents a page of a PostScript document.
