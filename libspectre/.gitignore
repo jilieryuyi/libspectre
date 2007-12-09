@@ -1,0 +1,4 @@
+.deps
+.libs
+libspectre.la
+*.lo
