@@ -53,9 +53,37 @@ AC_ISC_POSIX
 AC_PROG_CC_STDC
 AC_STDC_HEADERS
 
+LIBGS_REQUIRED="8.61"
+
 AC_CHECK_LIB(gs, gsapi_new_instance, have_libgs=yes, have_libgs=no)
 if test "x$have_libgs" = "xyes"; then
     LIB_GS="-lgs"
+    save_LIBS=$LIBS
+    LIBS="$LIBS -lgs"
+    AC_LANG_PUSH(C)
+    AC_MSG_CHECKING([for libgs >= $LIBGS_REQUIRED])
+    AC_RUN_IFELSE([AC_LANG_PROGRAM(
+[[
+#include <ghostscript/iapi.h>
+]],
+[[
+    gsapi_revision_t gsrev;
+
+    if (gsapi_revision (&gsrev, sizeof (gsrev)) != 0)
+        return 1;
+    if (gsrev.revision < `echo "$LIBGS_REQUIRED" | sed -e 's/\.//'`)
+        return 1;
+]])],
+                   [have_libgs=yes],
+		   [have_libgs=no],
+		   [have_libgs=yes]
+    )
+    AC_MSG_RESULT($have_libgs)
+    AC_LANG_POP(C)
+    LIBS=$save_LIBS
+    if test "x$have_libgs" = "xno"; then
+        AC_MSG_ERROR([You need libgs >= $LIBGS_REQUIRED in order to compile libspectre])
+    fi
 else
     AC_MSG_ERROR([You need libgs in order to compile libspectre])
 fi
