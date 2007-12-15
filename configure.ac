@@ -33,6 +33,9 @@ LT_AGE=0
 VERSION_INFO="$LT_CURRENT:$LT_REVISION:$LT_AGE"
 AC_SUBST(VERSION_INFO)
 
+LT_CURRENT_MINUS_AGE=`expr $LT_CURRENT - $LT_AGE`
+AC_SUBST(LT_CURRENT_MINUS_AGE)
+
 AC_SUBST(LT_CURRENT)
 AC_SUBST(LT_REVISION)
 AC_SUBST(LT_AGE)
@@ -193,6 +196,7 @@ AC_SUBST(SPECTRE_CFLAGS)
 
 AC_OUTPUT([
 Makefile
+Doxyfile
 libspectre/Makefile
 libspectre/spectre-version.h
 libspectre/ghostscript/Makefile
