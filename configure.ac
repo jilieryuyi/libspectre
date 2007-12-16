@@ -1,8 +1,8 @@
 AC_PREREQ(2.59)
 
 m4_define([spectre_major_version], [0])
-m4_define([spectre_minor_version], [0])
-m4_define([spectre_micro_version], [1])
+m4_define([spectre_minor_version], [1])
+m4_define([spectre_micro_version], [0])
 m4_define([spectre_version],
           [spectre_major_version.spectre_minor_version.spectre_micro_version])
 
