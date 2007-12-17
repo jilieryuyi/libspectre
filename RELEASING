@@ -5,23 +5,7 @@ Here are the steps to follow to create a new libspectre release:
    anything and your "master" and "origin" branchs are at the current
    revision.
 
-2) Verify that the code passes "make distcheck"
-
-	First, make sure you have 'nm' and 'readelf' commands in PATH.
-	this should be Ok with any Linux distro.
-
-	Running "make distcheck" should result in no warnings or
-	errors and end with a message of the form:
-
-	==================================================
-	libspectre-X.Y.Z archives ready for distribution:
-	libspectre-X.Y.Z.tar.gz
-	==================================================
-
-	(But the tar file isn't actually ready yet, as we still have
-	some more steps to follow).
-
-3) Fill out an entry in the NEWS file
+2) Fill out an entry in the NEWS file
 
 	Sift through the logs since the last release. This is most
 	easily done with a comand such as:
@@ -41,7 +25,7 @@ Here are the steps to follow to create a new libspectre release:
 		! -name 'spectre-gs.h' ! -name 'spectre-device.h' \
 		! -name 'spectre-utils.h' | xargs git log -p X.Y.Z.. --
 
-4) Increment spectre_{minor|micro}_version and LT_{CURRENT|REVISION|AGE}
+3) Increment spectre_{minor|micro}_version and LT_{CURRENT|REVISION|AGE}
    in configure.ac:
 
 	If there are API additions, then increment spectre_minor_version
@@ -52,6 +36,22 @@ Here are the steps to follow to create a new libspectre release:
 
 	Adjust LT_CURRENT, LT_REVISION, and LT_AGE as described in the
 	comments in configure.ac.
+
+4) Verify that the code passes "make distcheck"
+
+	First, make sure you have 'nm' and 'readelf' commands in PATH.
+	this should be Ok with any Linux distro.
+
+	Running "make distcheck" should result in no warnings or
+	errors and end with a message of the form:
+
+	==================================================
+	libspectre-X.Y.Z archives ready for distribution:
+	libspectre-X.Y.Z.tar.gz
+	==================================================
+
+	(But the tar file isn't actually ready yet, as we still have
+	some more steps to follow).
 
 5) Commit the changes to NEWS and configure.ac and push
 
