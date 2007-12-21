@@ -78,7 +78,9 @@ void                  spectre_render_context_get_resolution         (SpectreRend
 								     double               *x_dpi,
 								     double               *y_dpi);
 
-/*! Sets the page size in pixels
+/*! Sets the page size in pixels. Rotation shouldn't be considered,
+    the page size will be automatically adjusted when rendering according
+    to the rotation selected. 
     @param rc The rendering context to modify
     @param width the width of the page
     @param height the height of the page

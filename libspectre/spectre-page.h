@@ -65,10 +65,12 @@ const char        *spectre_page_get_label       (SpectrePage          *page);
 */
 SpectreOrientation spectre_page_get_orientation (SpectrePage          *page);
 
-/*! Returns the size of the page
+/*! Returns the size of the page. It always returns the page size according to
+    the page bounding box without taking into account the page orientation. 
     @param page The page whose size will be returned
-    @param width The page width will be returned here
-    @param height The page height will be returned here
+    @param width The page width will be returned here, or NULL
+    @param height The page height will be returned here, or NULL
+    @see spectre_page_get_orientation
 */
 void               spectre_page_get_size        (SpectrePage          *page,
 						 int                  *width,
