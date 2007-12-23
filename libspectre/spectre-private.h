@@ -32,7 +32,8 @@
 SPECTRE_BEGIN_DECLS
 
 struct SpectreRenderContext {
-	double             scale;
+	double             x_scale;
+	double             y_scale;
 	SpectreOrientation orientation;
 	double             x_dpi;
 	double             y_dpi;

@@ -34,7 +34,8 @@ spectre_render_context_new (void)
 	if (!rc)
 		return NULL;
 
-	rc->scale = 1.0;
+	rc->x_scale = 1.0;
+	rc->y_scale = 1.0;
 	rc->orientation = 0;
 	rc->x_dpi = 72.0;
 	rc->y_dpi = 72.0;
@@ -58,19 +59,26 @@ spectre_render_context_free (SpectreRenderContext *rc)
 
 void
 spectre_render_context_set_scale (SpectreRenderContext *rc,
-				  double                scale)
+				  double                x_scale,
+				  double                y_scale)
 {
 	_spectre_return_if_fail (rc != NULL);
 
-	rc->scale = scale;
+	rc->x_scale = x_scale;
+	rc->y_scale = y_scale;
 }
 
-double
-spectre_render_context_get_scale (SpectreRenderContext *rc)
+void 
+spectre_render_context_get_scale (SpectreRenderContext *rc,
+				  double               *x_scale,
+				  double               *y_scale)
 {
-	_spectre_return_val_if_fail (rc != NULL, 1.0);
+	_spectre_return_if_fail (rc != NULL);
 
-	return rc->scale;
+	if (x_scale)
+		*x_scale = rc->x_scale;
+	if (y_scale)
+		*y_scale = rc->y_scale;
 }
 
 void

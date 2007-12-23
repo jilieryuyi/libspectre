@@ -184,7 +184,6 @@ spectre_device_render (SpectreDevice        *device,
 	char      *dsp_format, *dsp_handle;
 	char      *width_points = NULL;
 	char      *height_points = NULL;
-	double     x_scale, y_scale;
 
 	gs = spectre_gs_new ();
 	if (!gs)
@@ -204,12 +203,8 @@ spectre_device_render (SpectreDevice        *device,
 		return SPECTRE_STATUS_RENDER_ERROR;
 	}
 
-	if (rc->scale != 1.0) {
-		width *= rc->scale;
-		height *= rc->scale;
-	}
-
-	x_scale = y_scale = rc->scale;
+	width = (int) ((width * rc->x_scale) + 0.5);
+	height = (int) ((height * rc->y_scale) + 0.5);
 
 	if (rc->use_platform_fonts == FALSE)
 		n_args++;
@@ -229,8 +224,8 @@ spectre_device_render (SpectreDevice        *device,
 							    rc->graphic_alpha_bits);
 	args[arg++] = size =_spectre_strdup_printf ("-g%dx%d", width, height);
 	args[arg++] = resolution = _spectre_strdup_printf ("-r%fx%f",
-							   x_scale * rc->x_dpi,
-							   y_scale * rc->y_dpi);
+							   rc->x_scale * rc->x_dpi,
+							   rc->y_scale * rc->y_dpi);
 	args[arg++] = dsp_format = _spectre_strdup_printf ("-dDisplayFormat=%d",
 							   DISPLAY_COLORS_RGB |
 							   DISPLAY_UNUSED_LAST |

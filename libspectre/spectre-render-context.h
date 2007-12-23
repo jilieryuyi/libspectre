@@ -38,15 +38,21 @@ void                  spectre_render_context_free                   (SpectreRend
 
 /*! Sets the scale. The default is 1
     @param rc The rendering context to modify
-    @param scale The scale to use when rendering. 2 is twice as big
+    @param x_scale The scale factor for the X dimension to use when rendering. 2 is twice as big
+    @param y_scale The scale factor for the Y dimension to use when rendering. 2 is twice as big
 */
 void                  spectre_render_context_set_scale              (SpectreRenderContext *rc,
-								     double                scale);
+								     double                x_scale,
+								     double                y_scale);
 
 /*! Gets the scale
     @param rc The rendering context to query
+    @param x_scale The scale factor for the X dimension will be stored here, or NULL
+    @param y_scale The scale factor for the Y dimension will be stored here, or NULL
 */
-double                spectre_render_context_get_scale              (SpectreRenderContext *rc);
+void                  spectre_render_context_get_scale              (SpectreRenderContext *rc,
+								     double               *x_scale,
+								     double               *y_scale);
 
 /*! Sets the rotation. The default is 0
     @param rc The rendering context to modify
@@ -71,8 +77,8 @@ void                  spectre_render_context_set_resolution         (SpectreRend
 
 /*! Gets the resolution
     @param rc The rendering context to query
-    @param x_dpi the horizontal resolution will be stored here
-    @param y_dpi the vertical resolution will be stored here
+    @param x_dpi the horizontal resolution will be stored here, or NULL
+    @param y_dpi the vertical resolution will be stored here, or NULL
 */
 void                  spectre_render_context_get_resolution         (SpectreRenderContext *rc,
 								     double               *x_dpi,
@@ -93,8 +99,8 @@ void                  spectre_render_context_set_page_size          (SpectreRend
 
 /*! Gets the page size in pixels
     @param rc The rendering context to query
-    @param width the width of the page will be stored here
-    @param height the height of the page will be stored here
+    @param width the width of the page will be stored here, or NULL
+    @param height the height of the page will be stored here, or NULL
 */
 void                  spectre_render_context_get_page_size          (SpectreRenderContext *rc,
 								     int                  *width,
