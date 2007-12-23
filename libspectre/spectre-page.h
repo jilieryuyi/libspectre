@@ -90,6 +90,19 @@ void               spectre_page_render          (SpectrePage          *page,
 						 unsigned char       **page_data,
 						 int                  *row_length);
 
+/* ! Renders a rectangle of the page to RGB32 format. This function can fail
+     @param page The page to renderer
+     @param rc The rendering context specifying how the page has to be rendered
+     @param x The X coordinate of the top left corner of the rectangle
+     @param y The Y coordinate to the top left corner of the rectangle
+     @param width The width of the rectangle
+     @param height The height of the rectangle
+     @param page_data A pointer that will point to the image data
+                      if the call succeeds
+     @param row_length The length of an image row will be returned here. It can
+                       happen that row_length is different than width * 4
+     @see spectre_page_status
+*/
 void               spectre_page_render_slice    (SpectrePage          *page,
 						 SpectreRenderContext *rc,
 						 int                   x,
