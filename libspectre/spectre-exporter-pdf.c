@@ -67,7 +67,7 @@ static SpectreStatus
 spectre_exporter_pdf_do_page (SpectreExporter *exporter,
 			      unsigned int     page_index)
 {
-	if (!spectre_gs_send_page (exporter->gs, exporter->doc, page_index)) {
+	if (!spectre_gs_send_page (exporter->gs, exporter->doc, page_index, 0, 0)) {
 		spectre_gs_free (exporter->gs);
 		exporter->gs = NULL;
 

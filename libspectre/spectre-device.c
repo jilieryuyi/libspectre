@@ -166,22 +166,25 @@ SpectreStatus
 spectre_device_render (SpectreDevice        *device,
 		       unsigned int          page,
 		       SpectreRenderContext *rc,
+		       int                   x,
+		       int                   y,
+		       int                   width,
+		       int                   height,
 		       unsigned char       **page_data,
 		       int                  *row_length)
 {
 	SpectreGS *gs;
-	char **args;
-	int n_args = 12;
-	int arg = 0;
-	int success;
-	char *text_alpha, *graph_alpha;
-	char *size = NULL;
-	char *resolution, *set;
-	char *dsp_format, *dsp_handle;
-	int urx, ury, llx, lly;
-	int page_width, page_height;
-	double x_scale, y_scale;
-	int width, height;
+	char     **args;
+	int        n_args = 12;
+	int        arg = 0;
+	int        success;
+	char      *text_alpha, *graph_alpha;
+	char      *size = NULL;
+	char      *resolution, *set;
+	char      *dsp_format, *dsp_handle;
+	char      *width_points = NULL;
+	char      *height_points = NULL;
+	double     x_scale, y_scale;
 
 	gs = spectre_gs_new ();
 	if (!gs)
@@ -201,29 +204,17 @@ spectre_device_render (SpectreDevice        *device,
 		return SPECTRE_STATUS_RENDER_ERROR;
 	}
 
-	psgetpagebox (device->doc, page,
-		      &urx, &ury, &llx, &lly);
-
-	page_width = (urx - llx);
-	page_height = (ury - lly);
-
-	if (rc->width == -1 || rc->height == -1) {
-		width = page_width * rc->scale;
-		height = page_height * rc->scale;
-	} else {
-		width = rc->width;
-		height = rc->height;
+	if (rc->scale != 1.0) {
+		width *= rc->scale;
+		height *= rc->scale;
 	}
 
-	if (rc->scale == 1.0 && (width != page_width || height != page_height)) {
-		x_scale = width / (double)page_width;
-		y_scale = height / (double)page_height;
-	} else {
-		x_scale = y_scale = rc->scale;
-	}
+	x_scale = y_scale = rc->scale;
 
 	if (rc->use_platform_fonts == FALSE)
 		n_args++;
+	if (rc->width != -1 && rc->height != -1)
+		n_args += 3;
 	
 	args = calloc (sizeof (char *), n_args);
 	args[arg++] = "libspectre"; /* This value doesn't really matter */
@@ -232,10 +223,10 @@ spectre_device_render (SpectreDevice        *device,
 	args[arg++] = "-dNOPAUSE";
 	args[arg++] = "-dNOPAGEPROMPT";
 	args[arg++] = "-sDEVICE=display";
-	args[arg++] = text_alpha =_spectre_strdup_printf("-dTextAlphaBits=%d",
-							 rc->text_alpha_bits);
-	args[arg++] = graph_alpha = _spectre_strdup_printf("-dGraphicsAlphaBits=%d",
-							   rc->graphic_alpha_bits);
+	args[arg++] = text_alpha = _spectre_strdup_printf ("-dTextAlphaBits=%d",
+							   rc->text_alpha_bits);
+	args[arg++] = graph_alpha = _spectre_strdup_printf ("-dGraphicsAlphaBits=%d",
+							    rc->graphic_alpha_bits);
 	args[arg++] = size =_spectre_strdup_printf ("-g%dx%d", width, height);
 	args[arg++] = resolution = _spectre_strdup_printf ("-r%fx%f",
 							   x_scale * rc->x_dpi,
@@ -251,10 +242,20 @@ spectre_device_render (SpectreDevice        *device,
 	if (rc->use_platform_fonts == FALSE)
 		args[arg++] = "-dNOPLATFONTS";
 
+	if (rc->width != -1 && rc->height != -1) {
+		args[arg++] = width_points = _spectre_strdup_printf ("-dDEVICEWIDTHPOINTS=%d",
+								     rc->width);
+		args[arg++] = height_points = _spectre_strdup_printf ("-dDEVICEHEIGHTPOINTS=%d",
+								      rc->height);
+		args[arg++] = "-dFIXEDMEDIA";
+	}
+
 	success = spectre_gs_run (gs, n_args, args);
 	free (text_alpha);
 	free (graph_alpha);
 	free (size);
+	free (width_points);
+	free (height_points);
 	free (resolution);
 	free (dsp_format);
 	free (dsp_handle);
@@ -273,7 +274,7 @@ spectre_device_render (SpectreDevice        *device,
 	}
 	free (set);
 
-	if (!spectre_gs_send_page (gs, device->doc, page)) {
+	if (!spectre_gs_send_page (gs, device->doc, page, x, y)) {
 		spectre_gs_free (gs);
 		return SPECTRE_STATUS_RENDER_ERROR;
 	}

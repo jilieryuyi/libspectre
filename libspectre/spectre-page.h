@@ -90,6 +90,15 @@ void               spectre_page_render          (SpectrePage          *page,
 						 unsigned char       **page_data,
 						 int                  *row_length);
 
+void               spectre_page_render_slice    (SpectrePage          *page,
+						 SpectreRenderContext *rc,
+						 int                   x,
+						 int                   y,
+						 int                   width,
+						 int                   height,
+						 unsigned char       **page_data,
+						 int                  *row_length);
+
 SPECTRE_END_DECLS
 
 #endif /* SPECTRE_PAGE_H */

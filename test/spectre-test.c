@@ -111,6 +111,102 @@ test_rotation (SpectreDocument *document,
 }
 
 static void
+test_render_slice (SpectreDocument *document,
+		   const char      *output)
+{
+	SpectrePage          *page;
+	SpectreRenderContext *rc;
+	int                   x, y;
+	int                   width, height;
+	int                   width_points;
+	int                   height_points;
+	unsigned char        *data = NULL;
+	int                   row_length;
+
+	page = spectre_document_get_page (document, 0);
+	
+	spectre_page_get_size (page, &width_points, &height_points);
+
+	/* Render the central slice */
+	width = width_points / 3;
+	height = height_points / 3;
+	x = width;
+	y = height;
+
+	printf ("Rendering page 0 slice %d, %d, %d, %d\n",
+		x, y, width, height);
+	
+	rc = spectre_render_context_new ();
+
+	spectre_page_render_slice (page, rc, x, y, width, height,
+				   &data, &row_length);
+	if (!spectre_page_status (page)) {
+		cairo_surface_t *surface;
+		char            *filename;
+
+		surface = cairo_image_surface_create_for_data (data,
+							       CAIRO_FORMAT_RGB24,
+							       width, height,
+							       row_length);
+
+		filename = _spectre_strdup_printf ("%s/page-slice.png", output);
+		cairo_surface_write_to_png (surface, filename);
+		free (filename);
+
+		cairo_surface_destroy (surface);
+	} else {
+		printf ("Error rendering page slice %d, %d, %d, %d: %s\n",
+			x, y, width, height,
+			spectre_status_to_string (spectre_page_status (page)));
+	}
+
+	free (data);
+	spectre_render_context_free (rc);
+	spectre_page_free (page);
+}
+
+static void
+test_page_size (SpectreDocument *document,
+		const char      *output)
+{
+	SpectrePage          *page;
+	SpectreRenderContext *rc;
+	unsigned char        *data = NULL;
+	int                   row_length;
+
+	page = spectre_document_get_page (document, 0);
+	
+	printf ("Rendering page 0 in a4 page\n");
+	
+	rc = spectre_render_context_new ();
+
+	spectre_render_context_set_page_size (rc, 595, 842);
+	spectre_page_render (page, rc, &data, &row_length);
+	if (!spectre_page_status (page)) {
+		cairo_surface_t *surface;
+		char            *filename;
+
+		surface = cairo_image_surface_create_for_data (data,
+							       CAIRO_FORMAT_RGB24,
+							       595, 842,
+							       row_length);
+
+		filename = _spectre_strdup_printf ("%s/page-a4.png", output);
+		cairo_surface_write_to_png (surface, filename);
+		free (filename);
+
+		cairo_surface_destroy (surface);
+	} else {
+		printf ("Error rendering page in a4 page: %s\n",
+			spectre_status_to_string (spectre_page_status (page)));
+	}
+
+	free (data);
+	spectre_render_context_free (rc);
+	spectre_page_free (page);
+}
+
+static void
 test_export (SpectreDocument      *document,
 	     SpectreExporterFormat format,
 	     const char           *output_dir)
@@ -269,6 +365,8 @@ int main (int argc, char **argv)
 
 	spectre_render_context_free (rc);
 
+	test_render_slice (document, argv[2]);
+	test_page_size (document, argv[2]);
 	test_rotation (document, argv[2]);
 	
 	spectre_document_free (document);

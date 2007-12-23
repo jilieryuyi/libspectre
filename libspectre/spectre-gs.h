@@ -46,7 +46,9 @@ int        spectre_gs_send_string          (SpectreGS           *gs,
 					    const char          *str);
 int        spectre_gs_send_page            (SpectreGS           *gs,
 					    struct document     *doc,
-					    unsigned int         page_index);
+					    unsigned int         page_index,
+					    int                  x,
+					    int                  y);
 void       spectre_gs_cleanup              (SpectreGS           *gs,
 					    SpectreGSCleanupFlag flag);
 void       spectre_gs_free                 (SpectreGS           *gs);

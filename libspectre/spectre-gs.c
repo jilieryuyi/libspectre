@@ -103,7 +103,7 @@ spectre_gs_process (SpectreGS  *gs,
 		return FALSE;
 	}
 
-	if (x != 0 && y != 0) {
+	if (x != 0 || y != 0) {
 		char *set;
 
 		set = _spectre_strdup_printf ("%d %d translate\n", -x, -y);
@@ -205,7 +205,9 @@ spectre_gs_send_string (SpectreGS  *gs,
 int
 spectre_gs_send_page (SpectreGS       *gs,
 		      struct document *doc,
-		      unsigned int     page_index)
+		      unsigned int     page_index,
+		      int              x,
+		      int              y)
 {
 	int doc_llx = 0, doc_lly = 0;
 	int page_llx = 0, page_lly = 0;
@@ -231,7 +233,7 @@ spectre_gs_send_page (SpectreGS       *gs,
 
 	if (!spectre_gs_process (gs,
 				 doc->filename,
-				 doc_llx, doc_lly,
+				 doc_llx + x, doc_lly + y,
 				 doc->beginprolog,
 				 doc->endprolog))
 		return FALSE;
@@ -246,7 +248,7 @@ spectre_gs_send_page (SpectreGS       *gs,
 	if (doc->numpages > 0) {
 		if (!spectre_gs_process (gs,
 					 doc->filename,
-					 page_llx, page_lly,
+					 page_llx + x, page_lly + y,
 					 doc->pages[page_index].begin,
 					 doc->pages[page_index].end))
 			return FALSE;

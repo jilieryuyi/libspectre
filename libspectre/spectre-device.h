@@ -35,6 +35,10 @@ SpectreDevice *spectre_device_new    (struct document      *doc);
 SpectreStatus  spectre_device_render (SpectreDevice        *device,
 				      unsigned int          page,
 				      SpectreRenderContext *rc,
+				      int                   x,
+				      int                   y,
+				      int                   width,
+				      int                   height,
 				      unsigned char       **page_data,
 				      int                  *row_length);
 void           spectre_device_free   (SpectreDevice        *device);

@@ -144,14 +144,42 @@ spectre_page_render (SpectrePage          *page,
 		     int                  *row_length)
 {
 	SpectreDevice *device;
+	int            width, height;
 
 	_spectre_return_if_fail (page != NULL);
 	_spectre_return_if_fail (rc != NULL);
 
+	spectre_page_get_size (page, &width, &height);
+
 	device = spectre_device_new (page->doc);
-	
 	page->status = spectre_device_render (device, page->index, rc,
+					      0, 0, width, height,
 					      page_data, row_length);
-	
+	spectre_device_free (device);
+}
+
+void
+spectre_page_render_slice (SpectrePage          *page,
+			   SpectreRenderContext *rc,
+			   int                   x,
+			   int                   y,
+			   int                   width,
+			   int                   height,
+			   unsigned char       **page_data,
+			   int                  *row_length)
+{
+	SpectreDevice *device;
+	int            page_height;
+
+	_spectre_return_if_fail (page != NULL);
+	_spectre_return_if_fail (rc != NULL);
+
+	spectre_page_get_size (page, NULL, &page_height);
+
+	device = spectre_device_new (page->doc);
+	page->status = spectre_device_render (device, page->index, rc,
+					      x, page_height - (y + height),
+					      width, height,
+					      page_data, row_length);
 	spectre_device_free (device);
 }
