@@ -1,6 +1,7 @@
 INCLUDES = 				\
 	-I$(top_srcdir)			\
 	-I$(top_srcdir)/libspectre	\
+	$(SPECTRE_CFLAGS)		\
 	$(CAIRO_CFLAGS)
 
 noinst_PROGRAMS = spectre-test

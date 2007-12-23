@@ -248,7 +248,7 @@ test_export (SpectreDocument      *document,
 	spectre_exporter_free (exporter);
 }
 
-void
+static void
 test_save (SpectreDocument *document,
 	   const char      *output_dir)
 {
@@ -263,7 +263,7 @@ test_save (SpectreDocument *document,
 	free (filename);
 }
 
-void
+static void
 test_save_to_pdf (SpectreDocument *document,
 		  const char      *output_dir)
 {
@@ -282,7 +282,7 @@ int main (int argc, char **argv)
 {
 	SpectreDocument      *document;
 	SpectreRenderContext *rc;
-	int                   i;
+	unsigned int          i;
 
 	/* TODO: check argv */
 
