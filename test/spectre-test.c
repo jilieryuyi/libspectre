@@ -207,6 +207,40 @@ test_page_size (SpectreDocument *document,
 }
 
 static void
+test_document_render (SpectreDocument *document,
+		      const char      *output)
+{
+	int            width, height;
+	unsigned char *data = NULL;
+	int            row_length;
+
+	printf ("Rendering document\n");
+
+	spectre_document_render (document, &width, &height, &data, &row_length);
+	if (!spectre_document_status (document)) {
+		cairo_surface_t *surface;
+		char            *filename;
+
+		/* TODO: wat to do with width, height */
+		surface = cairo_image_surface_create_for_data (data,
+							       CAIRO_FORMAT_RGB24,
+							       width, height,
+							       row_length);
+
+		filename = _spectre_strdup_printf ("%s/document.png", output);
+		cairo_surface_write_to_png (surface, filename);
+		free (filename);
+
+		cairo_surface_destroy (surface);
+	} else {
+		printf ("Error rendering document: %s\n",
+			spectre_status_to_string (spectre_document_status (document)));
+	}
+
+	free (data);
+}
+
+static void
 test_export (SpectreDocument      *document,
 	     SpectreExporterFormat format,
 	     const char           *output_dir)
@@ -300,6 +334,7 @@ int main (int argc, char **argv)
 		return 1;
 	}
 
+	test_document_render (document, argv[2]);
 	test_export (document, SPECTRE_EXPORTER_FORMAT_PDF, argv[2]);
 	test_export (document, SPECTRE_EXPORTER_FORMAT_PS, argv[2]);
 	test_save (document, argv[2]);

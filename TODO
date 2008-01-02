@@ -7,5 +7,5 @@
 [X] Makefile for ghostscript dir. It's not installale but it's distribuible
 [ ] spectre_document_load_from_data
 [ ] spectre_document_save_to_data
-[ ] A convenient function spectre_document_render for unstructured documents
+[X] A convenient function spectre_document_render for unstructured documents
 

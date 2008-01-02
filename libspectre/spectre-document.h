@@ -127,6 +127,40 @@ SpectrePage       *spectre_document_get_page           (SpectreDocument *documen
 SpectrePage       *spectre_document_get_page_by_label  (SpectreDocument *document,
 							const char      *label);
 
+/*! Convenient function for rendering documents with no pages, tipically eps.
+    When used with multi-page documents the first page will be rendered.
+    @param document the document to render
+    @rc the rendering context specifying how the document has to be rendered
+    @width the page width will be returned here, or NULL
+    @height the page height will be returned here, or NULL
+    @page_data a pointer that will point to the image data
+    @row_length the length of an image row will be returned here
+    @see spectre_document_render_full
+*/
+void               spectre_document_render_full        (SpectreDocument      *document,
+							SpectreRenderContext *rc,
+							int                  *width,
+							int                  *height,
+							unsigned char       **page_data,
+							int                  *row_length);
+
+/*! Convenient function for rendering documents with no pages, tipically eps.
+    Document will be rendered with the default options, use spectre_document_render_full
+    if you want to change any of them. 
+    When used with multi-page documents the first page will be rendered.
+    @param document the document to render
+    @width the page width will be returned here, or NULL
+    @height the page height will be returned here, or NULL
+    @page_data a pointer that will point to the image data
+    @row_length the length of an image row will be returned here
+    @see spectre_document_render_full
+*/
+void               spectre_document_render             (SpectreDocument      *document,
+							int                  *width,
+							int                  *height,
+							unsigned char       **page_data,
+							int                  *row_length);
+
 /*! Save document as filename. This function can fail
     @param document the document that will be saved
     @param filename the path where document will be saved
