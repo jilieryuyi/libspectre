@@ -231,9 +231,17 @@ spectre_gs_send_page (SpectreGS       *gs,
 		}
 	}
 
+	if (doc->numpages > 0) {
+		page_llx += x;
+		page_lly += y;
+	} else {
+		doc_llx += x;
+		doc_lly += y;
+	}
+
 	if (!spectre_gs_process (gs,
 				 doc->filename,
-				 doc_llx + x, doc_lly + y,
+				 doc_llx, doc_lly,
 				 doc->beginprolog,
 				 doc->endprolog))
 		return FALSE;
@@ -248,7 +256,7 @@ spectre_gs_send_page (SpectreGS       *gs,
 	if (doc->numpages > 0) {
 		if (!spectre_gs_process (gs,
 					 doc->filename,
-					 page_llx + x, page_lly + y,
+					 page_llx, page_lly,
 					 doc->pages[page_index].begin,
 					 doc->pages[page_index].end))
 			return FALSE;

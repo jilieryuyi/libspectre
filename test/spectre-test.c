@@ -221,7 +221,6 @@ test_document_render (SpectreDocument *document,
 		cairo_surface_t *surface;
 		char            *filename;
 
-		/* TODO: wat to do with width, height */
 		surface = cairo_image_surface_create_for_data (data,
 							       CAIRO_FORMAT_RGB24,
 							       width, height,
