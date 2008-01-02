@@ -34,6 +34,8 @@ struct SpectrePage
 	SpectreStatus    status;
 
 	unsigned int     index;
+	int              width;
+	int              height;
 };
 
 SpectrePage *
@@ -47,6 +49,8 @@ _spectre_page_new (unsigned int     page_index,
 		return NULL;
 
 	page->index = page_index;
+	page->width = -1;
+	page->height = -1;
 	page->doc = psdocreference (doc);
 
 	return page;
@@ -124,17 +128,22 @@ spectre_page_get_size (SpectrePage *page,
 		       int         *width,
 		       int         *height)
 {
-	int urx, ury, llx, lly;
-
 	_spectre_return_if_fail (page != NULL);
+
+	if (page->width == -1 || page>height == -1) {
+		int urx, ury, llx, lly;
 	
-	psgetpagebox (page->doc, page->index,
-		      &urx, &ury, &llx, &lly);
+		psgetpagebox (page->doc, page->index,
+			      &urx, &ury, &llx, &lly);
+
+		page->width = urx - llx;
+		page->height = ury - lly;
+	}
 
 	if (width)
-		*width = urx - llx;
+		*width = page->width;
 	if (height)
-		*height = ury - lly;
+		*height = page->height;
 }
 
 void
