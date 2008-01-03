@@ -1,7 +1,7 @@
 AC_PREREQ(2.59)
 
 m4_define([spectre_major_version], [0])
-m4_define([spectre_minor_version], [1])
+m4_define([spectre_minor_version], [2])
 m4_define([spectre_micro_version], [0])
 m4_define([spectre_version],
           [spectre_major_version.spectre_minor_version.spectre_micro_version])
@@ -19,7 +19,7 @@ AM_MAINTAINER_MODE
 #
 
 ## increment if the interface has additions, changes, removals.
-LT_CURRENT=1
+LT_CURRENT=2
 
 ## increment any time the source changes; set to
 ##  0 if you increment CURRENT
@@ -28,7 +28,7 @@ LT_REVISION=0
 ## increment if any interfaces have been added; set to 0
 ## if any interfaces have been changed or removed. removal has
 ## precedence over adding, so set to 0 if both happened.
-LT_AGE=0
+LT_AGE=1
 
 VERSION_INFO="$LT_CURRENT:$LT_REVISION:$LT_AGE"
 AC_SUBST(VERSION_INFO)

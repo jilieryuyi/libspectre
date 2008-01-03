@@ -1,3 +1,28 @@
+libspectre 0.2.0 (03 January 2008)
+==================================
+
+API additions:
+
+ - Rendering unstructured documents: it's a bit confusing calling
+   get_page for a document with no pages. The following functions has
+   been added for rendering unstructured documents:
+   
+    * spectre_document_render
+    * spectre_document_render_full
+    * spectre_document_get_page_size
+   
+ - Tile rendering: spectre_page_render_slice has been added to allow
+   rendering rectangles of the page. (Bug #13754)
+
+API changes:
+
+ - spectre_render_context_set_page_size determines the size of the
+   output image, but it doesn't affect the scale factor anymore.
+
+ - spectre_render_context_[set|get]_scale now require the scale factor for
+   both the X and Y dimensions.
+
+
 libspectre 0.1.0 (16 December 2007)
 ===================================
 
