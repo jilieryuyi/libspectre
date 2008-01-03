@@ -130,7 +130,7 @@ spectre_page_get_size (SpectrePage *page,
 {
 	_spectre_return_if_fail (page != NULL);
 
-	if (page->width == -1 || page>height == -1) {
+	if (page->width == -1 || page->height == -1) {
 		int urx, ury, llx, lly;
 	
 		psgetpagebox (page->doc, page->index,
