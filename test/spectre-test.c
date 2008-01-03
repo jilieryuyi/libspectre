@@ -210,16 +210,18 @@ static void
 test_document_render (SpectreDocument *document,
 		      const char      *output)
 {
-	int            width, height;
 	unsigned char *data = NULL;
 	int            row_length;
 
 	printf ("Rendering document\n");
 
-	spectre_document_render (document, &width, &height, &data, &row_length);
+	spectre_document_render (document, &data, &row_length);
 	if (!spectre_document_status (document)) {
 		cairo_surface_t *surface;
 		char            *filename;
+		int              width, height;
+
+		spectre_document_get_page_size (document, &width, &height);
 
 		surface = cairo_image_surface_create_for_data (data,
 							       CAIRO_FORMAT_RGB24,
@@ -236,6 +238,49 @@ test_document_render (SpectreDocument *document,
 			spectre_status_to_string (spectre_document_status (document)));
 	}
 
+	free (data);
+}
+
+static void
+test_document_render_full (SpectreDocument *document,
+			   const char      *output)
+{
+	unsigned char        *data = NULL;
+	int                   row_length;
+	SpectreRenderContext *rc;
+
+	printf ("Rendering document at 2x\n");
+
+	rc = spectre_render_context_new ();
+	
+	spectre_render_context_set_scale (rc, 2.0, 2.0);
+	spectre_document_render_full (document, rc, &data, &row_length);
+	if (!spectre_document_status (document)) {
+		cairo_surface_t *surface;
+		char            *filename;
+		int              width, height;
+
+		spectre_document_get_page_size (document, &width, &height);
+
+		width = (int) ((width * 2.0) + 0.5);
+		height = (int) ((height * 2.0) + 0.5);
+
+		surface = cairo_image_surface_create_for_data (data,
+							       CAIRO_FORMAT_RGB24,
+							       width, height,
+							       row_length);
+
+		filename = _spectre_strdup_printf ("%s/document-2x.png", output);
+		cairo_surface_write_to_png (surface, filename);
+		free (filename);
+
+		cairo_surface_destroy (surface);
+	} else {
+		printf ("Error rendering document at 2x: %s\n",
+			spectre_status_to_string (spectre_document_status (document)));
+	}
+
+	spectre_render_context_free (rc);
 	free (data);
 }
 
@@ -334,6 +379,7 @@ int main (int argc, char **argv)
 	}
 
 	test_document_render (document, argv[2]);
+	test_document_render_full (document, argv[2]);
 	test_export (document, SPECTRE_EXPORTER_FORMAT_PDF, argv[2]);
 	test_export (document, SPECTRE_EXPORTER_FORMAT_PS, argv[2]);
 	test_save (document, argv[2]);

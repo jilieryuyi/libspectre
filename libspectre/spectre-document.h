@@ -139,8 +139,6 @@ SpectrePage       *spectre_document_get_page_by_label  (SpectreDocument *documen
 */
 void               spectre_document_render_full        (SpectreDocument      *document,
 							SpectreRenderContext *rc,
-							int                  *width,
-							int                  *height,
 							unsigned char       **page_data,
 							int                  *row_length);
 
@@ -156,10 +154,18 @@ void               spectre_document_render_full        (SpectreDocument      *do
     @see spectre_document_render_full
 */
 void               spectre_document_render             (SpectreDocument      *document,
-							int                  *width,
-							int                  *height,
 							unsigned char       **page_data,
 							int                  *row_length);
+
+/*  Convenient function for getting the page size of documents with no pages, tipically eps.
+    When used with multi-page documents the size of the first page will be returned.
+    @param document the document whose page will be returned
+    @width the page width will be returned here, or NULL
+    @height the page height will be returned here, or NULL
+*/
+void               spectre_document_get_page_size      (SpectreDocument      *document,
+							int                  *width,
+							int                  *height);
 
 /*! Save document as filename. This function can fail
     @param document the document that will be saved

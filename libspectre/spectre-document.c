@@ -302,14 +302,13 @@ spectre_document_get_page_by_label (SpectreDocument *document,
 void
 spectre_document_render_full (SpectreDocument      *document,
 			      SpectreRenderContext *rc,
-			      int                  *width,
-			      int                  *height,
 			      unsigned char       **page_data,
 			      int                  *row_length)
 {
 	SpectrePage *page;
 
 	_spectre_return_if_fail (document != NULL);
+	_spectre_return_if_fail (rc != NULL);
 
 	if (!document->doc) {
 		document->status = SPECTRE_STATUS_DOCUMENT_NOT_LOADED;
@@ -325,26 +324,11 @@ spectre_document_render_full (SpectreDocument      *document,
 	spectre_page_render (page, rc, page_data, row_length);
 	document->status = spectre_page_status (page);
 
-	if (width || height) {
-		if (rc->width != -1 && rc->height != -1) {
-			if (width)  *width = rc->width;
-			if (height) *height = rc->height;
-		} else {
-			int w, h;
-
-			spectre_page_get_size (page, &w, &h);
-			if (width)  *width = w;
-			if (height) *height = h;
-		}
-	}
-	
 	spectre_page_free (page);
 }
 
 void
 spectre_document_render (SpectreDocument *document,
-			 int             *width,
-			 int             *height,
 			 unsigned char  **page_data,
 			 int             *row_length)
 {
@@ -353,11 +337,38 @@ spectre_document_render (SpectreDocument *document,
 	_spectre_return_if_fail (document != NULL);
 
 	rc = spectre_render_context_new ();
-	spectre_document_render_full (document, rc,
-				      width, height,
-				      page_data,
-				      row_length);
+	spectre_document_render_full (document, rc, page_data, row_length);
 	spectre_render_context_free (rc);
+}
+
+void
+spectre_document_get_page_size (SpectreDocument *document,
+				int             *width,
+				int             *height)
+{
+	SpectrePage *page;
+	int          w, h;
+
+	_spectre_return_if_fail (document != NULL);
+
+	if (!document->doc) {
+		document->status = SPECTRE_STATUS_DOCUMENT_NOT_LOADED;
+		return;
+	}
+
+	page = spectre_document_get_page (document, 0);
+	if (!page || document->status != SPECTRE_STATUS_SUCCESS) {
+		spectre_page_free (page);
+		return;
+	}
+		
+	spectre_page_get_size (page, &w, &h);
+	if (width)
+		*width = w;
+	if (height)
+		*height = h;
+	
+	spectre_page_free (page);
 }
 
 void
