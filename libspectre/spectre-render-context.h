@@ -106,14 +106,14 @@ void                  spectre_render_context_get_page_size          (SpectreRend
 								     int                  *width,
 								     int                  *height);
 
-/*! Sets wheter to use the platform fonts when rendering or not. The default is TRUE
+/*! Sets whether to use the platform fonts when rendering or not. The default is TRUE
     @param rc The rendering context to modify
     @param use_platform_fonts should platform fonts be used when rendering?
 */
 void                  spectre_render_context_set_use_platform_fonts (SpectreRenderContext *rc,
 								     int                   use_platform_fonts);
 
-/*! Gets wheter to use the platform fonts when rendering or not
+/*! Gets whether to use the platform fonts when rendering or not
     @param rc The rendering context to query
 */
 int                   spectre_render_context_get_use_platform_fonts (SpectreRenderContext *rc);
