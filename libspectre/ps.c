@@ -1265,7 +1265,7 @@ static void
 psfree(doc)
     struct document *doc;
 {
-    int i;
+    unsigned int i;
 
     BEGINMESSAGE(psfree)
     if (doc) {
@@ -2078,7 +2078,7 @@ pscopydoc(dest_file,src_filename,d,pagelist)
     Boolean pages_atend = False;
     int pages;
     int page = 1;
-    int i, j;
+    unsigned int i, j;
     int here;
     FileData fd;
 
