@@ -134,7 +134,7 @@ spectre_update (void *handle, void *device, int x, int y, int w, int h)
 	return 0;
 }
 
-static display_callback spectre_device = {
+static const display_callback spectre_device = {
 	sizeof (display_callback),
 	DISPLAY_VERSION_MAJOR,
 	DISPLAY_VERSION_MINOR,
@@ -196,7 +196,7 @@ spectre_device_render (SpectreDevice        *device,
 		return SPECTRE_STATUS_RENDER_ERROR;
 	}
 
-	if (!spectre_gs_set_display_callback (gs, &spectre_device)) {
+	if (!spectre_gs_set_display_callback (gs, (display_callback *)&spectre_device)) {
 		spectre_gs_cleanup (gs, CLEANUP_DELETE_INSTANCE);
 		spectre_gs_free (gs);
 		
