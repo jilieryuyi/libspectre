@@ -130,7 +130,7 @@ static int dsc_strncmp(s1, s2, n)
 
 /* list of standard paper sizes from Adobe's PPD. */
 
-static struct documentmedia papersizes[] = {
+static const struct documentmedia papersizes[] = {
     {"BBox",	         0,  0},
     {"Letter",		 612,  792},
     {"LetterSmall",	 612,  792},
@@ -623,7 +623,7 @@ psscan(const char *filename, int scanstyle)
 		doc->media[0].width = 0;
 		doc->media[0].height = 0;
 		for (i=0; papersizes[i].name; i++) {
- 		    dmp = &papersizes[i];
+			dmp = (Media)&papersizes[i];
 		    /* Note: Paper size comment uses down cased paper size
 		     * name.  Case insensitive compares are only used for
 		     * PaperSize comments.
@@ -653,7 +653,7 @@ psscan(const char *filename, int scanstyle)
 		doc->media[doc->nummedia].width = 0;
 		doc->media[doc->nummedia].height = 0;
 		for (i=0; papersizes[i].name; i++) {
-		   dmp = &papersizes[i];
+			dmp = (Media)&papersizes[i];
 		    /* Note: Paper size comment uses down cased paper size
 		     * name.  Case insensitive compares are only used for
 		     * PaperSize comments.
@@ -690,7 +690,7 @@ psscan(const char *filename, int scanstyle)
 		    doc->media[doc->nummedia].width = 0;
 		    doc->media[doc->nummedia].height = 0;
 		    for (i=0; papersizes[i].name; i++) {
-    		        dmp = &papersizes[i];
+			    dmp = (Media)&papersizes[i];
 			/* Note: Paper size comment uses down cased paper size
 			 * name.  Case insensitive compares are only used for
 			 * PaperSize comments.
