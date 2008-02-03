@@ -1,3 +1,5 @@
+AUTOMAKE_OPTIONS = foreign
+
 SUBDIRS = libspectre
 
 if ENABLE_TEST
