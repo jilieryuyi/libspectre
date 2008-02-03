@@ -99,10 +99,7 @@
 
 /* We use this helper function for providing proper */
 /* case and colon :-) insensitive DSC matching */
-static int dsc_strncmp(s1, s2, n)
-  char *s1;
-  char *s2;
-  size_t n;
+static int dsc_strncmp(char *s1, char *s2, size_t n)
 {
  char *tmp;	
 
@@ -332,7 +329,7 @@ psscan(const char *filename, int scanstyle)
     int page_bb_set = NONE;
     int page_media_set = NONE;
     int preread;		/* flag which tells the readline isn't needed */
-    int i;
+    unsigned int i;
     unsigned int maxpages = 0;
     unsigned int nextpage = 1;	/* Next expected page */
     unsigned int thispage;
@@ -344,7 +341,7 @@ psscan(const char *filename, int scanstyle)
     long position;		/* Position of the current line */
     long beginsection;		/* Position of the beginning of the section */
     unsigned int line_len; 	/* Length of the current line */
-    unsigned int section_len;	/* Place to accumulate the section length */
+    unsigned int section_len = 0; /* Place to accumulate the section length */
     char *next_char;		/* 1st char after text returned by ps_gettext() */
     char *cp;
     Media dmp;
@@ -546,17 +543,19 @@ psscan(const char *filename, int scanstyle)
 	    if (strcmp(text, "(atend)") == 0 || strcmp(text, "atend") == 0) {
 		pages_set = ATEND;
 	    } else {
+		int page_order;
+		
 		switch (sscanf(line+length("%%Pages:"), "%d %d",
-			       &maxpages, &i)) {
+			       &maxpages, &page_order)) {
 		    case 2:
 			if (page_order_set == NONE) {
-			    if (i == -1) {
+			    if (page_order == -1) {
 				doc->pageorder = DESCEND;
 				page_order_set = 1;
-			    } else if (i == 0) {
+			    } else if (page_order == 0) {
 				doc->pageorder = SPECIAL;
 				page_order_set = 1;
-			    } else if (i == 1) {
+			    } else if (page_order == 1) {
 				doc->pageorder = ASCEND;
 				page_order_set = 1;
 			    }
@@ -1201,11 +1200,12 @@ continuepage:
 		doc->pageorder = SPECIAL;
 	    }
 	} else if (pages_set == ATEND && iscomment(line+2, "Pages:")) {
-	    if (sscanf(line+length("%%Pages:"), "%*u %d", &i) == 1) {
+	    int page_order;
+	    if (sscanf(line+length("%%Pages:"), "%*u %d", &page_order) == 1) {
 		if (page_order_set == NONE) {
-		    if (i == -1) doc->pageorder = DESCEND;
-		    else if (i == 0) doc->pageorder = SPECIAL;
-		    else if (i == 1) doc->pageorder = ASCEND;
+		    if (page_order == -1) doc->pageorder = DESCEND;
+		    else if (page_order == 0) doc->pageorder = SPECIAL;
+		    else if (page_order == 1) doc->pageorder = ASCEND;
 		}
 	    }
 	}
@@ -1262,8 +1262,7 @@ continuepage:
 /*###########################################################*/
 
 static void
-psfree(doc)
-    struct document *doc;
+psfree(struct document *doc)
 {
     unsigned int i;
 
@@ -2181,13 +2180,13 @@ psgetpagebox (const struct document *doc, int page, int *urx, int *ury, int *llx
 	  * or the page bbox (if specified)	
 	  * or the bounding box	
 	  */
-         if ((page >= 0) && (doc->numpages > page) &&
+	      if ((page >= 0) && (doc->numpages > (unsigned int)page) &&
 	     (doc->pages) && (doc->pages[page].media)) {
 	    new_pagesize = doc->pages[page].media - doc->media;
 	 } else if (doc->default_page_media != NULL) {
 	    new_pagesize = doc->default_page_media - doc->media;
 	 } else if ((page >= 0) &&
-		    (doc->numpages > page) &&
+		    (doc->numpages > (unsigned int)page) &&
 		    (doc->pages) &&
 		    (doc->pages[page].boundingbox[URX] >
 		     doc->pages[page].boundingbox[LLX]) &&
@@ -2227,7 +2226,7 @@ psgetpagebox (const struct document *doc, int page, int *urx, int *ury, int *llx
          new_pagesize = DEFAULT_PAGE_SIZE;
       new_llx = new_lly = 0;
       if (doc && doc->media &&
-	  (new_pagesize < doc->nummedia)) {
+	  ((unsigned int)new_pagesize < doc->nummedia)) {
 	      new_urx = doc->media[new_pagesize].width;
         new_ury = doc->media[new_pagesize].height;
       } else {
