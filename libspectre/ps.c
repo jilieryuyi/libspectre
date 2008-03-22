@@ -1769,7 +1769,7 @@ static char * readline (fd, lineP, positionP, line_lenP)
 #endif
    if ((line[0] == '%') &&
        positionP && *positionP > 0 &&
-       (iscomment(line,"%!PS") || iscomment(line, "\004%!PS"))) {
+       (!iscomment(line, "%!PS-AdobeFont") && (iscomment(line,"%!PS") || iscomment(line, "\004%!PS")))) {
        nesting_level=1;
        line = ps_io_fgetchars(fd,-1);
        if (line) *line_lenP += FD_LINE_LEN;
