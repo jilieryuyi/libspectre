@@ -240,10 +240,15 @@ spectre_document_get_page (SpectreDocument *document,
 			   unsigned int     page_index)
 {
 	SpectrePage *page;
+	unsigned int index;
 
 	_spectre_return_val_if_fail (document != NULL, NULL);
 
-	if (page_index >= spectre_document_get_n_pages (document)) {
+	index = (document->doc->pageorder == DESCEND) ?
+		(document->doc->numpages - 1) - page_index :
+		page_index;
+
+	if (index >= spectre_document_get_n_pages (document)) {
 		document->status = SPECTRE_STATUS_INVALID_PAGE;
 		return NULL;
 	}
@@ -253,7 +258,7 @@ spectre_document_get_page (SpectreDocument *document,
 		return NULL;
 	}
 	
-	page = _spectre_page_new (page_index, document->doc);
+	page = _spectre_page_new (index, document->doc);
 	if (!page) {
 		document->status = SPECTRE_STATUS_NO_MEMORY;
 		return NULL;
