@@ -344,7 +344,7 @@ psscan(const char *filename, int scanstyle)
     unsigned int section_len = 0; /* Place to accumulate the section length */
     char *next_char;		/* 1st char after text returned by ps_gettext() */
     char *cp;
-    Media dmp;
+    ConstMedia dmp;
     FileData fd;
     int respect_eof;            /* Derived from the scanstyle argument.
                                    If set to 0 EOF comments will be ignored,

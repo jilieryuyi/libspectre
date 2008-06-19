@@ -77,6 +77,7 @@ typedef struct documentmedia {
 	int  height;
 } MediaStruct, *Media;
 
+typedef const struct documentmedia *ConstMedia;
 
 typedef struct document {
     unsigned int ref_count;
@@ -112,7 +113,7 @@ typedef struct document {
     int  default_page_orientation;	/* PORTRAIT, LANDSCAPE */
     unsigned int nummedia;
     struct documentmedia *media;
-    Media default_page_media;
+    ConstMedia default_page_media;
     unsigned int numpages;
     struct page *pages;
 } *Document;
@@ -120,7 +121,7 @@ typedef struct document {
 struct page {
     char *label;
     int  boundingbox[4];
-    struct documentmedia *media;
+    const struct documentmedia *media;
     int  orientation;			/* PORTRAIT, LANDSCAPE */
     long begin, end;			/* offsets into file */
     unsigned int len;
