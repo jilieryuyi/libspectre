@@ -245,15 +245,30 @@ spectre_gs_send_page (SpectreGS       *gs,
 				 doc->beginprolog,
 				 doc->endprolog))
 		return FALSE;
-	
+
 	if (!spectre_gs_process (gs,
 				 doc->filename,
 				 0, 0,
 				 doc->beginsetup,
 				 doc->endsetup))
 		return FALSE;
-	
+
 	if (doc->numpages > 0) {
+		if (doc->pageorder == SPECIAL) {
+			unsigned int i;
+			/* Pages cannot be re-ordered */
+
+
+			for (i = 0; i < page_index; i++) {
+				if (!spectre_gs_process (gs,
+							 doc->filename,
+							 0, 0,
+							 doc->pages[i].begin,
+							 doc->pages[i].end))
+					return FALSE;
+			}
+		}
+		
 		if (!spectre_gs_process (gs,
 					 doc->filename,
 					 page_llx, page_lly,
