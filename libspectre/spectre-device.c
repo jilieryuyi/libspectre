@@ -228,9 +228,14 @@ spectre_device_render (SpectreDevice        *device,
 							   rc->y_scale * rc->y_dpi);
 	args[arg++] = dsp_format = _spectre_strdup_printf ("-dDisplayFormat=%d",
 							   DISPLAY_COLORS_RGB |
-							   DISPLAY_UNUSED_LAST |
 							   DISPLAY_DEPTH_8 |
+#ifdef WORDS_BIGENDIAN
+							   DISPLAY_UNUSED_FIRST |
+							   DISPLAY_BIGENDIAN |
+#else
+							   DISPLAY_UNUSED_LAST |
 							   DISPLAY_LITTLEENDIAN |
+#endif
 							   DISPLAY_TOPFIRST);
 	args[arg++] = dsp_handle = _spectre_strdup_printf ("-sDisplayHandle=16#%llx",
 							   (unsigned long long int)device);
