@@ -68,6 +68,21 @@ enum {ATEND = -1, NONE = 0, PORTRAIT, LANDSCAPE, ASCEND, DESCEND, SPECIAL};
 
 #define PSLINELENGTH 257	/* 255 characters + 1 newline + 1 NULL */
 
+/* rjl: DOS binary EPS header */
+#define PS_DWORD unsigned long/* must be 32 bits unsigned */
+#define PS_WORD unsigned short/* must be 16 bits unsigned */
+typedef struct tagDOSEPS {
+	unsigned char id[4];
+	PS_DWORD ps_begin;
+	PS_DWORD ps_length;
+	PS_DWORD mf_begin;
+	PS_DWORD mf_length;
+	PS_DWORD tiff_begin;
+	PS_DWORD tiff_length;
+	PS_WORD checksum;
+} DOSEPS;
+
+
 /*##############################################
       media
   ##############################################*/
@@ -114,6 +129,7 @@ typedef struct document {
     unsigned int nummedia;
     struct documentmedia *media;
     ConstMedia default_page_media;
+    DOSEPS *doseps;
     unsigned int numpages;
     struct page *pages;
 } *Document;

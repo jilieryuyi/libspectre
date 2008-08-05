@@ -53,6 +53,12 @@
  * ###jp### 04/96
  * 
  */
+
+/* modified by Russell Lang, rjl@aladdin.com to use with GSview
+ * 1995-01-11
+ * supports DOS EPS files (binary header)
+ */
+
 #define USE_ACROREAD_WORKAROUND
 
 #include <stdlib.h>
@@ -182,15 +188,21 @@ typedef struct FileDataStruct_ {
 
 static FileData ps_io_init PT((FILE *));
 static void     ps_io_exit PT((FileData));
+static void     ps_io_rewind PT((FileData));
 static char    *ps_io_fgetchars PT((FileData, int));
 static int      ps_io_fseek PT((FileData, int));
 static int      ps_io_ftell PT((FileData));
 
-static char    *readline PT((FileData, char **, long *, unsigned int *));
+static char    *readline PT((FileData, unsigned long, char **, long *, unsigned int *));
 static char    *gettextline PT((char *));
 static char    *ps_gettext PT((char *,char **));
 static int      blank PT((char *));
 static char    *pscopyuntil PT((FileData,FILE *,long,long,char *));
+
+/* DOS EPS header reading */
+static unsigned long   ps_read_doseps PT((FileData, DOSEPS *));
+static PS_DWORD        reorder_dword PT((PS_DWORD));
+static PS_WORD         reorder_word PT((PS_WORD));
 
 static char    *skipped_line = "% ps_io_fgetchars: skipped line";
 static char    *empty_string = "";
@@ -345,6 +357,8 @@ psscan(const char *filename, int scanstyle)
     char *next_char;		/* 1st char after text returned by ps_gettext() */
     char *cp;
     ConstMedia dmp;
+    unsigned long enddoseps;    /* zero of not DOS EPS, otherwise position of end of ps section */
+    DOSEPS doseps;
     FileData fd;
     int respect_eof;            /* Derived from the scanstyle argument.
                                    If set to 0 EOF comments will be ignored,
@@ -378,7 +392,10 @@ psscan(const char *filename, int scanstyle)
     }
 
     fd = ps_io_init(file);
-    if (!readline(fd,&line, &position, &line_len)) {
+    
+    /* rjl: check for DOS EPS files and almost DSC files that start with ^D */
+    enddoseps = ps_read_doseps (fd, &doseps);
+    if (!readline(fd, enddoseps, &line, &position, &line_len)) {
 	fprintf(stderr, "Warning: empty file.\n");
         ENDMESSAGE(psscan)
         ps_io_exit(fd);
@@ -391,7 +408,7 @@ psscan(const char *filename, int scanstyle)
      * follows, this seems to be a real pjl file. */
     if(iscomment(line, "\033%-12345X@PJL")) {
         /* read until first DSC comment */
-        while(readline(fd, &line, &position, &line_len) && (line[0] != '%')) ;
+        while(readline(fd, enddoseps, &line, &position, &line_len) && (line[0] != '%')) ;
 	if(line[0] != '%') {
 	    fprintf(stderr, "psscan error: input files seems to be a PJL file.\n");
 	    ENDMESSAGE(psscan)
@@ -453,9 +470,14 @@ psscan(const char *filename, int scanstyle)
 	doc->default_page_orientation = NONE;
 	doc->orientation = NONE;
     }
+
+    if (enddoseps) { /* rjl: add doseps header */
+        doc->doseps = (DOSEPS *) malloc(sizeof(DOSEPS));
+	*(doc->doseps) = doseps;
+    }
     
     preread = 0;
-    while (preread || readline(fd, &line, &position, &line_len)) {
+    while (preread || readline(fd, enddoseps, &line, &position, &line_len)) {
 	if (!preread) section_len += line_len;
 	preread = 0;
 	if (line[0] != '%' ||
@@ -587,7 +609,7 @@ psscan(const char *filename, int scanstyle)
 		    PS_free(doc->media[0].name);
 	    }
 	    preread=1;
-	    while (readline(fd, &line, &position, &line_len) &&
+	    while (readline(fd, enddoseps, &line, &position, &line_len) &&
 		   DSCcomment(line) && iscomment(line+2, "+")) {
 		section_len += line_len;
 		doc->media = (Media)
@@ -675,7 +697,7 @@ psscan(const char *filename, int scanstyle)
 		    PS_free(doc->media[doc->nummedia].name);
 	    }
 	    preread=1;
-	    while (readline(fd, &line, &position, &line_len) &&
+	    while (readline(fd, enddoseps, &line, &position, &line_len) &&
 		   DSCcomment(line) && iscomment(line+2, "+")) {
 		section_len += line_len;
 		next_char = line + length("%%+");
@@ -713,7 +735,7 @@ psscan(const char *filename, int scanstyle)
     }
 
     if (DSCcomment(line) && iscomment(line+2, "EndComments")) {
-	readline(fd, &line, &position, &line_len);
+	    readline(fd, enddoseps, &line, &position, &line_len);
 	section_len += line_len;
     }
     doc->endheader = position;
@@ -723,19 +745,19 @@ psscan(const char *filename, int scanstyle)
 
     beginsection = position;
     section_len = line_len;
-    while (blank(line) && readline(fd, &line, &position, &line_len)) {
+    while (blank(line) && readline(fd, enddoseps, &line, &position, &line_len)) {
 	section_len += line_len;
     }
 
     if (doc->epsf && DSCcomment(line) && iscomment(line+2, "BeginPreview")) {
 	doc->beginpreview = beginsection;
 	beginsection = 0;
-	while (readline(fd, &line, &position, &line_len) &&
+	while (readline(fd, enddoseps, &line, &position, &line_len) &&
 	       !(DSCcomment(line) && iscomment(line+2, "EndPreview"))) {
 	    section_len += line_len;
 	}
 	section_len += line_len;
-	readline(fd, &line, &position, &line_len);
+	readline(fd, enddoseps, &line, &position, &line_len);
 	section_len += line_len;
 	doc->endpreview = position;
 	doc->lenpreview = section_len - line_len;
@@ -747,14 +769,14 @@ psscan(const char *filename, int scanstyle)
 	beginsection = position;
 	section_len = line_len;
     }
-    while (blank(line) && readline(fd, &line, &position, &line_len)) {
+    while (blank(line) && readline(fd, enddoseps, &line, &position, &line_len)) {
 	section_len += line_len;
     }
 
     if (DSCcomment(line) && iscomment(line+2, "BeginDefaults")) {
 	doc->begindefaults = beginsection;
 	beginsection = 0;
-	while (readline(fd, &line, &position, &line_len) &&
+	while (readline(fd, enddoseps, &line, &position, &line_len) &&
 	       !(DSCcomment(line) && iscomment(line+2, "EndDefaults"))) {
 	    section_len += line_len;
 	    if (!DSCcomment(line)) {
@@ -812,7 +834,7 @@ psscan(const char *filename, int scanstyle)
 	    }
 	}
 	section_len += line_len;
-	readline(fd, &line, &position, &line_len);
+	readline(fd, enddoseps, &line, &position, &line_len);
 	section_len += line_len;
 	doc->enddefaults = position;
 	doc->lendefaults = section_len - line_len;
@@ -824,7 +846,7 @@ psscan(const char *filename, int scanstyle)
 	beginsection = position;
 	section_len = line_len;
     }
-    while (blank(line) && readline(fd, &line, &position, &line_len)) {
+    while (blank(line) && readline(fd, enddoseps, &line, &position, &line_len)) {
 	section_len += line_len;
     }
 
@@ -838,7 +860,7 @@ psscan(const char *filename, int scanstyle)
 	preread = 1;
 
 	while ((preread ||
-		readline(fd, &line, &position, &line_len)) &&
+		readline(fd, enddoseps, &line, &position, &line_len)) &&
 	       !(DSCcomment(line) &&
 	         (iscomment(line+2, "EndProlog") ||
 	          iscomment(line+2, "BeginSetup") ||
@@ -850,7 +872,7 @@ psscan(const char *filename, int scanstyle)
 	}
 	section_len += line_len;
 	if (DSCcomment(line) && iscomment(line+2, "EndProlog")) {
-	    readline(fd, &line, &position, &line_len);
+		readline(fd, enddoseps, &line, &position, &line_len);
 	    section_len += line_len;
 	}
 	doc->endprolog = position;
@@ -863,7 +885,7 @@ psscan(const char *filename, int scanstyle)
 	beginsection = position;
 	section_len = line_len;
     }
-    while (blank(line) && readline(fd, &line, &position, &line_len)) {
+    while (blank(line) && readline(fd, enddoseps, &line, &position, &line_len)) {
 	section_len += line_len;
     }
 
@@ -875,7 +897,7 @@ psscan(const char *filename, int scanstyle)
 	beginsection = 0;
 	preread = 1;
 	while ((preread ||
-		readline(fd, &line, &position, &line_len)) &&
+		readline(fd, enddoseps, &line, &position, &line_len)) &&
 	       !(DSCcomment(line) &&
 	         (iscomment(line+2, "EndSetup") ||
 	          iscomment(line+2, "Page:") ||
@@ -943,7 +965,7 @@ psscan(const char *filename, int scanstyle)
 	}
 	section_len += line_len;
 	if (DSCcomment(line) && iscomment(line+2, "EndSetup")) {
-	    readline(fd, &line, &position, &line_len);
+		readline(fd, enddoseps, &line, &position, &line_len);
 	    section_len += line_len;
 	}
 	doc->endsetup = position;
@@ -976,7 +998,7 @@ psscan(const char *filename, int scanstyle)
 	      (iscomment(line+2, "Page:") ||
 	       iscomment(line+2, "Trailer") ||
 	       (respect_eof && iscomment(line+2, "EOF"))))) &&
-             (readline(fd, &line, &position, &line_len))) {
+             (readline(fd, enddoseps, &line, &position, &line_len))) {
         section_len += line_len;
         doc->lensetup = section_len - line_len;
 	doc->endsetup = position;
@@ -990,7 +1012,7 @@ psscan(const char *filename, int scanstyle)
 	beginsection = position;
 	section_len = line_len;
     }
-    while (blank(line) && readline(fd, &line, &position, &line_len)) {
+    while (blank(line) && readline(fd, enddoseps, &line, &position, &line_len)) {
 	section_len += line_len;
     }
 
@@ -1031,7 +1053,7 @@ newpage:
 	    section_len = line_len;
 	}
 continuepage:
-	while (readline(fd, &line, &position, &line_len) &&
+	while (readline(fd, enddoseps, &line, &position, &line_len) &&
 	       !(DSCcomment(line) &&
 	         (iscomment(line+2, "Page:") ||
 	          iscomment(line+2, "Trailer") ||
@@ -1134,7 +1156,7 @@ continuepage:
 
     preread = 1;
     while ((preread ||
-	    readline(fd, &line, &position, &line_len)) &&
+	    readline(fd, enddoseps, &line, &position, &line_len)) &&
  	   !(respect_eof && DSCcomment(line) && iscomment(line+2, "EOF"))) {
 	if (!preread) section_len += line_len;
 	preread = 0;
@@ -1225,7 +1247,7 @@ continuepage:
     }
     section_len += line_len;
     if (DSCcomment(line) && iscomment(line+2, "EOF")) {
-	readline(fd, &line, &position, &line_len);
+	    readline(fd, enddoseps, &line, &position, &line_len);
 	section_len += line_len;
     }
     doc->endtrailer = position;
@@ -1235,7 +1257,7 @@ continuepage:
     section_len = line_len;
     preread = 1;
     while (preread ||
-	   readline(fd, &line, &position, &line_len)) {
+	   readline(fd, enddoseps, &line, &position, &line_len)) {
 	if (!preread) section_len += line_len;
 	preread = 0;
 	if (DSCcomment(line) && iscomment(line+2, "Page:")) {
@@ -1296,6 +1318,7 @@ psfree(struct document *doc)
 	if (doc->pages) PS_free(doc->pages);
 	if (doc->media) PS_free(doc->media);
 	if (doc->languagelevel) PS_free(doc->languagelevel);
+	if (doc->doseps) free(doc->doseps); /* rjl: */
 	PS_free(doc);
     }
     ENDMESSAGE(psfree)
@@ -1500,8 +1523,30 @@ static FileData ps_io_init(file)
    FD_BUF_SIZE  = (2*LINE_CHUNK_SIZE)+1;
    FD_BUF       = PS_XtMalloc(FD_BUF_SIZE);
    FD_BUF[0]    = '\0';
+   
    ENDMESSAGE(ps_io_init)
+	   
    return(fd);
+}
+
+/*----------------------------------------------------------*/
+/* ps_io_rewind */
+/*----------------------------------------------------------*/
+
+static void
+ps_io_rewind(fd)
+   FileData fd;
+{
+   rewind(FD_FILE);
+   FD_FILEPOS       = ftell(FD_FILE);
+   FD_BUF[0]        = '\0';
+   FD_BUF_END       = 0;
+   FD_BUF_SIZE      = 0;
+   FD_LINE_BEGIN    = 0;
+   FD_LINE_END      = 0;
+   FD_LINE_LEN      = 0;
+   FD_LINE_TERMCHAR = '\0';
+   FD_STATUS        = FD_STATUS_OKAY;
 }
 
 /*----------------------------------------------------------*/
@@ -1715,8 +1760,9 @@ static char * ps_io_fgetchars(fd,num)
 */
 /*----------------------------------------------------------*/
 
-static char * readline (fd, lineP, positionP, line_lenP)
+static char * readline (fd, enddoseps, lineP, positionP, line_lenP)
    FileData fd;
+   unsigned long enddoseps;
    char **lineP;
    long *positionP;
    unsigned int *line_lenP;
@@ -1729,6 +1775,11 @@ static char * readline (fd, lineP, positionP, line_lenP)
    BEGINMESSAGE(readline)
 
    if (positionP) *positionP = FD_FILEPOS;
+   if (positionP && enddoseps) {
+       if (*positionP >= enddoseps)
+           return NULL;    /* don't read any more, we have reached end of dos eps section */
+   }
+   
    line = ps_io_fgetchars(fd,-1);
    if (!line) {
       INFMESSAGE(could not get line)
@@ -1747,7 +1798,7 @@ static char * readline (fd, lineP, positionP, line_lenP)
 #define IS_END(comment)				\
            (iscomment(line+5,(comment)))
 #define SKIP_WHILE(cond)				\
-	   while (readline(fd, &line, NULL, &nbytes) && (cond)) *line_lenP += nbytes;\
+           while (readline(fd, enddoseps, &line, NULL, &nbytes) && (cond)) *line_lenP += nbytes;	\
            skipped=1;
 #define SKIP_UNTIL_1(comment) {				\
            INFMESSAGE(skipping until comment)		\
@@ -1774,14 +1825,14 @@ static char * readline (fd, lineP, positionP, line_lenP)
        printf("skipping starts here: %s\n",line);
        SKIP_UNTIL_1("EOF")
        *line_lenP += nbytes;
-       readline(fd, &line, NULL, &nbytes);
+       readline(fd, enddoseps, &line, NULL, &nbytes);
        printf("skipping ends here: %s\n",line);
      }
    }
    else
 #endif
    if ((line[0] == '%') &&
-       positionP && *positionP > 0 &&
+       positionP && *positionP > enddoseps &&
        (!iscomment(line, "%!PS-AdobeFont") && (iscomment(line,"%!PS") || iscomment(line, "\004%!PS")))) {
        nesting_level=1;
        line = ps_io_fgetchars(fd,-1);
@@ -2171,6 +2222,63 @@ pscopydoc(dest_file,src_filename,d,pagelist)
 }
 #undef length
 
+/* rjl: routines to handle reading DOS EPS files */
+static unsigned long dsc_arch = 0x00000001;
+
+/* change byte order if architecture is big-endian */
+static PS_DWORD
+reorder_dword(val)
+    PS_DWORD val;
+{
+    if (*((char *)(&dsc_arch)))
+        return val;	/* little endian machine */
+    else
+	return ((val&0xff) << 24) | ((val&0xff00) << 8)
+             | ((val&0xff0000L) >> 8) | ((val>>24)&0xff);
+}
+
+/* change byte order if architecture is big-endian */
+static PS_WORD
+reorder_word(val)
+    PS_WORD val;
+{
+    if (*((char *)(&dsc_arch)))
+        return val;	/* little endian machine */
+    else
+	return (PS_WORD) ((PS_WORD)(val&0xff) << 8) | (PS_WORD)((val&0xff00) >> 8);
+}
+
+/* DOS EPS header reading */
+static unsigned long
+ps_read_doseps(fd,doseps)
+    FileData fd;
+    DOSEPS *doseps;
+{
+    fread(doseps->id, 1, 4, FD_FILE);
+    if (! ((doseps->id[0]==0xc5) && (doseps->id[1]==0xd0) 
+	   && (doseps->id[2]==0xd3) && (doseps->id[3]==0xc6)) ) {
+        /* id is "EPSF" with bit 7 set */
+        ps_io_rewind(fd);
+	return 0; 	/* OK */
+    }
+    fread(&doseps->ps_begin,    4, 1, FD_FILE);	/* PS offset */
+    doseps->ps_begin = (unsigned long)reorder_dword(doseps->ps_begin);
+    fread(&doseps->ps_length,   4, 1, FD_FILE);	/* PS length */
+    doseps->ps_length = (unsigned long)reorder_dword(doseps->ps_length);
+    fread(&doseps->mf_begin,    4, 1, FD_FILE);	/* Metafile offset */
+    doseps->mf_begin = (unsigned long)reorder_dword(doseps->mf_begin);
+    fread(&doseps->mf_length,   4, 1, FD_FILE);	/* Metafile length */
+    doseps->mf_length = (unsigned long)reorder_dword(doseps->mf_length);
+    fread(&doseps->tiff_begin,  4, 1, FD_FILE);	/* TIFF offset */
+    doseps->tiff_begin = (unsigned long)reorder_dword(doseps->tiff_begin);
+    fread(&doseps->tiff_length, 4, 1, FD_FILE);	/* TIFF length */
+    doseps->tiff_length = (unsigned long)reorder_dword(doseps->tiff_length);
+    fread(&doseps->checksum,    2, 1, FD_FILE);
+    doseps->checksum = (unsigned short)reorder_word(doseps->checksum);
+    ps_io_fseek(fd, doseps->ps_begin);	        /* seek to PS section */
+
+    return doseps->ps_begin + doseps->ps_length;
+}
 
 /* From Evince */
 #define DEFAULT_PAGE_SIZE 1
