@@ -90,7 +90,7 @@ spectre_gs_process (SpectreGS  *gs,
 	size_t left = end - begin;
 	void *ghostscript_instance = gs->ghostscript_instance;
 	
-	fd = fopen (filename, "r");
+	fd = fopen (filename, "rb");
 	if (!fd) {
 		return FALSE;
 	}

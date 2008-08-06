@@ -26,11 +26,11 @@ static SpectreStatus
 spectre_exporter_ps_begin (SpectreExporter *exporter,
 			   const char      *filename)
 {
-	exporter->from = fopen (exporter->doc->filename, "r");
+	exporter->from = fopen (exporter->doc->filename, "rb");
 	if (!exporter->from)
 		return SPECTRE_STATUS_EXPORTER_ERROR;
 	
-	exporter->to = fopen (filename, "w");
+	exporter->to = fopen (filename, "wb");
 	if (!exporter->to) {
 		fclose (exporter->from);
 		exporter->from = NULL;

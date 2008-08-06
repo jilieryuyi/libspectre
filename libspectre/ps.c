@@ -386,7 +386,7 @@ psscan(const char *filename, int scanstyle)
       return(NULL);
     }
 
-    file = fopen (filename, "r");
+    file = fopen (filename, "rb");
     if (!file) {
 	    return NULL;
     }
@@ -2148,7 +2148,7 @@ pscopydoc(dest_file,src_filename,d,pagelist)
     BEGINMESSAGE(pscopydoc)
 
     INFSMESSAGE(copying from file, src_filename)
-    src_file = fopen(src_filename, "r");
+    src_file = fopen(src_filename, "rb");
     fd = ps_io_init(src_file);
 
     i=0;

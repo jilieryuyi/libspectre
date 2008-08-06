@@ -397,13 +397,13 @@ spectre_document_save (SpectreDocument *document,
 		return;
 	}
 
-	from = fopen (document->doc->filename, "r");
+	from = fopen (document->doc->filename, "rb");
 	if (!from) {
 		document->status = SPECTRE_STATUS_SAVE_ERROR;
 		return;
 	}
 
-	to = fopen (filename, "w");
+	to = fopen (filename, "wb");
 	if (!to) {
 		document->status = SPECTRE_STATUS_SAVE_ERROR;
 		fclose (from);
