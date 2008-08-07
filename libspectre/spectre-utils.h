@@ -43,6 +43,20 @@ void _spectre_warn_check_failed  (const char *format,
 #define _SPECTRE_FUNCTION_NAME "unknown function"
 #endif
 
+/* Define SPECTRE_VA_COPY() to do the right thing for copying va_list variables. 
+ * config.h may have already defined SPECTRE_VA_COPY as va_copy or __va_copy. 
+ */
+#if !defined (SPECTRE_VA_COPY)
+#  if defined (__GNUC__) && defined (__PPC__) && (defined (_CALL_SYSV) || defined (_WIN32))
+#    define SPECTRE_VA_COPY(ap1, ap2)   (*(ap1) = *(ap2))
+#  elif defined (SPECTRE_VA_COPY_AS_ARRAY)
+#    define SPECTRE_VA_COPY(ap1, ap2)   memcpy ((ap1), (ap2), sizeof (va_list))
+#  else /* va_list is a pointer */
+#    define SPECTRE_VA_COPY(ap1, ap2)   ((ap1) = (ap2))
+#  endif /* va_list is a pointer */
+#endif /* !SPECTRE_VA_COPY */
+
+
 /*
  * (code from GLib)
  * 

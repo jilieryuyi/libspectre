@@ -145,7 +145,6 @@ _spectre_real_assert (int          condition,
 		abort ();
 	}
 }
-
 #endif /* SPECTRE_DISABLE_ASSERT */
 
 static char *
@@ -153,11 +152,30 @@ spectre_strdup_vprintf (const char *format,
 			va_list     args)
 {
 	char *string = NULL;
-	int len = vasprintf (&string, format, args);
+	int len;
+#if defined(HAVE_VASPRINTF)
+	len = vasprintf (&string, format, args);
 	
 	if (len < 0)
 		string = NULL;
+#else /* !HAVE_VASPRINTF */
+	va_list args_copy;
+	char c;
 
+	SPECTRE_VA_COPY (args_copy, args);
+
+	string = malloc ((vsnprintf (&c, 1, format, args) + 1) * sizeof (char));
+	if (string) {
+		len = vsprintf (string, format, args_copy);
+		if (len < 0) {
+			free (string);
+			string = NULL;
+		}
+	}
+
+	va_end (args_copy);
+#endif	
+	
 	return string;
 }
 

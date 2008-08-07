@@ -57,6 +57,8 @@ AC_PROG_CC_STDC
 AC_STDC_HEADERS
 AC_C_BIGENDIAN
 
+AC_CHECK_FUNC(vasprintf, [ AC_DEFINE(HAVE_VASPRINTF, 1, [Define if the 'vasprintf' function is available.]) ])
+
 LIBGS_REQUIRED="8.61"
 
 AC_CHECK_LIB(gs, gsapi_new_instance, have_libgs=yes, have_libgs=no)
@@ -152,7 +154,7 @@ dnl skipped and all flags rechecked.  So there's no need to do anything
 dnl else.  If for any reason you need to force a recheck, just change
 dnl MAYBE_WARN in an ignorable way (like adding whitespace)
 
-MAYBE_WARN="-Wall -ansi \
+MAYBE_WARN="-Wall \
 -Wsign-compare -Werror-implicit-function-declaration \
 -Wpointer-arith -Wstrict-prototypes \
 -Wmissing-prototypes -Wmissing-declarations -Wnested-externs \
@@ -194,6 +196,91 @@ WARN_CFLAGS="$spectre_cv_warn_cflags"
 SPECTRE_CFLAGS="$SPECTRE_CFLAGS $WARN_CFLAGS"
 
 AC_SUBST(SPECTRE_CFLAGS)
+
+dnl **********************************
+dnl *** va_copy checks (from GLib) ***
+dnl **********************************
+dnl we currently check for all three va_copy possibilities, so we get
+dnl all results in config.log for bug reports.
+AC_CACHE_CHECK([for an implementation of va_copy()],spectre_cv_va_copy,[
+	AC_LINK_IFELSE([#include <stdarg.h>
+#include <stdlib.h>
+	void f (int i, ...) {
+	va_list args1, args2;
+	va_start (args1, i);
+	va_copy (args2, args1);
+	if (va_arg (args2, int) != 42 || va_arg (args1, int) != 42)
+	  exit (1);
+	va_end (args1); va_end (args2);
+	}
+	int main() {
+	  f (0, 42);
+	  return 0;
+	}],
+	[spectre_cv_va_copy=yes],
+	[spectre_cv_va_copy=no])
+])
+AC_CACHE_CHECK([for an implementation of __va_copy()],spectre_cv___va_copy,[
+	AC_LINK_IFELSE([#include <stdarg.h>
+#include <stdlib.h>	
+	void f (int i, ...) {
+	va_list args1, args2;
+	va_start (args1, i);
+	__va_copy (args2, args1);
+	if (va_arg (args2, int) != 42 || va_arg (args1, int) != 42)
+	  exit (1);
+	va_end (args1); va_end (args2);
+	}
+	int main() {
+	  f (0, 42);
+	  return 0;
+	}],
+	[spectre_cv___va_copy=yes],
+	[spectre_cv___va_copy=no])
+])
+
+if test "x$spectre_cv_va_copy" = "xyes"; then
+  spectre_va_copy_func=va_copy
+else if test "x$spectre_cv___va_copy" = "xyes"; then
+  spectre_va_copy_func=__va_copy
+fi
+fi
+
+if test -n "$spectre_va_copy_func"; then
+  AC_DEFINE_UNQUOTED(SPECTRE_VA_COPY,$spectre_va_copy_func,[A 'va_copy' style function])
+fi
+
+AC_LANG_PUSH(C)
+AC_CACHE_CHECK([whether va_lists can be copied by value],
+	spectre_cv_va_val_copy,
+	[AC_RUN_IFELSE([AC_LANG_PROGRAM(
+[[
+	#include <stdarg.h>
+	#include <stdlib.h>
+]],
+[[
+	void f (int i, ...) {
+	va_list args1, args2;
+	va_start (args1, i);
+	args2 = args1;
+	if (va_arg (args2, int) != 42 || va_arg (args1, int) != 42)
+	  exit (1);
+	va_end (args1); va_end (args2);
+	}
+	int main() {
+	  f (0, 42);
+	  return 0;
+	}
+]])],
+	[spectre_cv_va_val_copy=yes],
+	[spectre_cv_va_val_copy=no],
+	[spectre_cv_va_val_copy=yes])
+])
+AC_LANG_POP(C)
+
+if test "x$spectre_cv_va_val_copy" = "xno"; then
+  AC_DEFINE(SPECTRE_VA_COPY_AS_ARRAY,1, ['va_lists' cannot be copies as values])
+fi
 
 AC_OUTPUT([
 Makefile
