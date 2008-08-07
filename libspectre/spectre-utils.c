@@ -32,13 +32,17 @@
 #include <unistd.h>
 #endif
 
+#ifdef WIN32
+#include <windows.h>
+#endif
+
 static unsigned long
 _spectre_get_pid (void)
 {
 #if defined(HAVE_SYS_TYPES_H) && defined(HAVE_UNISTD_H)
 	return getpid ();
-#else
-	/* TODO */
+#elif defined(WIN32)
+	return GetCurrentProcessId ();
 #endif
 }
 
