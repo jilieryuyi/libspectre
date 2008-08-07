@@ -21,7 +21,9 @@
 #ifndef SPECTRE_UTILS_H
 #define SPECTRE_UTILS_H
 
+#ifdef HAVE_CONFIG_H
 #include <config.h>
+#endif
 
 #include <stdarg.h>
 
