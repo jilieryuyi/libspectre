@@ -193,7 +193,7 @@ static char    *ps_io_fgetchars PT((FileData, int));
 static int      ps_io_fseek PT((FileData, int));
 static int      ps_io_ftell PT((FileData));
 
-static char    *readline PT((FileData, unsigned long, char **, long *, unsigned int *));
+static char    *readline PT((FileData, long, char **, long *, unsigned int *));
 static char    *gettextline PT((char *));
 static char    *ps_gettext PT((char *,char **));
 static int      blank PT((char *));
@@ -357,7 +357,7 @@ psscan(const char *filename, int scanstyle)
     char *next_char;		/* 1st char after text returned by ps_gettext() */
     char *cp;
     ConstMedia dmp;
-    unsigned long enddoseps;    /* zero of not DOS EPS, otherwise position of end of ps section */
+    long enddoseps;             /* zero of not DOS EPS, otherwise position of end of ps section */
     DOSEPS doseps;
     FileData fd;
     int respect_eof;            /* Derived from the scanstyle argument.
@@ -1762,7 +1762,7 @@ static char * ps_io_fgetchars(fd,num)
 
 static char * readline (fd, enddoseps, lineP, positionP, line_lenP)
    FileData fd;
-   unsigned long enddoseps;
+   long enddoseps;
    char **lineP;
    long *positionP;
    unsigned int *line_lenP;
