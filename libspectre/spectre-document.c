@@ -74,6 +74,14 @@ spectre_document_load (SpectreDocument *document,
 		return;
 	}
 
+	if (document->doc->numpages == 0 && document->doc->lenprolog == 0) {
+		document->status = SPECTRE_STATUS_LOAD_ERROR;
+		psdocdestroy (document->doc);
+		document->doc = NULL;
+		
+		return;
+	}
+
 	document->structured = ((!document->doc->epsf && document->doc->numpages > 0) ||
 				(document->doc->epsf && document->doc->numpages > 1));
 
