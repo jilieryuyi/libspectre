@@ -229,6 +229,7 @@ spectre_device_render (SpectreDevice        *device,
 	args[arg++] = dsp_format = _spectre_strdup_printf ("-dDisplayFormat=%d",
 							   DISPLAY_COLORS_RGB |
 							   DISPLAY_DEPTH_8 |
+							   DISPLAY_ROW_ALIGN_32 |
 #ifdef WORDS_BIGENDIAN
 							   DISPLAY_UNUSED_FIRST |
 							   DISPLAY_BIGENDIAN |
