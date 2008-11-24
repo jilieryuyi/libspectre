@@ -209,39 +209,36 @@ spectre_gs_send_page (SpectreGS       *gs,
 		      int              x,
 		      int              y)
 {
-	int doc_llx = 0, doc_lly = 0;
-	int page_llx = 0, page_lly = 0;
+	int xoffset = 0, yoffset = 0;
+	int page_urx, page_ury, page_llx, page_lly;
+	int bbox_urx, bbox_ury, bbox_llx, bbox_lly;
+	int doc_xoffset = 0, doc_yoffset = 0;
+	int page_xoffset = 0, page_yoffset = 0;
 
-	if ((doc->boundingbox[URX] > doc->boundingbox[LLX]) &&
-	    (doc->boundingbox[URY] > doc->boundingbox[LLY])) {
-		doc_llx = doc->boundingbox[LLX];
-		doc_lly = doc->boundingbox[LLY];
-	}
-
-	if (doc->numpages > 0 &&
-	    (doc->pages[page_index].boundingbox[URX] >
-	     doc->pages[page_index].boundingbox[LLX]) &&
-	    (doc->pages[page_index].boundingbox[URY] >
-	     doc->pages[page_index].boundingbox[LLY])) {
-		/* Do not translate twice */
-		if (doc->pages[page_index].boundingbox[LLX] != doc_llx &&
-		    doc->pages[page_index].boundingbox[LLY] != doc_lly) {
-			page_llx =  doc->pages[page_index].boundingbox[LLX];
-			page_lly = doc->pages[page_index].boundingbox[LLY];
+	if (psgetpagebbox (doc, page_index, &bbox_urx, &bbox_ury, &bbox_llx, &bbox_lly)) {
+		psgetpagebox (doc, page_index,
+			      &page_urx, &page_ury,
+			      &page_llx, &page_lly);
+		if ((bbox_urx - bbox_llx) == (page_urx - page_llx) ||
+		    (bbox_ury - bbox_lly) == (page_ury - page_lly)) {
+			/* BoundingBox */
+			xoffset = page_llx;
+			yoffset = page_lly;
 		}
 	}
 
 	if (doc->numpages > 0) {
-		page_llx += x;
-		page_lly += y;
+		page_xoffset = xoffset + x;
+		page_yoffset = yoffset + y;
 	} else {
-		doc_llx += x;
-		doc_lly += y;
+		doc_xoffset = xoffset + x;
+		doc_yoffset = yoffset + y;
 	}
-
+	
 	if (!spectre_gs_process (gs,
 				 doc->filename,
-				 doc_llx, doc_lly,
+				 doc_xoffset,
+				 doc_yoffset,
 				 doc->beginprolog,
 				 doc->endprolog))
 		return FALSE;
@@ -262,7 +259,8 @@ spectre_gs_send_page (SpectreGS       *gs,
 			for (i = 0; i < page_index; i++) {
 				if (!spectre_gs_process (gs,
 							 doc->filename,
-							 0, 0,
+							 page_xoffset,
+							 page_yoffset,
 							 doc->pages[i].begin,
 							 doc->pages[i].end))
 					return FALSE;
@@ -271,7 +269,8 @@ spectre_gs_send_page (SpectreGS       *gs,
 		
 		if (!spectre_gs_process (gs,
 					 doc->filename,
-					 page_llx, page_lly,
+					 page_xoffset,
+					 page_yoffset,
 					 doc->pages[page_index].begin,
 					 doc->pages[page_index].end))
 			return FALSE;
