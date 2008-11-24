@@ -21,6 +21,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
 
 #include "spectre-device.h"
 #include "spectre-gs.h"
@@ -239,7 +240,7 @@ spectre_device_render (SpectreDevice        *device,
 #endif
 							   DISPLAY_TOPFIRST);
 	args[arg++] = dsp_handle = _spectre_strdup_printf ("-sDisplayHandle=16#%llx",
-							   (unsigned long long int)device);
+							   (uintptr_t)device);
 	if (rc->use_platform_fonts == FALSE)
 		args[arg++] = "-dNOPLATFONTS";
 
