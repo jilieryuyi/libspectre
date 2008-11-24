@@ -2280,6 +2280,42 @@ ps_read_doseps(fd,doseps)
     return doseps->ps_begin + doseps->ps_length;
 }
 
+int
+psgetpagebbox (const struct document *doc, int page, int *urx, int *ury, int *llx, int *lly)
+{
+   int new_llx = 0;
+   int new_lly = 0;
+   int new_urx = 0;
+   int new_ury = 0;
+
+   if ((page >= 0) &&
+       (doc->pages) &&
+       (doc->pages[page].boundingbox[URX] >
+	doc->pages[page].boundingbox[LLX]) &&
+       (doc->pages[page].boundingbox[URY] >
+	doc->pages[page].boundingbox[LLY])) {
+      /* use page bbox */
+      new_llx = doc->pages[page].boundingbox[LLX];
+      new_lly = doc->pages[page].boundingbox[LLY];
+      new_urx = doc->pages[page].boundingbox[URX];
+      new_ury = doc->pages[page].boundingbox[URY];
+   } else if ((doc->boundingbox[URX] > doc->boundingbox[LLX]) &&
+	      (doc->boundingbox[URY] > doc->boundingbox[LLY])) {
+      /* use doc bbox */
+      new_llx = doc->boundingbox[LLX];
+      new_lly = doc->boundingbox[LLY];
+      new_urx = doc->boundingbox[URX];
+      new_ury = doc->boundingbox[URY];
+   }
+
+   *llx = new_llx;
+   *lly = new_lly;
+   *urx = new_urx;
+   *ury = new_ury;
+
+   return (new_llx != 0 && new_lly != 0 && new_urx != 0 && new_ury != 0);
+}
+
 /* From Evince */
 #define DEFAULT_PAGE_SIZE 1
 
@@ -2301,7 +2337,7 @@ psgetpagebox (const struct document *doc, int page, int *urx, int *ury, int *llx
 	  * or the page bbox (if specified)	
 	  * or the bounding box	
 	  */
-	      if ((page >= 0) && (doc->numpages > (unsigned int)page) &&
+         if ((page >= 0) && (doc->numpages > (unsigned int)page) &&
 	     (doc->pages) && (doc->pages[page].media)) {
 	    new_pagesize = doc->pages[page].media - doc->media;
 	 } else if (doc->default_page_media != NULL) {
@@ -2323,25 +2359,7 @@ psgetpagebox (const struct document *doc, int page, int *urx, int *ury, int *llx
 
    /* Compute bounding box */
    if (doc && (doc->epsf || new_pagesize == -1)) {    /* epsf or bbox */
-      if ((page >= 0) &&
-	  (doc->pages) &&
-	  (doc->pages[page].boundingbox[URX] >
-	   doc->pages[page].boundingbox[LLX]) &&
-	  (doc->pages[page].boundingbox[URY] >
-	   doc->pages[page].boundingbox[LLY])) {
-         /* use page bbox */
-	 new_llx = doc->pages[page].boundingbox[LLX];
-	 new_lly = doc->pages[page].boundingbox[LLY];
-	 new_urx = doc->pages[page].boundingbox[URX];
-	 new_ury = doc->pages[page].boundingbox[URY];
-      } else if ((doc->boundingbox[URX] > doc->boundingbox[LLX]) &&
-		 (doc->boundingbox[URY] > doc->boundingbox[LLY])) {
-	 /* use doc bbox */
-	 new_llx = doc->boundingbox[LLX];
-	 new_lly = doc->boundingbox[LLY];
-	 new_urx = doc->boundingbox[URX];
-	 new_ury = doc->boundingbox[URY];
-      }
+      psgetpagebbox (doc, page, &new_urx, &new_ury, &new_llx, &new_lly);
    } else {
       if (new_pagesize < 0)
          new_pagesize = DEFAULT_PAGE_SIZE;

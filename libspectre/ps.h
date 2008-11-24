@@ -179,6 +179,17 @@ extern void				pscopydoc (
 #endif
 );
 
+int                                     psgetpagebbox (
+#if NeedFunctionPrototypes
+   const struct document *,
+   int,
+   int *,
+   int *,
+   int *,
+   int *
+#endif
+);
+
 void                                    psgetpagebox (
 #if NeedFunctionPrototypes
     const struct document *,
