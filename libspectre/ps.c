@@ -462,9 +462,8 @@ psscan(const char *filename, int scanstyle)
     if ((iscomment(line,"%!PS") || iscomment(line, "\004%!PS"))) {
       INFMESSAGE(found "PS-Adobe-" comment)
 
-      doc = (struct document *) PS_malloc(sizeof(struct document));
+      doc = (struct document *) PS_calloc(1, sizeof(struct document));
       CHECK_MALLOCED(doc);
-      memset(doc, 0, sizeof(struct document));
 
       /* ignore possible leading ^D */
       if (*line == '\004') {
@@ -499,9 +498,8 @@ psscan(const char *filename, int scanstyle)
 	   In a way, this makes sense, a program PostScript does not need
 	   the !PS at the beginning.
 	*/
-	doc = (struct document *) PS_malloc(sizeof(struct document));
+	doc = (struct document *) PS_calloc(1, sizeof(struct document));
 	CHECK_MALLOCED(doc);
-	memset(doc, 0, sizeof(struct document));
 	doc->ref_count = 1;
 	doc->filename = _spectre_strdup (filename);
 	doc->default_page_orientation = NONE;
