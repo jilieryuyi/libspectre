@@ -1,3 +1,17 @@
+libspectre 0.2.2 (25 November 2008)
+===================================
+
+This is another bugfix only release in the libspectre's 0.2 series.
+
+A problem when rendering some documents where the page size is
+different from the Bounding Box has been fixed (Bug #18239)
+
+Parser is now locale-independent when parsing float numbers (Bug #18685)
+
+The display format has been fixed to match cairo/pixman. Thanks to
+Chris Wilson (Bug #18266)
+
+
 libspectre 0.2.1 (10 August 2008)
 =================================
 
