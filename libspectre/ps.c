@@ -209,29 +209,36 @@ static char    *empty_string = "";
 
 static Boolean scan_boundingbox(int *bb, const char *line)
 {
-    float fllx, flly, furx, fury;
+    char fllx[21], flly[21], furx[21], fury[21];
     
     if (sscanf (line, "%d %d %d %d",
 		&bb[LLX], &bb[LLY], &bb[URX], &bb[URY]) == 4)
        return True;
     
-    if (sscanf (line, "%f %f %f %f",
-		&fllx, &flly, &furx, &fury) == 4) {
-        bb[LLX] = fllx;
-	bb[LLY] = flly;
-	bb[URX] = furx;
-	bb[URY] = fury;
-	
-	if (bb[LLX] > fllx)
-	   bb[LLX]--;
-	if (bb[LLY] > flly)
-	   bb[LLY]--;
-	if (bb[URX] < furx)
-	   bb[URX]++;
-	if (bb[URY] < fury)
-	   bb[URY]++;
-	
-	return True;
+    if (sscanf (line, "%20s %20s %20s %20s",
+		fllx, flly, furx, fury) == 4) {
+       float ffllx, fflly, ffurx, ffury;
+
+       ffllx = _spectre_strtod (fllx, NULL);
+       fflly = _spectre_strtod (flly, NULL);
+       ffurx = _spectre_strtod (furx, NULL);
+       ffury = _spectre_strtod (fury, NULL);
+       
+       bb[LLX] = ffllx;
+       bb[LLY] = fflly;
+       bb[URX] = ffurx;
+       bb[URY] = ffury;
+       
+       if (bb[LLX] > ffllx)
+          bb[LLX]--;
+       if (bb[LLY] > fflly)
+          bb[LLY]--;
+       if (bb[URX] < ffurx)
+          bb[URX]++;
+       if (bb[URY] < ffury)
+          bb[URY]++;
+       
+       return True;
     }
     
     return False;
@@ -600,16 +607,16 @@ psscan(const char *filename, int scanstyle)
 	    }
 	} else if (doc->nummedia == NONE &&
 		   iscomment(line+2, "DocumentMedia:")) {
-	    float w, h;
+	    char w[21], h[21];
 	    doc->media = (Media)
 			 PS_malloc(sizeof (MediaStruct));
             CHECK_MALLOCED(doc->media);
 	    doc->media[0].name = ps_gettext(line+length("%%DocumentMedia:"),
 					    &next_char);
 	    if (doc->media[0].name != NULL) {
-		if (sscanf(next_char, "%f %f", &w, &h) == 2) {
-		    doc->media[0].width = w + 0.5;
-		    doc->media[0].height = h + 0.5;
+		if (sscanf(next_char, "%20s %20s", w, h) == 2) {
+		    doc->media[0].width = _spectre_strtod (w, NULL) + 0.5;
+		    doc->media[0].height = _spectre_strtod (h, NULL) + 0.5;
 		}
 		if (doc->media[0].width != 0 && doc->media[0].height != 0)
 		    doc->nummedia = 1;
@@ -628,9 +635,9 @@ psscan(const char *filename, int scanstyle)
 		doc->media[doc->nummedia].name = ps_gettext(line+length("%%+"),
 							    &next_char);
 		if (doc->media[doc->nummedia].name != NULL) {
-		    if (sscanf(next_char, "%f %f", &w, &h) == 2) {
-			doc->media[doc->nummedia].width = w + 0.5;
-			doc->media[doc->nummedia].height = h + 0.5;
+		    if (sscanf(next_char, "%20s %20s", w, h) == 2) {
+		        doc->media[doc->nummedia].width = _spectre_strtod (w, NULL) + 0.5;
+			doc->media[doc->nummedia].height = _spectre_strtod (h, NULL) + 0.5;
 		    }
 		    if (doc->media[doc->nummedia].width != 0 &&
 			doc->media[doc->nummedia].height != 0) doc->nummedia++;
