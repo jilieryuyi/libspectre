@@ -121,14 +121,16 @@ void _spectre_real_assert (int          condition,
 #endif /* SPECTRE_DISABLE_CHECKS */
 
 /* String handling helpers */
-char *_spectre_strdup_printf (const char *format,
-			      ...);
-char *_spectre_strdup        (const char *str);
-int   _spectre_strncasecmp   (const char *s1,
-			      const char *s2,
-			      size_t      n);
-int   _spectre_strcasecmp    (const char *s1,
-			      const char *s2);
+char  *_spectre_strdup_printf (const char *format,
+			       ...);
+char  *_spectre_strdup        (const char *str);
+int    _spectre_strncasecmp   (const char *s1,
+			       const char *s2,
+			       size_t      n);
+int    _spectre_strcasecmp    (const char *s1,
+			       const char *s2);
+double _spectre_strtod        (const char *nptr,
+			       char      **endptr);
 
 SPECTRE_END_DECLS
 
