@@ -207,6 +207,36 @@ static PS_WORD         reorder_word PT((PS_WORD));
 static char    *skipped_line = "% ps_io_fgetchars: skipped line";
 static char    *empty_string = "";
 
+static Boolean scan_boundingbox(int *bb, const char *line)
+{
+    float fllx, flly, furx, fury;
+    
+    if (sscanf (line, "%d %d %d %d",
+		&bb[LLX], &bb[LLY], &bb[URX], &bb[URY]) == 4)
+       return True;
+    
+    if (sscanf (line, "%f %f %f %f",
+		&fllx, &flly, &furx, &fury) == 4) {
+        bb[LLX] = fllx;
+	bb[LLY] = flly;
+	bb[URX] = furx;
+	bb[URY] = fury;
+	
+	if (bb[LLX] > fllx)
+	   bb[LLX]--;
+	if (bb[LLY] > flly)
+	   bb[LLY]--;
+	if (bb[URX] < furx)
+	   bb[URX]++;
+	if (bb[URY] < fury)
+	   bb[URY]++;
+	
+	return True;
+    }
+    
+    return False;
+}
+
 /*--------------------------------------------------*/
 
 /*
@@ -502,31 +532,9 @@ psscan(const char *filename, int scanstyle)
 	    if (strcmp(text, "(atend)") == 0) {
 		bb_set = ATEND;
 	    } else {
-		if (sscanf(line+length("%%BoundingBox:"), "%d %d %d %d",
-			   &(doc->boundingbox[LLX]),
-			   &(doc->boundingbox[LLY]),
-			   &(doc->boundingbox[URX]),
-			   &(doc->boundingbox[URY])) == 4)
+		if (scan_boundingbox(doc->boundingbox,
+				line + length("%%BoundingBox:")))
 		    bb_set = 1;
-		else {
-		    float fllx, flly, furx, fury;
-		    if (sscanf(line+length("%%BoundingBox:"), "%f %f %f %f",
-			       &fllx, &flly, &furx, &fury) == 4) {
-			bb_set = 1;
-			doc->boundingbox[LLX] = fllx;
-			doc->boundingbox[LLY] = flly;
-			doc->boundingbox[URX] = furx;
-			doc->boundingbox[URY] = fury;
-			if (fllx < doc->boundingbox[LLX])
-			    doc->boundingbox[LLX]--;
-			if (flly < doc->boundingbox[LLY])
-			    doc->boundingbox[LLY]--;
-			if (furx > doc->boundingbox[URX])
-			    doc->boundingbox[URX]++;
-			if (fury > doc->boundingbox[URY])
-			    doc->boundingbox[URY]++;
-		    }
-		}
 	    }
 	} else if (orientation_set == NONE &&
 		   iscomment(line+2, "Orientation:")) {
@@ -806,31 +814,9 @@ psscan(const char *filename, int scanstyle)
 		PS_free(cp);
 	    } else if (page_bb_set == NONE &&
 		       iscomment(line+2, "PageBoundingBox:")) {
-		if (sscanf(line+length("%%PageBoundingBox:"), "%d %d %d %d",
-			   &(doc->default_page_boundingbox[LLX]),
-			   &(doc->default_page_boundingbox[LLY]),
-			   &(doc->default_page_boundingbox[URX]),
-			   &(doc->default_page_boundingbox[URY])) == 4)
+		if (scan_boundingbox(doc->default_page_boundingbox,
+			    line+length("%%PageBoundingBox:")))
 		    page_bb_set = 1;
-		else {
-		    float fllx, flly, furx, fury;
-		    if (sscanf(line+length("%%PageBoundingBox:"), "%f %f %f %f",
-			       &fllx, &flly, &furx, &fury) == 4) {
-			page_bb_set = 1;
-			doc->default_page_boundingbox[LLX] = fllx;
-			doc->default_page_boundingbox[LLY] = flly;
-			doc->default_page_boundingbox[URX] = furx;
-			doc->default_page_boundingbox[URY] = fury;
-			if (fllx < doc->default_page_boundingbox[LLX])
-			    doc->default_page_boundingbox[LLX]--;
-			if (flly < doc->default_page_boundingbox[LLY])
-			    doc->default_page_boundingbox[LLY]--;
-			if (furx > doc->default_page_boundingbox[URX])
-			    doc->default_page_boundingbox[URX]++;
-			if (fury > doc->default_page_boundingbox[URY])
-			    doc->default_page_boundingbox[URY]++;
-		    }
-		}
 	    }
 	}
 	section_len += line_len;
@@ -936,31 +922,9 @@ psscan(const char *filename, int scanstyle)
 		PS_free(cp);
 	    } else if (page_bb_set == NONE &&
 		       iscomment(line+2, "PageBoundingBox:")) {
-		if (sscanf(line+length("%%PageBoundingBox:"), "%d %d %d %d",
-			   &(doc->default_page_boundingbox[LLX]),
-			   &(doc->default_page_boundingbox[LLY]),
-			   &(doc->default_page_boundingbox[URX]),
-			   &(doc->default_page_boundingbox[URY])) == 4)
+		if (scan_boundingbox(doc->default_page_boundingbox,
+			    line+length("%%PageBoundingBox:")))
 		    page_bb_set = 1;
-		else {
-		    float fllx, flly, furx, fury;
-		    if (sscanf(line+length("%%PageBoundingBox:"), "%f %f %f %f",
-			       &fllx, &flly, &furx, &fury) == 4) {
-			page_bb_set = 1;
-			doc->default_page_boundingbox[LLX] = fllx;
-			doc->default_page_boundingbox[LLY] = flly;
-			doc->default_page_boundingbox[URX] = furx;
-			doc->default_page_boundingbox[URY] = fury;
-			if (fllx < doc->default_page_boundingbox[LLX])
-			    doc->default_page_boundingbox[LLX]--;
-			if (flly < doc->default_page_boundingbox[LLY])
-			    doc->default_page_boundingbox[LLY]--;
-			if (furx > doc->default_page_boundingbox[URX])
-			    doc->default_page_boundingbox[URX]++;
-			if (fury > doc->default_page_boundingbox[URY])
-			    doc->default_page_boundingbox[URY]++;
-		    }
-		}
 	    }
 	}
 	section_len += line_len;
@@ -1103,38 +1067,10 @@ continuepage:
 		if (strcmp(text, "(atend)") == 0 || strcmp(text, "atend") == 0) {
 		    page_bb_set = ATEND;
 		} else {
-		    if (sscanf(line+length("%%PageBoundingBox:"), "%d %d %d %d",
-			    &(doc->pages[doc->numpages].boundingbox[LLX]),
-			    &(doc->pages[doc->numpages].boundingbox[LLY]),
-			    &(doc->pages[doc->numpages].boundingbox[URX]),
-			    &(doc->pages[doc->numpages].boundingbox[URY])) == 4) 
-		      {
-			if (page_bb_set == NONE) page_bb_set = 1;
-		      }
-		    else {
-			float fllx, flly, furx, fury;
-			if (sscanf(line+length("%%PageBoundingBox:"),
-				   "%f %f %f %f",
-				   &fllx, &flly, &furx, &fury) == 4) {
-			    if (page_bb_set == NONE) page_bb_set = 1;
-			    doc->pages[doc->numpages].boundingbox[LLX] = fllx;
-			    doc->pages[doc->numpages].boundingbox[LLY] = flly;
-			    doc->pages[doc->numpages].boundingbox[URX] = furx;
-			    doc->pages[doc->numpages].boundingbox[URY] = fury;
-			    if (fllx <
-				    doc->pages[doc->numpages].boundingbox[LLX])
-				doc->pages[doc->numpages].boundingbox[LLX]--;
-			    if (flly <
-				    doc->pages[doc->numpages].boundingbox[LLY])
-				doc->pages[doc->numpages].boundingbox[LLY]--;
-			    if (furx >
-				    doc->pages[doc->numpages].boundingbox[URX])
-				doc->pages[doc->numpages].boundingbox[URX]++;
-			    if (fury >
-				    doc->pages[doc->numpages].boundingbox[URY])
-				doc->pages[doc->numpages].boundingbox[URY]++;
-			}
-		    }
+		    if (scan_boundingbox(doc->pages[doc->numpages].boundingbox,
+				line+length("%%PageBoundingBox:")))
+			if(page_bb_set == NONE)
+			    page_bb_set = 1;
 		}
 	    }
 	}
@@ -1191,28 +1127,7 @@ continuepage:
 	    doc->begintrailer = position;
 	    section_len = line_len;
 	} else if (bb_set == ATEND && iscomment(line+2, "BoundingBox:")) {
-	    if (sscanf(line+length("%%BoundingBox:"), "%d %d %d %d",
-		       &(doc->boundingbox[LLX]),
-		       &(doc->boundingbox[LLY]),
-		       &(doc->boundingbox[URX]),
-		       &(doc->boundingbox[URY])) != 4) {
-		float fllx, flly, furx, fury;
-		if (sscanf(line+length("%%BoundingBox:"), "%f %f %f %f",
-			   &fllx, &flly, &furx, &fury) == 4) {
-		    doc->boundingbox[LLX] = fllx;
-		    doc->boundingbox[LLY] = flly;
-		    doc->boundingbox[URX] = furx;
-		    doc->boundingbox[URY] = fury;
-		    if (fllx < doc->boundingbox[LLX])
-			doc->boundingbox[LLX]--;
-		    if (flly < doc->boundingbox[LLY])
-			doc->boundingbox[LLY]--;
-		    if (furx > doc->boundingbox[URX])
-			doc->boundingbox[URX]++;
-		    if (fury > doc->boundingbox[URY])
-			doc->boundingbox[URY]++;
-		}
-	    }
+	    scan_boundingbox(doc->boundingbox, line + length("%%BoundingBox:"));
 	} else if (orientation_set == ATEND &&
 		   iscomment(line+2, "Orientation:")) {
 	    sscanf(line+length("%%Orientation:"), "%256s", text);
