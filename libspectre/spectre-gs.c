@@ -86,7 +86,7 @@ spectre_gs_process (SpectreGS  *gs,
 	int error;
 	static char buf[BUFFER_SIZE];
 	unsigned int read;
-	int wrote;
+	int exit_code;
 	size_t left = end - begin;
 	void *ghostscript_instance = gs->ghostscript_instance;
 	
@@ -97,7 +97,7 @@ spectre_gs_process (SpectreGS  *gs,
 	
 	fseek (fd, begin, SEEK_SET);
 
-	gsapi_run_string_begin (ghostscript_instance, 0, &error);
+	error = gsapi_run_string_begin (ghostscript_instance, 0, &exit_code);
 	if (critic_error_code (error)) {
 		fclose (fd);
 		return FALSE;
@@ -107,10 +107,11 @@ spectre_gs_process (SpectreGS  *gs,
 		char *set;
 
 		set = _spectre_strdup_printf ("%d %d translate\n", -x, -y);
-		gsapi_run_string_continue (ghostscript_instance, set, strlen (set),
-					   0, &error);
+		error = gsapi_run_string_continue (ghostscript_instance, set, strlen (set),
+						   0, &exit_code);
+		error = error == e_NeedInput ? 0 : error;
 		free (set);
-		if (critic_error_code (error)) {
+		if (error != e_NeedInput && critic_error_code (error)) {
 			fclose (fd);
 			return FALSE;
 		}
@@ -123,8 +124,9 @@ spectre_gs_process (SpectreGS  *gs,
 			to_read = left;
 		
 		read = fread (buf, sizeof (char), to_read, fd);
-		wrote = gsapi_run_string_continue (ghostscript_instance,
-						   buf, read, 0, &error);
+		error = gsapi_run_string_continue (ghostscript_instance,
+						   buf, read, 0, &exit_code);
+		error = error == e_NeedInput ? 0 : error;
 		left -= read;
 	}
 	
@@ -132,7 +134,7 @@ spectre_gs_process (SpectreGS  *gs,
 	if (critic_error_code (error))
 		return FALSE;
 	
-	gsapi_run_string_end (ghostscript_instance, 0, &error);
+	error = gsapi_run_string_end (ghostscript_instance, 0, &exit_code);
 	if (critic_error_code (error))
 		return FALSE;
 
@@ -195,9 +197,10 @@ spectre_gs_send_string (SpectreGS  *gs,
 			const char *str)
 {
 	int error;
+	int exit_code;
 	
-	gsapi_run_string_with_length (gs->ghostscript_instance,
-				      str, strlen (str), 0, &error);
+	error = gsapi_run_string_with_length (gs->ghostscript_instance,
+					      str, strlen (str), 0, &exit_code);
 
 	return !critic_error_code (error);
 }
