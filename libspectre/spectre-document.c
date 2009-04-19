@@ -69,7 +69,6 @@ spectre_document_load (SpectreDocument *document,
 	
 	document->doc = psscan (filename, SCANSTYLE_NORMAL);
 	if (!document->doc) {
-		/* FIXME: OOM | INVALID_PS */
 		document->status = SPECTRE_STATUS_LOAD_ERROR;
 		return;
 	}
@@ -80,6 +79,21 @@ spectre_document_load (SpectreDocument *document,
 		document->doc = NULL;
 		
 		return;
+	} else if (document->doc->numpages == 0 && !document->doc->format) {
+		/* Make sure it's a valid PS document */
+		unsigned char *data = NULL;
+		int            row_length;
+
+		spectre_document_render (document, &data, &row_length);
+		free (data);
+		
+		if (spectre_document_status (document)) {
+			document->status = SPECTRE_STATUS_LOAD_ERROR;
+			psdocdestroy (document->doc);
+			document->doc = NULL;
+
+			return;
+		}
 	}
 
 	document->structured = ((!document->doc->epsf && document->doc->numpages > 0) ||
