@@ -606,8 +606,7 @@ psscan(const char *filename, int scanstyle)
 	} else if (doc->nummedia == NONE &&
 		   iscomment(line+2, "DocumentMedia:")) {
 	    char w[21], h[21];
-	    doc->media = (Media)
-			 PS_malloc(sizeof (MediaStruct));
+	    doc->media = (Media) PS_calloc(1, sizeof (MediaStruct));
             CHECK_MALLOCED(doc->media);
 	    doc->media[0].name = ps_gettext(line+length("%%DocumentMedia:"),
 					    &next_char);
@@ -616,10 +615,12 @@ psscan(const char *filename, int scanstyle)
 		    doc->media[0].width = _spectre_strtod (w, NULL) + 0.5;
 		    doc->media[0].height = _spectre_strtod (h, NULL) + 0.5;
 		}
-		if (doc->media[0].width != 0 && doc->media[0].height != 0)
+		if (doc->media[0].width != 0 && doc->media[0].height != 0) {
 		    doc->nummedia = 1;
-		else
+		} else {
 		    PS_free(doc->media[0].name);
+		    doc->media[0].name = NULL;
+		}
 	    }
 	    preread=1;
 	    while (readline(fd, enddoseps, &line, &position, &line_len) &&
@@ -629,7 +630,8 @@ psscan(const char *filename, int scanstyle)
 			     PS_realloc(doc->media,
 				     (doc->nummedia+1)*
 				     sizeof (MediaStruct));
-                CHECK_MALLOCED(doc->media);
+		CHECK_MALLOCED(doc->media);
+		memset (doc->media + doc->nummedia, 0, sizeof (MediaStruct));
 		doc->media[doc->nummedia].name = ps_gettext(line+length("%%+"),
 							    &next_char);
 		if (doc->media[doc->nummedia].name != NULL) {
@@ -637,10 +639,12 @@ psscan(const char *filename, int scanstyle)
 		        doc->media[doc->nummedia].width = _spectre_strtod (w, NULL) + 0.5;
 			doc->media[doc->nummedia].height = _spectre_strtod (h, NULL) + 0.5;
 		    }
-		    if (doc->media[doc->nummedia].width != 0 &&
-			doc->media[doc->nummedia].height != 0) doc->nummedia++;
-		    else
+		    if (doc->media[doc->nummedia].width != 0 &&	doc->media[doc->nummedia].height != 0) {
+		        doc->nummedia++;
+		    } else {
 			PS_free(doc->media[doc->nummedia].name);
+			doc->media[doc->nummedia].name = NULL;
+		    }
 		}
 	    }
 	    section_len += line_len;
@@ -648,14 +652,11 @@ psscan(const char *filename, int scanstyle)
 	} else if (doc->nummedia == NONE &&
 		   iscomment(line+2, "DocumentPaperSizes:")) {
 
-	    doc->media = (Media)
-			 PS_malloc(sizeof (MediaStruct));
+	    doc->media = (Media) PS_calloc(1, sizeof (MediaStruct));
             CHECK_MALLOCED(doc->media);
 	    doc->media[0].name = ps_gettext(line+length("%%DocumentPaperSizes:"),
 					    &next_char);
 	    if (doc->media[0].name != NULL) {
-		doc->media[0].width = 0;
-		doc->media[0].height = 0;
 		for (i=0; papersizes[i].name; i++) {
 			dmp = (Media)&papersizes[i];
 		    /* Note: Paper size comment uses down cased paper size
@@ -672,10 +673,12 @@ psscan(const char *filename, int scanstyle)
 			break;
 		    }
 		}
-		if (doc->media[0].width != 0 && doc->media[0].height != 0)
+		if (doc->media[0].width != 0 && doc->media[0].height != 0) {
 		    doc->nummedia = 1;
-		else
+		} else {
 		    PS_free(doc->media[0].name);
+		    doc->media[0].name = NULL;
+		}
 	    }
 	    while ((cp = ps_gettext(next_char, &next_char))) {
 		doc->media = (Media)
@@ -683,9 +686,8 @@ psscan(const char *filename, int scanstyle)
 				     (doc->nummedia+1)*
 				     sizeof (MediaStruct));
                 CHECK_MALLOCED(doc->media);
+		memset (doc->media + doc->nummedia, 0, sizeof (MediaStruct));
 		doc->media[doc->nummedia].name = cp;
-		doc->media[doc->nummedia].width = 0;
-		doc->media[doc->nummedia].height = 0;
 		for (i=0; papersizes[i].name; i++) {
 			dmp = (Media)&papersizes[i];
 		    /* Note: Paper size comment uses down cased paper size
@@ -693,7 +695,7 @@ psscan(const char *filename, int scanstyle)
 		     * PaperSize comments.
 		     */
 		    if (_spectre_strcasecmp(doc->media[doc->nummedia].name,
-			       dmp->name) == 0) {
+					    dmp->name) == 0) {
 			PS_free(doc->media[doc->nummedia].name);
 			doc->media[doc->nummedia].name =
 				(char *)PS_malloc(strlen(dmp->name)+1);
@@ -704,10 +706,12 @@ psscan(const char *filename, int scanstyle)
 			break;
 		    }
 		}
-		if (doc->media[doc->nummedia].width != 0 &&
-		    doc->media[doc->nummedia].height != 0) doc->nummedia++;
-		else
+		if (doc->media[doc->nummedia].width != 0 && doc->media[doc->nummedia].height != 0) {
+		    doc->nummedia++;
+		} else {
 		    PS_free(doc->media[doc->nummedia].name);
+		    doc->media[doc->nummedia].name = NULL;
+		}
 	    }
 	    preread=1;
 	    while (readline(fd, enddoseps, &line, &position, &line_len) &&
@@ -720,9 +724,8 @@ psscan(const char *filename, int scanstyle)
 					 (doc->nummedia+1)*
 					 sizeof (MediaStruct));
                     CHECK_MALLOCED(doc->media);
+		    memset (doc->media + doc->nummedia, 0, sizeof (MediaStruct));
 		    doc->media[doc->nummedia].name = cp;
-		    doc->media[doc->nummedia].width = 0;
-		    doc->media[doc->nummedia].height = 0;
 		    for (i=0; papersizes[i].name; i++) {
 			    dmp = (Media)&papersizes[i];
 			/* Note: Paper size comment uses down cased paper size
@@ -730,16 +733,18 @@ psscan(const char *filename, int scanstyle)
 			 * PaperSize comments.
 			 */
 			if (_spectre_strcasecmp(doc->media[doc->nummedia].name,
-				   dmp->name) == 0) {
+						dmp->name) == 0) {
 			    doc->media[doc->nummedia].width = dmp->width;
 			    doc->media[doc->nummedia].height = dmp->height;
 			    break;
 			}
 		    }
-		    if (doc->media[doc->nummedia].width != 0 &&
-			doc->media[doc->nummedia].height != 0) doc->nummedia++;
-		    else
+		    if (doc->media[doc->nummedia].width != 0 && doc->media[doc->nummedia].height != 0) {
+		        doc->nummedia++;
+		    } else {
 			PS_free(doc->media[doc->nummedia].name);
+			doc->media[doc->nummedia].name = NULL;
+		    }
 		}
 	    }
 	    section_len += line_len;
