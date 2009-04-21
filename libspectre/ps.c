@@ -194,6 +194,7 @@ static int      ps_io_fseek PT((FileData, int));
 static int      ps_io_ftell PT((FileData));
 
 static char    *readline PT((FileData, long, char **, long *, unsigned int *));
+static char    *readlineuntil PT((FileData, long, char **, long *, unsigned int *, char));
 static char    *gettextline PT((char *));
 static char    *ps_gettext PT((char *,char **));
 static int      blank PT((char *));
@@ -445,7 +446,7 @@ psscan(const char *filename, int scanstyle)
      * follows, this seems to be a real pjl file. */
     if(iscomment(line, "\033%-12345X@PJL")) {
         /* read until first DSC comment */
-        while(readline(fd, enddoseps, &line, &position, &line_len) && (line[0] != '%')) ;
+        readlineuntil(fd, enddoseps, &line, &position, &line_len, '%');
 	if(line[0] != '%') {
 	    fprintf(stderr, "psscan error: input files seems to be a PJL file.\n");
 	    ENDMESSAGE(psscan)
@@ -1849,6 +1850,44 @@ static char * readline (fd, enddoseps, lineP, positionP, line_lenP)
    }
 
    ENDMESSAGE(readline)
+   return(FD_BUF+FD_LINE_BEGIN);
+}
+
+/*----------------------------------------------------------*/
+/*
+   readlineuntil()
+   Read the next line in the postscript file until char is found
+   Similar to readline, but it doesn't skip lines.
+*/
+/*----------------------------------------------------------*/
+
+static char * readlineuntil (fd, enddoseps, lineP, positionP, line_lenP, charP)
+   FileData fd;
+   long enddoseps;
+   char **lineP;
+   long *positionP;
+   unsigned int *line_lenP;
+   char charP;
+{
+   char *line;
+
+   if (positionP) *positionP = FD_FILEPOS;
+
+   do {
+       line = ps_io_fgetchars(fd,-1);
+       if (!line) {
+           INFMESSAGE(could not get line)
+	   *line_lenP = 0;
+	   *lineP     = empty_string;
+	   ENDMESSAGE(readline)
+	   return(NULL);
+       }
+
+       if (positionP) *positionP = FD_FILEPOS;
+       *line_lenP = FD_LINE_LEN;
+       *lineP = FD_BUF+FD_LINE_BEGIN;
+   } while (line[0] != charP);
+
    return(FD_BUF+FD_LINE_BEGIN);
 }
 
