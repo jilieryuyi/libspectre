@@ -215,7 +215,7 @@ spectre_device_render (SpectreDevice        *device,
 	args = calloc (sizeof (char *), n_args);
 	args[arg++] = "libspectre"; /* This value doesn't really matter */
 	args[arg++] = "-dMaxBitmap=10000000";
-	args[arg++] = "-dDELAYSAFER";
+	args[arg++] = "-dSAFER";
 	args[arg++] = "-dNOPAUSE";
 	args[arg++] = "-dNOPAGEPROMPT";
 	args[arg++] = "-sDEVICE=display";
