@@ -2260,7 +2260,7 @@ psgetpagebbox (const struct document *doc, int page, int *urx, int *ury, int *ll
    *urx = new_urx;
    *ury = new_ury;
 
-   return (new_llx != 0 && new_lly != 0 && new_urx != 0 && new_ury != 0);
+   return (new_llx != 0 || new_lly != 0 || new_urx != 0 || new_ury != 0);
 }
 
 /* From Evince */
