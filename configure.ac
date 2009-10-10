@@ -59,7 +59,7 @@ AC_C_BIGENDIAN
 
 AC_CHECK_FUNC(vasprintf, [ AC_DEFINE(HAVE_VASPRINTF, 1, [Define if the 'vasprintf' function is available.]) ])
 
-LIBGS_REQUIRED="8.61"
+LIBGS_REQUIRED="8.62"
 
 AC_CHECK_LIB(gs, gsapi_new_instance, have_libgs=yes, have_libgs=no)
 if test "x$have_libgs" = "xyes"; then
