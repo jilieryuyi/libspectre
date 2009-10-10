@@ -287,7 +287,6 @@ Makefile
 Doxyfile
 libspectre/Makefile
 libspectre/spectre-version.h
-libspectre/ghostscript/Makefile
 test/Makefile
 libspectre.pc
 ])
