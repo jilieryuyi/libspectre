@@ -1,3 +1,30 @@
+libspectre 0.2.3 (18 October 2009)
+==================================
+
+This is another bugfix only release in the libspectre's 0.2 series.
+
+Several fixes in the PostScript parser:
+
+ - Detection of invalid or broken files has been improved. A document
+   scanned without errors with no pages and no format is likely to be
+   an invalid file, or not a PostScript file at all (Bug #19042)
+
+ - Fix possible uninitialized use of Document media struct
+   contents. Thanks to Alexander Myltsev (Bug #18685)
+
+ - Fix documents with PJL commands before the initial DSC comments.
+
+Ghostscript is now always run with -dSAFER option
+
+A missing argument in gs command line of PDF exporter was making it
+always fail for any document in BSD systems. Thanks to Antoine
+Jacoutot who gave me remote access to an OpenBSD system to fix this
+(Bug #18826)
+
+Internal copy of ghostscript headers have been removed since they are
+already installed by ghostscript since version 8.62 (Bug #18827)
+
+
 libspectre 0.2.2 (25 November 2008)
 ===================================
 
