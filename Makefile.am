@@ -84,7 +84,7 @@ release-upload: release-check $(tar_file) $(sha1_file) $(gpg_file)
 	scp $(tar_file) $(sha1_file) $(gpg_file) $(RELEASE_UPLOAD_HOST):$(RELEASE_UPLOAD_DIR)
 	mv $(tar_file) $(sha1_file) $(gpg_file) releases
 	ssh $(RELEASE_UPLOAD_HOST) "rm -f $(RELEASE_UPLOAD_DIR)/LATEST-$(PACKAGE)-[0-9]* && ln -s $(tar_file) $(RELEASE_UPLOAD_DIR)/LATEST-$(PACKAGE)-$(VERSION)"
-	 git-tag -s -m "libspectre $(SPECTRE_MAJOR_VERSION).$(SPECTRE_MINOR_VERSION).$(SPECTRE_MICRO_VERSION) release" $(SPECTRE_MAJOR_VERSION).$(SPECTRE_MINOR_VERSION).$(SPECTRE_MICRO_VERSION)
+	 git tag -s -m "libspectre $(SPECTRE_MAJOR_VERSION).$(SPECTRE_MINOR_VERSION).$(SPECTRE_MICRO_VERSION) release" $(SPECTRE_MAJOR_VERSION).$(SPECTRE_MINOR_VERSION).$(SPECTRE_MICRO_VERSION)
 
 release-publish-message: releases/$(sha1_file)
 	@echo "Please follow the instructions in RELEASING to push stuff out and"
