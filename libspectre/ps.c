@@ -581,7 +581,7 @@ psscan(const char *filename, int scanstyle)
 	    } else {
 		int page_order;
 		
-		switch (sscanf(line+length("%%Pages:"), "%d %d",
+		switch (sscanf(line+length("%%Pages:"), "%u %d",
 			       &maxpages, &page_order)) {
 		    case 2:
 			if (page_order_set == NONE) {
@@ -1000,7 +1000,7 @@ newpage:
             CHECK_MALLOCED(doc->pages);
 	}
 	label = ps_gettext(line+length("%%Page:"), &next_char);
-	if (sscanf(next_char, "%d", &thispage) != 1) thispage = 0;
+	if (sscanf(next_char, "%u", &thispage) != 1) thispage = 0;
 	if (nextpage == 1) {
 	    ignore = thispage != 1;
 	}
@@ -1111,7 +1111,7 @@ continuepage:
 	    /* Do nothing */
 	} else if (iscomment(line+2, "Page:")) {
 	    PS_free(ps_gettext(line+length("%%Page:"), &next_char));
-	    if (sscanf(next_char, "%d", &thispage) != 1) thispage = 0;
+	    if (sscanf(next_char, "%u", &thispage) != 1) thispage = 0;
 	    if (!ignore && thispage == nextpage) {
 		if (doc->numpages > 0) {
 		    doc->pages[doc->numpages-1].end = position;
@@ -2116,7 +2116,7 @@ pscopydoc(dest_file,src_filename,d,pagelist)
           fputs(comment, dest_file);
           pages_atend = True;
        } else {
-          switch (sscanf(comment+length("%%Pages:"), "%*d %d", &i)) {
+          switch (sscanf(comment+length("%%Pages:"), "%*d %u", &i)) {
              case 1:
                 fprintf(dest_file, "%%%%Pages: %d %d\n", pages, i);
                 break;
@@ -2151,7 +2151,7 @@ pscopydoc(dest_file,src_filename,d,pagelist)
          PS_free(comment);
          continue;
       }
-      switch (sscanf(comment+length("%%Pages:"), "%*d %d", &i)) {
+      switch (sscanf(comment+length("%%Pages:"), "%*d %u", &i)) {
          case 1:
             fprintf(dest_file, "%%%%Pages: %d %d\n", pages, i);
             break;
