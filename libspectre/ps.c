@@ -864,6 +864,20 @@ psscan(const char *filename, int scanstyle)
 	          iscomment(line+2, "Page:") ||
 	          iscomment(line+2, "Trailer") ||
 	          iscomment(line+2, "EOF")))) {
+	    if (iscomment(line, "%!PS")) {
+	        /* Embedded document in Prolog, typically font resources.
+		 * Skip until end of resource or Prolog
+		 */
+		while (readline(fd, enddoseps, &line, &position, &line_len) &&
+		       !(DSCcomment(line) &&
+			 (iscomment(line+2, "EndProlog") ||
+			  iscomment(line+2, "BeginSetup") ||
+			  iscomment(line+2, "Page:") ||
+			  iscomment(line+2, "Trailer") ||
+			  iscomment(line+2, "EOF")))) {
+		    section_len += line_len;
+		}
+	    }
 	    if (!preread) section_len += line_len;
 	    preread = 0;
 	}
