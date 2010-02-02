@@ -48,4 +48,4 @@ libspectre_la_SOURCES = 		\
 	$(gv_sources)
 
 libspectre_la_LIBADD = $(LIB_GS)
-libspectre_la_LDFLAGS = -version-info @VERSION_INFO@
+libspectre_la_LDFLAGS = -version-info @VERSION_INFO@ -no-undefined
