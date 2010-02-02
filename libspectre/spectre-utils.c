@@ -162,11 +162,17 @@ spectre_strdup_vprintf (const char *format,
 		string = NULL;
 #else /* !HAVE_VASPRINTF */
 	va_list args_copy;
+	int n;
 	char c;
 
 	SPECTRE_VA_COPY (args_copy, args);
 
-	string = malloc ((vsnprintf (&c, 1, format, args) + 1) * sizeof (char));
+#if HAVE__VSCPRINTF
+	n = _vscprintf (format, args);
+#else
+	n = vsnprintf (&c, 1, format, args);
+#endif
+	string = malloc ((n + 1) * sizeof (char));
 	if (string) {
 		len = vsprintf (string, format, args_copy);
 		if (len < 0) {
