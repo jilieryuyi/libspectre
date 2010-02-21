@@ -89,7 +89,7 @@ spectre_render_context_set_rotation (SpectreRenderContext *rc,
 
 	rotation %= 360;
 
-	if (rotation >= 0 && rotation < 90)
+	if (rotation < 90)
 		rc->orientation = SPECTRE_ORIENTATION_PORTRAIT;
 	else if (rotation >= 90 && rotation < 180)
 		rc->orientation = SPECTRE_ORIENTATION_LANDSCAPE;
