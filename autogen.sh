@@ -15,7 +15,7 @@ cd $srcdir
 PACKAGE=libspectre
 
 LIBTOOLIZE=${LIBTOOLIZE-libtoolize}
-LIBTOOLIZE_FLAGS="--copy --force"
+LIBTOOLIZE_FLAGS="--copy --force --automake"
 AUTOHEADER=${AUTOHEADER-autoheader}
 AUTOMAKE_FLAGS="--add-missing --foreign"
 AUTOCONF=${AUTOCONF-autoconf}
@@ -49,8 +49,8 @@ esac
 
 
 # some terminal codes ...
-boldface="`tput bold 2>/dev/null`"
-normal="`tput sgr0 2>/dev/null`"
+boldface="`tput bold 2>/dev/null || true`"
+normal="`tput sgr0 2>/dev/null || true`"
 printbold() {
     echo $ECHO_N "$boldface"
     echo "$@"
@@ -137,7 +137,7 @@ version_check autoconf AUTOCONF $AUTOCONF $autoconf_min_vers \
 # 
 # We check automake first to allow it to be a newer version than we know about.
 #
-version_check automake AUTOMAKE "$AUTOMAKE automake automake-1.10 automake-1.9 automake-1.8 automake-1.7" $automake_min_vers \
+version_check automake AUTOMAKE "$AUTOMAKE automake automake-1.11 automake-1.10 automake-1.9 automake-1.8 automake-1.7" $automake_min_vers \
     "http://ftp.gnu.org/pub/gnu/automake/automake-${automake_min_vers}.tar.gz" || DIE=1
 ACLOCAL=`echo $AUTOMAKE | sed s/automake/aclocal/`
 
@@ -187,7 +187,7 @@ do_cmd $AUTOMAKE $AUTOMAKE_FLAGS
 
 do_cmd $AUTOCONF
 
-cd $ORIGDIR || exit 1
+cd "$ORIGDIR" || exit 1
 
 rm -f config.cache
 
