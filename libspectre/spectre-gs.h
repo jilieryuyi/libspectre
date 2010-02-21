@@ -42,6 +42,12 @@ int        spectre_gs_set_display_callback (SpectreGS           *gs,
 int        spectre_gs_run                  (SpectreGS           *gs,
 					    int                  n_args,
 					    char               **args);
+int        spectre_gs_process              (SpectreGS           *gs,
+					    const char          *filename,
+					    int                  x,
+					    int                  y,
+					    long                 begin,
+					    long                 end);
 int        spectre_gs_send_string          (SpectreGS           *gs,
 					    const char          *str);
 int        spectre_gs_send_page            (SpectreGS           *gs,

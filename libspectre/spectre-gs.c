@@ -74,7 +74,7 @@ spectre_gs_stdout (void *handler, const char *out, int len)
 	return len;
 }
 
-static int
+int
 spectre_gs_process (SpectreGS  *gs,
 		    const char *filename,
 		    int         x,
