@@ -587,13 +587,10 @@ psscan(const char *filename, int scanstyle)
 			if (page_order_set == NONE) {
 			    if (page_order == -1) {
 				doc->pageorder = DESCEND;
-				page_order_set = 1;
 			    } else if (page_order == 0) {
 				doc->pageorder = SPECIAL;
-				page_order_set = 1;
 			    } else if (page_order == 1) {
 				doc->pageorder = ASCEND;
-				page_order_set = 1;
 			    }
 			}
 		    case 1:
