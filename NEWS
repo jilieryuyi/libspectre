@@ -1,3 +1,18 @@
+libspectre 0.2.4 (21 February 2010)
+===================================
+
+This is another bugfix only release in the libspectre's 0.2 series.
+
+Documents containing embedded documents inside the prolog,
+typically font resources, were not correctly rendered (Bug #25573)
+
+Hib Eris fixed some portability issues to make libspectre build and
+work on Windows (Bug #26377)
+
+PDF exporter was broken which might cause a crash when printing some
+documents (Bug #26592)
+
+
 libspectre 0.2.3 (18 October 2009)
 ==================================
 
