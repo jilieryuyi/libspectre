@@ -30,7 +30,8 @@ spectre_exporter_pdf_begin (SpectreExporter *exporter,
 	char *args[9];
 	int arg = 0;
 	char *output_file;
-	
+	struct document *doc = exporter->doc;
+
 	exporter->gs = spectre_gs_new ();
 	if (!spectre_gs_create_instance (exporter->gs, NULL)) {
 		spectre_gs_cleanup (exporter->gs, CLEANUP_DELETE_INSTANCE);
@@ -61,6 +62,28 @@ spectre_exporter_pdf_begin (SpectreExporter *exporter,
 
 	free (output_file);
 
+	if (!spectre_gs_process (exporter->gs,
+				 doc->filename,
+				 0, 0,
+				 doc->beginprolog,
+				 doc->endprolog)) {
+		spectre_gs_free (exporter->gs);
+		exporter->gs = NULL;
+
+		return SPECTRE_STATUS_EXPORTER_ERROR;
+	}
+
+	if (!spectre_gs_process (exporter->gs,
+				 doc->filename,
+				 0, 0,
+				 doc->beginsetup,
+				 doc->endsetup)) {
+		spectre_gs_free (exporter->gs);
+		exporter->gs = NULL;
+
+		return SPECTRE_STATUS_EXPORTER_ERROR;
+	}
+
 	return SPECTRE_STATUS_SUCCESS;
 }
 
@@ -68,7 +91,13 @@ static SpectreStatus
 spectre_exporter_pdf_do_page (SpectreExporter *exporter,
 			      unsigned int     page_index)
 {
-	if (!spectre_gs_send_page (exporter->gs, exporter->doc, page_index, 0, 0)) {
+	struct document *doc = exporter->doc;
+
+	if (!spectre_gs_process (exporter->gs,
+				 doc->filename,
+				 0, 0,
+				 doc->pages[page_index].begin,
+				 doc->pages[page_index].end)) {
 		spectre_gs_free (exporter->gs);
 		exporter->gs = NULL;
 
@@ -81,10 +110,18 @@ spectre_exporter_pdf_do_page (SpectreExporter *exporter,
 static SpectreStatus
 spectre_exporter_pdf_end (SpectreExporter *exporter)
 {
+	int ret;
+	struct document *doc = exporter->doc;
+
+	ret = spectre_gs_process (exporter->gs,
+				  doc->filename,
+				  0, 0,
+				  doc->begintrailer,
+				  doc->endtrailer);
 	spectre_gs_free (exporter->gs);
 	exporter->gs = NULL;
 
-	return SPECTRE_STATUS_SUCCESS;
+	return ret ? SPECTRE_STATUS_SUCCESS : SPECTRE_STATUS_EXPORTER_ERROR;
 }
 
 SpectreExporter *
