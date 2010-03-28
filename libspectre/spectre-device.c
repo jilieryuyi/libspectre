@@ -179,6 +179,7 @@ spectre_device_render (SpectreDevice        *device,
 	int        n_args = 12;
 	int        arg = 0;
 	int        success;
+	char      *fmt;
 	char      *text_alpha, *graph_alpha;
 	char      *size = NULL;
 	char      *resolution, *set;
@@ -239,8 +240,10 @@ spectre_device_render (SpectreDevice        *device,
 							   DISPLAY_LITTLEENDIAN |
 #endif
 							   DISPLAY_TOPFIRST);
-	args[arg++] = dsp_handle = _spectre_strdup_printf ("-sDisplayHandle=16#%llx",
-							   (uintptr_t)device);
+	fmt = _spectre_strdup_printf ("-sDisplayHandle=16#%s",
+				      sizeof (device) == 4 ? "%lx" : "%llx");
+	args[arg++] = dsp_handle = _spectre_strdup_printf (fmt, device);
+	free (fmt);
 	if (rc->use_platform_fonts == FALSE)
 		args[arg++] = "-dNOPLATFONTS";
 
