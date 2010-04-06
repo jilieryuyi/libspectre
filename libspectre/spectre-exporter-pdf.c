@@ -93,6 +93,9 @@ spectre_exporter_pdf_do_page (SpectreExporter *exporter,
 {
 	struct document *doc = exporter->doc;
 
+	if (!exporter->gs)
+		return SPECTRE_STATUS_EXPORTER_ERROR;
+
 	if (!spectre_gs_process (exporter->gs,
 				 doc->filename,
 				 0, 0,
@@ -112,6 +115,9 @@ spectre_exporter_pdf_end (SpectreExporter *exporter)
 {
 	int ret;
 	struct document *doc = exporter->doc;
+
+	if (!exporter->gs)
+		return SPECTRE_STATUS_EXPORTER_ERROR;
 
 	ret = spectre_gs_process (exporter->gs,
 				  doc->filename,
