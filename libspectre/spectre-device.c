@@ -240,10 +240,16 @@ spectre_device_render (SpectreDevice        *device,
 							   DISPLAY_LITTLEENDIAN |
 #endif
 							   DISPLAY_TOPFIRST);
+#ifdef WIN32
+#define FMT64 "I64"
+#else
+#define FMT64 "ll"
+#endif
 	fmt = _spectre_strdup_printf ("-sDisplayHandle=16#%s",
-				      sizeof (device) == 4 ? "%lx" : "%llx");
+				      sizeof (device) == 4 ? "%lx" : "%"FMT64"x");
 	args[arg++] = dsp_handle = _spectre_strdup_printf (fmt, device);
 	free (fmt);
+#undef FMT64
 	if (rc->use_platform_fonts == FALSE)
 		args[arg++] = "-dNOPLATFONTS";
 
