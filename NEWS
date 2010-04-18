@@ -1,3 +1,19 @@
+libspectre 0.2.5 (18 April 2010)
+================================
+
+This is another bugfix only release in the libspectre's 0.2 series.
+
+This release contains two important fixes:
+
+ - The first one is a portability issue that caused crashes on
+   big-endian 64 bit systems. Thanks to Rogério Brito who spotted the
+   problem, see launchpad bug
+   https://bugs.launchpad.net/ubuntu/+source/libspectre/+bug/298139
+
+ - The second one is a crash when something goes wrong while running
+   pdf exporter. (Bug #26592)
+
+
 libspectre 0.2.4 (21 February 2010)
 ===================================
 
