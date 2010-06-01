@@ -158,7 +158,7 @@ dnl skipped and all flags rechecked.  So there's no need to do anything
 dnl else.  If for any reason you need to force a recheck, just change
 dnl MAYBE_WARN in an ignorable way (like adding whitespace)
 
-MAYBE_WARN="-Wall -Wextra -pedantic \
+MAYBE_WARN="-Wall -Wextra \
 -Wsign-compare -Werror-implicit-function-declaration \
 -Wpointer-arith -Wstrict-prototypes \
 -Wmissing-prototypes -Wmissing-declarations -Wnested-externs \
@@ -168,6 +168,12 @@ MAYBE_WARN="-Wall -Wextra -pedantic \
 -Wno-missing-field-initializers -Wno-unused-parameter \
 -Wno-attributes -Wno-long-long -Winline"
 
+AC_ARG_ENABLE(iso-c,
+              AC_HELP_STRING([--enable-iso-c], [Try to warn if code is not ISO C ]),,[enable_iso_c=no])
+
+if test "x$enable_iso_c" != "xno"; then
+   MAYBE_WARN="$MAYBE_WARN -ansi -pedantic"
+fi
 
 # invalidate cached value if MAYBE_WARN has changed
 if test "x$spectre_cv_warn_maybe" != "x$MAYBE_WARN"; then
