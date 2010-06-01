@@ -27,7 +27,7 @@ static SpectreStatus
 spectre_exporter_pdf_begin (SpectreExporter *exporter,
 			    const char      *filename)
 {
-	char *args[9];
+	char *args[10];
 	int arg = 0;
 	char *output_file;
 	struct document *doc = exporter->doc;
@@ -46,13 +46,14 @@ spectre_exporter_pdf_begin (SpectreExporter *exporter,
 	args[arg++] = "-dBATCH";
 	args[arg++] = "-dNOPAUSE";
 	args[arg++] = "-dSAFER";
+	args[arg++] = "-P-";
 	args[arg++] = "-sDEVICE=pdfwrite";
 	args[arg++] = output_file = _spectre_strdup_printf ("-sOutputFile=%s",
 							    filename);
 	args[arg++] = "-c";
 	args[arg++] = ".setpdfwrite";
 
-	if (!spectre_gs_run (exporter->gs, 9, args)) {
+	if (!spectre_gs_run (exporter->gs, 10, args)) {
 		free (output_file);
 		spectre_gs_free (exporter->gs);
 		exporter->gs = NULL;

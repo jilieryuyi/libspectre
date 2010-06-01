@@ -176,7 +176,7 @@ spectre_device_render (SpectreDevice        *device,
 {
 	SpectreGS *gs;
 	char     **args;
-	int        n_args = 12;
+	int        n_args = 13;
 	int        arg = 0;
 	int        success;
 	char      *fmt;
@@ -219,6 +219,7 @@ spectre_device_render (SpectreDevice        *device,
 	args[arg++] = "-dSAFER";
 	args[arg++] = "-dNOPAUSE";
 	args[arg++] = "-dNOPAGEPROMPT";
+	args[arg++] = "-P-";
 	args[arg++] = "-sDEVICE=display";
 	args[arg++] = text_alpha = _spectre_strdup_printf ("-dTextAlphaBits=%d",
 							   rc->text_alpha_bits);
