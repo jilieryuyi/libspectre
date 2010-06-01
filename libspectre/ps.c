@@ -1184,8 +1184,15 @@ continuepage:
     }
     section_len += line_len;
     if (DSCcomment(line) && iscomment(line+2, "EOF")) {
-	    readline(fd, enddoseps, &line, &position, &line_len);
+        readline(fd, enddoseps, &line, &position, &line_len);
 	section_len += line_len;
+    } else if (doc->doseps) {
+        /* No EOF, make sure endtrailer <= ps_end */
+        if (position > doc->doseps->ps_begin + doc->doseps->ps_length) {
+	    position = doc->doseps->ps_begin + doc->doseps->ps_length;
+	    section_len = position - doc->begintrailer;
+	    line_len = 0;
+	}
     }
     doc->endtrailer = position;
     doc->lentrailer = section_len - line_len;
