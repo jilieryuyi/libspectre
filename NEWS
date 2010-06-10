@@ -1,3 +1,22 @@
+libspectre 0.2.6 (10 June 2010)
+===============================
+
+This is another bugfix only release in the libspectre's 0.2 series.
+
+The most important change in this release is that gs is now always
+initalized with the flag -P- to make Ghostscript not look in the
+current directory for library files. See Debian bug
+http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=583183
+
+Compiler flags -ansi and -pedantic are now optional and can be enabled
+with --enable-iso-c configure option. It seems -pedantic causes
+performance regression when compiling with Sun Studio compiler. Thanks
+to Dagobert Michelsen for eporting the issue. (Bug #27735)
+
+Files with a doseps header and without EOF comment are correctly
+rendered now. (Bug #27830)
+
+
 libspectre 0.2.5 (18 April 2010)
 ================================
 
