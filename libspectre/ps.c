@@ -597,6 +597,8 @@ psscan(const char *filename, int scanstyle)
 			if (maxpages > 0) {
 			    doc->pages = (struct page *) PS_calloc(maxpages,
 							   sizeof(struct page));
+                            if (!doc->pages)
+                                maxpages = 0;
                             CHECK_MALLOCED(doc->pages);
 			}
 		}
