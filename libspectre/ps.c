@@ -1004,14 +1004,14 @@ psscan(const char *filename, int scanstyle)
 	section_len += line_len;
     }
 
+    if (maxpages == 0) {
+	maxpages = 1;
+	doc->pages = (struct page *) PS_calloc(maxpages, sizeof(struct page));
+	CHECK_MALLOCED(doc->pages);
+    }
 
 newpage:
     while (DSCcomment(line) && iscomment(line+2, "Page:")) {
-	if (maxpages == 0) {
-	    maxpages = 1;
-	    doc->pages = (struct page *) PS_calloc(maxpages, sizeof(struct page));
-            CHECK_MALLOCED(doc->pages);
-	}
 	label = ps_gettext(line+length("%%Page:"), &next_char);
 	if (sscanf(next_char, "%u", &thispage) != 1) thispage = 0;
 	if (nextpage == 1) {
