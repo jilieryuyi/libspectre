@@ -1,3 +1,13 @@
+libspectre 0.2.7 (08 August 2012)
+=================================
+
+This is another bugfix only release in the libspectre's 0.2 series.
+
+This release fixes two crashes than can happen when %%Pages: or
+%%Page: comments are missing in the document or when %%Pages: comment
+is present but it's invalid.
+
+
 libspectre 0.2.6 (10 June 2010)
 ===============================
 
