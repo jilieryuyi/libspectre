@@ -1,9 +1,3 @@
-INCLUDES = 			\
-	-I$(top_builddir)	\
-	-I$(srcdir)		\
-	-I$(top_srcdir)		\
-	$(SPECTRE_CFLAGS)
-
 EXTRA_DIST=spectre-version.h.in
 
 lib_LTLIBRARIES = libspectre.la
@@ -46,6 +40,12 @@ libspectre_la_SOURCES = 		\
 	spectre-utils.h			\
 	spectre-utils.c			\
 	$(gv_sources)
+
+libspectre_la_CFLAGS = 		\
+	-I$(top_builddir)       \
+	-I$(srcdir)             \
+	-I$(top_srcdir)         \
+	$(SPECTRE_CFLAGS)
 
 libspectre_la_LIBADD = $(LIB_GS)
 libspectre_la_LDFLAGS = -version-info @VERSION_INFO@ -no-undefined
