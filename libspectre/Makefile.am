@@ -41,10 +41,7 @@ libspectre_la_SOURCES = 		\
 	spectre-utils.c			\
 	$(gv_sources)
 
-libspectre_la_CFLAGS = 		\
-	-I$(top_builddir)       \
-	-I$(srcdir)             \
-	-I$(top_srcdir)         \
+libspectre_la_CPPFLAGS = 		\
 	$(SPECTRE_CFLAGS)
 
 libspectre_la_LIBADD = $(LIB_GS)
