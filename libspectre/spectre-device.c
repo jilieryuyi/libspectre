@@ -181,10 +181,12 @@ spectre_device_render (SpectreDevice        *device,
 	char      *fmt;
 	char      *text_alpha, *graph_alpha;
 	char      *size = NULL;
-	char      *resolution, *set;
+	char      *resolution;
 	char      *dsp_format, *dsp_handle;
 	char      *width_points = NULL;
 	char      *height_points = NULL;
+	int        scaled_width;
+	int        scaled_height;
 
 	gs = spectre_gs_new ();
 	if (!gs)
@@ -204,8 +206,14 @@ spectre_device_render (SpectreDevice        *device,
 		return SPECTRE_STATUS_RENDER_ERROR;
 	}
 
-	width = (int) ((width * rc->x_scale) + 0.5);
-	height = (int) ((height * rc->y_scale) + 0.5);
+	if (rc->orientation == SPECTRE_ORIENTATION_PORTRAIT ||
+	    rc->orientation == SPECTRE_ORIENTATION_REVERSE_PORTRAIT) {
+		scaled_width = (int) ((width * rc->x_scale) + 0.5);
+		scaled_height = (int) ((height * rc->y_scale) + 0.5);
+	} else {
+		scaled_width = (int) ((height * rc->y_scale) + 0.5);
+		scaled_height = (int) ((width * rc->x_scale) + 0.5);
+	}
 
 	if (rc->use_platform_fonts == FALSE)
 		n_args++;
@@ -224,10 +232,19 @@ spectre_device_render (SpectreDevice        *device,
 							   rc->text_alpha_bits);
 	args[arg++] = graph_alpha = _spectre_strdup_printf ("-dGraphicsAlphaBits=%d",
 							    rc->graphic_alpha_bits);
-	args[arg++] = size =_spectre_strdup_printf ("-g%dx%d", width, height);
-	args[arg++] = resolution = _spectre_strdup_printf ("-r%fx%f",
-							   rc->x_scale * rc->x_dpi,
-							   rc->y_scale * rc->y_dpi);
+	args[arg++] = size =_spectre_strdup_printf ("-g%dx%d", scaled_width, scaled_height);
+
+	if (rc->orientation == SPECTRE_ORIENTATION_PORTRAIT ||
+	    rc->orientation == SPECTRE_ORIENTATION_REVERSE_PORTRAIT) {
+		args[arg++] = resolution = _spectre_strdup_printf ("-r%fx%f",
+								   rc->x_scale * rc->x_dpi,
+								   rc->y_scale * rc->y_dpi);
+	} else {
+		args[arg++] = resolution = _spectre_strdup_printf ("-r%fx%f",
+								   rc->y_scale * rc->y_dpi,
+								   rc->x_scale * rc->x_dpi);
+	}
+
 	args[arg++] = dsp_format = _spectre_strdup_printf ("-dDisplayFormat=%d",
 							   DISPLAY_COLORS_RGB |
 							   DISPLAY_DEPTH_8 |
@@ -254,10 +271,18 @@ spectre_device_render (SpectreDevice        *device,
 		args[arg++] = "-dNOPLATFONTS";
 
 	if (rc->width != -1 && rc->height != -1) {
-		args[arg++] = width_points = _spectre_strdup_printf ("-dDEVICEWIDTHPOINTS=%d",
-								     rc->width);
-		args[arg++] = height_points = _spectre_strdup_printf ("-dDEVICEHEIGHTPOINTS=%d",
-								      rc->height);
+		if (rc->orientation == SPECTRE_ORIENTATION_PORTRAIT ||
+		    rc->orientation == SPECTRE_ORIENTATION_REVERSE_PORTRAIT) {
+			args[arg++] = width_points = _spectre_strdup_printf ("-dDEVICEWIDTHPOINTS=%d",
+									     rc->width);
+			args[arg++] = height_points = _spectre_strdup_printf ("-dDEVICEHEIGHTPOINTS=%d",
+									      rc->height);
+		} else {
+			args[arg++] = width_points = _spectre_strdup_printf ("-dDEVICEWIDTHPOINTS=%d",
+									     rc->height);
+			args[arg++] = height_points = _spectre_strdup_printf ("-dDEVICEHEIGHTPOINTS=%d",
+									      rc->width);
+		}
 		args[arg++] = "-dFIXEDMEDIA";
 	}
 
@@ -276,16 +301,7 @@ spectre_device_render (SpectreDevice        *device,
 		return SPECTRE_STATUS_RENDER_ERROR;
 	}
 
-	set = _spectre_strdup_printf ("<< /Orientation %d >> setpagedevice .locksafe",
-				      rc->orientation);
-	if (!spectre_gs_send_string (gs, set)) {
-		free (set);
-		spectre_gs_free (gs);
-		return SPECTRE_STATUS_RENDER_ERROR;
-	}
-	free (set);
-
-	if (!spectre_gs_send_page (gs, device->doc, page, x, y)) {
+	if (!spectre_gs_send_page (gs, device->doc, page, x, y, width, height, spectre_render_context_get_rotation (rc))) {
 		spectre_gs_free (gs);
 		return SPECTRE_STATUS_RENDER_ERROR;
 	}

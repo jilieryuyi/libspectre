@@ -66,6 +66,7 @@ spectre_exporter_pdf_begin (SpectreExporter *exporter,
 	if (!spectre_gs_process (exporter->gs,
 				 doc->filename,
 				 0, 0,
+				 0,
 				 doc->beginprolog,
 				 doc->endprolog)) {
 		spectre_gs_free (exporter->gs);
@@ -77,6 +78,7 @@ spectre_exporter_pdf_begin (SpectreExporter *exporter,
 	if (!spectre_gs_process (exporter->gs,
 				 doc->filename,
 				 0, 0,
+				 0,
 				 doc->beginsetup,
 				 doc->endsetup)) {
 		spectre_gs_free (exporter->gs);
@@ -100,6 +102,7 @@ spectre_exporter_pdf_do_page (SpectreExporter *exporter,
 	if (!spectre_gs_process (exporter->gs,
 				 doc->filename,
 				 0, 0,
+				 0,
 				 doc->pages[page_index].begin,
 				 doc->pages[page_index].end)) {
 		spectre_gs_free (exporter->gs);
@@ -123,6 +126,7 @@ spectre_exporter_pdf_end (SpectreExporter *exporter)
 	ret = spectre_gs_process (exporter->gs,
 				  doc->filename,
 				  0, 0,
+				  0,
 				  doc->begintrailer,
 				  doc->endtrailer);
 	spectre_gs_free (exporter->gs);

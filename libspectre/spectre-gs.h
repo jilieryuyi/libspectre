@@ -46,6 +46,7 @@ int        spectre_gs_process              (SpectreGS           *gs,
 					    const char          *filename,
 					    int                  x,
 					    int                  y,
+					    int                  rotation,
 					    long                 begin,
 					    long                 end);
 int        spectre_gs_send_string          (SpectreGS           *gs,
@@ -54,7 +55,10 @@ int        spectre_gs_send_page            (SpectreGS           *gs,
 					    struct document     *doc,
 					    unsigned int         page_index,
 					    int                  x,
-					    int                  y);
+					    int                  y,
+					    int                  crop_width,
+					    int                  crop_height,
+					    int                  rotation);
 void       spectre_gs_cleanup              (SpectreGS           *gs,
 					    SpectreGSCleanupFlag flag);
 void       spectre_gs_free                 (SpectreGS           *gs);
