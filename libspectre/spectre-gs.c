@@ -79,7 +79,6 @@ spectre_gs_process (SpectreGS  *gs,
 		    const char *filename,
 		    int         x,
 		    int         y,
-		    int         rotation,
 		    long        begin,
 		    long        end)
 {
@@ -108,20 +107,6 @@ spectre_gs_process (SpectreGS  *gs,
 		char *set;
 
 		set = _spectre_strdup_printf ("%d %d translate\n", -x, -y);
-		error = gsapi_run_string_continue (ghostscript_instance, set, strlen (set),
-						   0, &exit_code);
-		error = error == e_NeedInput ? 0 : error;
-		free (set);
-		if (error != e_NeedInput && critic_error_code (error)) {
-			fclose (fd);
-			return FALSE;
-		}
-	}
-
-	if (rotation != 0) {
-		char *set;
-
-		set = _spectre_strdup_printf ("%d rotate", rotation);
 		error = gsapi_run_string_continue (ghostscript_instance, set, strlen (set),
 						   0, &exit_code);
 		error = error == e_NeedInput ? 0 : error;
@@ -221,21 +206,17 @@ spectre_gs_send_string (SpectreGS  *gs,
 }
 
 int
-spectre_gs_send_page (SpectreGS          *gs,
-		      struct document    *doc,
-		      unsigned int        page_index,
-		      int                 x,
-		      int                 y,
-		      int                 crop_width,
-		      int                 crop_height,
-		      int                 rotation)
+spectre_gs_send_page (SpectreGS       *gs,
+		      struct document *doc,
+		      unsigned int     page_index,
+		      int              x,
+		      int              y)
 {
 	int xoffset = 0, yoffset = 0;
 	int page_urx, page_ury, page_llx, page_lly;
 	int bbox_urx, bbox_ury, bbox_llx, bbox_lly;
 	int doc_xoffset = 0, doc_yoffset = 0;
 	int page_xoffset = 0, page_yoffset = 0;
-	int tmp_xoffset, tmp_yoffset;
 
 	if (psgetpagebbox (doc, page_index, &bbox_urx, &bbox_ury, &bbox_llx, &bbox_lly)) {
 		psgetpagebox (doc, page_index,
@@ -249,42 +230,18 @@ spectre_gs_send_page (SpectreGS          *gs,
 		}
 	}
 
-	switch (rotation) {
-		default:
-			tmp_xoffset = xoffset + x;
-			tmp_yoffset = yoffset + y;
-			break;
-		case 90:
-			tmp_xoffset = - (yoffset + y + crop_height);
-			tmp_yoffset = xoffset + x;
-			break;
-		case 180:
-			tmp_xoffset = - (xoffset + x + crop_width);
-			tmp_yoffset = - (yoffset + y + crop_height);
-			break;
-		case 270:
-			tmp_xoffset = yoffset + y;
-			tmp_yoffset = - (xoffset + x + crop_width);
-			break;
-	}
-
 	if (doc->numpages > 0) {
-		page_xoffset = tmp_xoffset;
-		page_yoffset = tmp_yoffset;
+		page_xoffset = xoffset + x;
+		page_yoffset = yoffset + y;
 	} else {
-		doc_xoffset = tmp_xoffset;
-		doc_yoffset = tmp_yoffset;
+		doc_xoffset = xoffset + x;
+		doc_yoffset = yoffset + y;
 	}
 	
-
-	if (!spectre_gs_send_string (gs, "/setpagedevice { pop } bind def"))
-		return FALSE;
-
 	if (!spectre_gs_process (gs,
 				 doc->filename,
 				 doc_xoffset,
 				 doc_yoffset,
-				 0,
 				 doc->beginprolog,
 				 doc->endprolog))
 		return FALSE;
@@ -292,7 +249,6 @@ spectre_gs_send_page (SpectreGS          *gs,
 	if (!spectre_gs_process (gs,
 				 doc->filename,
 				 0, 0,
-				 0,
 				 doc->beginsetup,
 				 doc->endsetup))
 		return FALSE;
@@ -308,7 +264,6 @@ spectre_gs_send_page (SpectreGS          *gs,
 							 doc->filename,
 							 page_xoffset,
 							 page_yoffset,
-							 rotation,
 							 doc->pages[i].begin,
 							 doc->pages[i].end))
 					return FALSE;
@@ -319,7 +274,6 @@ spectre_gs_send_page (SpectreGS          *gs,
 					 doc->filename,
 					 page_xoffset,
 					 page_yoffset,
-					 rotation,
 					 doc->pages[page_index].begin,
 					 doc->pages[page_index].end))
 			return FALSE;
@@ -328,7 +282,6 @@ spectre_gs_send_page (SpectreGS          *gs,
 	if (!spectre_gs_process (gs,
 				 doc->filename,
 				 0, 0,
-				 0,
 				 doc->begintrailer,
 				 doc->endtrailer))
 		return FALSE;
