@@ -99,7 +99,7 @@ spectre_sync (void *handle, void *device)
 }
 
 static int
-spectre_page (void *handle, void * device, int copies, int flush)
+spectre_page (void *handle, void *device, int copies, int flush)
 {
 	SpectreDevice *sd;
 
@@ -162,6 +162,105 @@ spectre_device_new (struct document *doc)
 	return device;
 }
 
+#define PIXEL_SIZE 4
+#define ROW_ALIGN 32
+
+static void
+swap_pixels (unsigned char *data,
+             size_t         pixel_a_start,
+             size_t         pixel_b_start)
+{
+        unsigned char value;
+        size_t        i;
+
+        for (i = 0; i < PIXEL_SIZE; i++) {
+                value = data[pixel_a_start + i];
+                data[pixel_a_start + i] = data[pixel_b_start + i];
+                data[pixel_b_start + i] = value;
+        }
+}
+
+static void
+copy_pixel (unsigned char *dest,
+            unsigned char *src,
+            size_t         dest_pixel_start,
+            size_t         src_pixel_start)
+{
+        memcpy (dest + dest_pixel_start, src + src_pixel_start, PIXEL_SIZE);
+}
+
+static void
+rotate_image_to_orientation (unsigned char    **page_data,
+                             int               *row_length,
+                             int                width,
+                             int                height,
+                             SpectreOrientation orientation)
+{
+        int            i, j;
+        size_t         stride, padding;
+        unsigned char *user_image;
+
+        switch (orientation) {
+        default:
+        case SPECTRE_ORIENTATION_PORTRAIT:
+                break;
+        case SPECTRE_ORIENTATION_REVERSE_PORTRAIT:
+                for (j = 0; j < height / 2; ++j) {
+                        for (i = 0; i < width; ++i) {
+                                swap_pixels (*page_data,
+                                             *row_length * j + PIXEL_SIZE * i,
+                                             *row_length * (height - 1 - j) + PIXEL_SIZE * (width - 1 - i));
+                        }
+                }
+                if (height % 2 == 1) {
+                        for (i = 0; i < width / 2; ++i) {
+                                swap_pixels (*page_data,
+                                             *row_length * (height / 2) + PIXEL_SIZE * i,
+                                             *row_length * (height - 1 - height / 2) + PIXEL_SIZE * (width - 1 - i));
+                        }
+                }
+                break;
+        case SPECTRE_ORIENTATION_LANDSCAPE:
+        case SPECTRE_ORIENTATION_REVERSE_LANDSCAPE:
+                if (height % ROW_ALIGN > 0) {
+                        padding = (ROW_ALIGN - height % ROW_ALIGN) * PIXEL_SIZE;
+                        stride = height * PIXEL_SIZE + padding;
+                        user_image = malloc (width * stride);
+
+                        for (j = 0; j < width; ++j)
+                                memset (user_image + j * stride + stride - padding, 0, padding);
+                } else {
+                        stride = height * PIXEL_SIZE;
+                        user_image = malloc (width * stride);
+                }
+
+                if (orientation == SPECTRE_ORIENTATION_LANDSCAPE) {
+                        for (j = 0; j < height; ++j) {
+                                for (i = 0; i < width; ++i) {
+                                        copy_pixel (user_image,
+                                                    *page_data,
+                                                    stride * i + PIXEL_SIZE * (height - 1 - j),
+                                                    *row_length * j + PIXEL_SIZE * i);
+                                }
+                        }
+                } else {
+                        for (j = 0; j < height; ++j) {
+                                for (i = 0; i < width; ++i) {
+                                        copy_pixel (user_image,
+                                                    *page_data,
+                                                    stride * (width - 1 - i) + PIXEL_SIZE * j,
+                                                    *row_length * j + PIXEL_SIZE * i);
+                                }
+                        }
+                }
+
+                free (*page_data);
+                *page_data = user_image;
+                *row_length = stride;
+                break;
+        }
+}
+
 SpectreStatus
 spectre_device_render (SpectreDevice        *device,
 		       unsigned int          page,
@@ -185,10 +284,13 @@ spectre_device_render (SpectreDevice        *device,
 	char      *dsp_format, *dsp_handle;
 	char      *width_points = NULL;
 	char      *height_points = NULL;
+        long       gs_version;
 
 	gs = spectre_gs_new ();
 	if (!gs)
 		return SPECTRE_STATUS_NO_MEMORY;
+
+        gs_version = spectre_gs_get_version();
 
 	if (!spectre_gs_create_instance (gs, device)) {
 		spectre_gs_cleanup (gs, CLEANUP_DELETE_INSTANCE);
@@ -277,7 +379,7 @@ spectre_device_render (SpectreDevice        *device,
 	}
 
 	set = _spectre_strdup_printf ("<< /Orientation %d >> setpagedevice .locksafe",
-				      rc->orientation);
+				      gs_version >= 908 ? SPECTRE_ORIENTATION_PORTRAIT : rc->orientation);
 	if (!spectre_gs_send_string (gs, set)) {
 		free (set);
 		spectre_gs_free (gs);
@@ -292,6 +394,8 @@ spectre_device_render (SpectreDevice        *device,
 
 	*page_data = device->user_image;
 	*row_length = device->row_length;
+        if (gs_version >= 908)
+                rotate_image_to_orientation (page_data, row_length, width, height, rc->orientation);
 
 	spectre_gs_free (gs);
 
