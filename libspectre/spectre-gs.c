@@ -29,6 +29,17 @@
 #include <ghostscript/iapi.h>
 #include <ghostscript/ierrors.h>
 
+/* e_ macros have been removed from Ghostscript in 9.18. */
+#ifndef e_Fatal
+#define e_Fatal gs_error_Fatal
+#endif
+#ifndef e_NeedInput
+#define e_NeedInput gs_error_NeedInput
+#endif
+#ifndef e_ExecStackUnderflow
+#define e_ExecStackUnderflow gs_error_ExecStackUnderflow
+#endif
+
 #define BUFFER_SIZE 32768
 
 struct SpectreGS {
