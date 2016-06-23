@@ -58,7 +58,7 @@ int        spectre_gs_send_page            (SpectreGS           *gs,
 void       spectre_gs_cleanup              (SpectreGS           *gs,
 					    SpectreGSCleanupFlag flag);
 void       spectre_gs_free                 (SpectreGS           *gs);
-	
+long       spectre_gs_get_version          (void);
 SPECTRE_END_DECLS
 
 #endif /* SPECTRE_GS_H */

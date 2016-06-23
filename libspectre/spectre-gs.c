@@ -327,3 +327,14 @@ spectre_gs_free (SpectreGS *gs)
 			    CLEANUP_EXIT);
 	free (gs);
 }
+
+long
+spectre_gs_get_version (void)
+{
+        gsapi_revision_t gsrev;
+
+        if (gsapi_revision (&gsrev, sizeof(gsrev)) != 0)
+                return 0;
+
+        return gsrev.revision;
+}
