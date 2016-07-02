@@ -23,8 +23,11 @@ DISTCLEANFILES = 		\
 
 dist-hook: changelog
 
-changelog: $(top_srcdir)/.git/HEAD
-	git log --stat > ChangeLog
+changelog:
+	@if test -d "$(srcdir)/.git"; then \
+	  git log --stat > ChangeLog; \
+	  cp ChangeLog $(distdir)/; \
+	fi
 
 doc: Doxyfile
 	doxygen Doxyfile
@@ -129,4 +132,4 @@ doc-publish: doc
 	scp $(MANUAL_TAR_FILE) $(RELEASE_UPLOAD_HOST):$(MANUAL_UPLOAD_DIR)
 	ssh $(RELEASE_UPLOAD_HOST) "cd $(MANUAL_UPLOAD_DIR) && tar xzf $(MANUAL_TAR_FILE) && rm -f manual && ln -s $(MANUAL_DATED) manual && ln -sf $(MANUAL_TAR_FILE) libspectre-manual.tar.gz"
 
-.PHONY: release-verify-newer release-remove-old release-cleanup-group-sticky release-check release-upload release-publish doc-publish
+.PHONY: release-verify-newer release-remove-old release-cleanup-group-sticky release-check release-upload release-publish doc-publish changelog
