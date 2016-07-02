@@ -1,3 +1,19 @@
+libspectre 0.2.8 (01 July 2016)
+===============================
+
+This is another bugfix only release in the libspectre's 0.2 series.
+
+Marek fixed the document rotation with newer versions of Ghostscript (Bug #76450)
+
+Build was also broken with Ghostscript >= 9.18 and has been fixed.
+
+Fixed a compile warning due to a comparison of integers of different
+signs reported by Daniel Macks when building on OS X (Bug #56476)
+
+Makefiles were updated to properly use CPPFLAGS instead of CFLAGS as
+suggested by Daniel Macks (Bug #56481)
+
+
 libspectre 0.2.7 (08 August 2012)
 =================================
 

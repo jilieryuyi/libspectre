@@ -2,7 +2,7 @@ AC_PREREQ(2.59)
 
 m4_define([spectre_major_version], [0])
 m4_define([spectre_minor_version], [2])
-m4_define([spectre_micro_version], [7])
+m4_define([spectre_micro_version], [8])
 m4_define([spectre_version],
           [spectre_major_version.spectre_minor_version.spectre_micro_version])
 
@@ -25,7 +25,7 @@ LT_CURRENT=2
 
 ## increment any time the source changes; set to
 ##  0 if you increment CURRENT
-LT_REVISION=7
+LT_REVISION=8
 
 ## increment if any interfaces have been added; set to 0
 ## if any interfaces have been changed or removed. removal has
