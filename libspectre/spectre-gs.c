@@ -55,12 +55,12 @@ critic_error_code (int code)
 	if (code <= -100) {
 		switch (code) {
 			case e_Fatal:
-				fprintf (stderr, "fatal internal error %d", code);
+				fprintf (stderr, "(libspectre) ghostscript reports: fatal internal error %d", code);
 				return TRUE;
 				break;
 
 			case e_ExecStackUnderflow:
-				fprintf (stderr, "stack overflow %d", code);
+				fprintf (stderr, "(libspectre) ghostscript reports: stack overflow %d", code);
 				return TRUE;
 				break;
 
@@ -73,7 +73,7 @@ critic_error_code (int code)
 		int x = (-1) * code;
 
 		if (x < (int) (sizeof (errors) / sizeof (const char*))) {
-			fprintf (stderr, "%s %d\n", errors[x], code);
+			fprintf (stderr, "(libspectre) ghostscript reports: %s %d\n", errors[x], code);
 		}
 		return TRUE;
 	}
