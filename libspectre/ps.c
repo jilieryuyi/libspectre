@@ -1065,7 +1065,7 @@ continuepage:
 		       iscomment(line+2, "PageMedia:")) {
 		cp = ps_gettext(line+length("%%PageMedia:"), NULL);
 		for (dmp = doc->media, i=0; i<doc->nummedia; i++, dmp++) {
-		    if (strcmp(cp, dmp->name) == 0) {
+		    if (cp && strcmp(cp, dmp->name) == 0) {
 			doc->pages[doc->numpages].media = dmp;
 			break;
 		    }
