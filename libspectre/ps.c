@@ -593,6 +593,7 @@ psscan(const char *filename, int scanstyle)
 				doc->pageorder = ASCEND;
 			    }
 			}
+			// fall-through
 		    case 1:
 			if (maxpages > 0) {
 			    doc->pages = (struct page *) PS_calloc(maxpages,
