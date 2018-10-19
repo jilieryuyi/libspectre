@@ -1866,13 +1866,7 @@ static char * readline (fd, enddoseps, lineP, positionP, line_lenP)
 */
 /*----------------------------------------------------------*/
 
-static char * readlineuntil (fd, enddoseps, lineP, positionP, line_lenP, charP)
-   FileData fd;
-   long enddoseps;
-   char **lineP;
-   long *positionP;
-   unsigned int *line_lenP;
-   char charP;
+static char * readlineuntil (FileData fd, long enddoseps, char **lineP, long *positionP, unsigned int *line_lenP, char charP)
 {
    char *line;
 
@@ -2208,8 +2202,7 @@ reorder_dword(val)
 
 /* change byte order if architecture is big-endian */
 static PS_WORD
-reorder_word(val)
-    PS_WORD val;
+reorder_word(PS_WORD val)
 {
     if (*((char *)(&dsc_arch)))
         return val;	/* little endian machine */
