@@ -34,17 +34,6 @@
  */
 #define GS_MIN_VERSION (924)
 
-/* e_ macros have been removed from Ghostscript in 9.18. */
-#ifndef e_Fatal
-#define e_Fatal gs_error_Fatal
-#endif
-#ifndef e_NeedInput
-#define e_NeedInput gs_error_NeedInput
-#endif
-#ifndef e_ExecStackUnderflow
-#define e_ExecStackUnderflow gs_error_ExecStackUnderflow
-#endif
-
 #define BUFFER_SIZE 32768
 
 struct SpectreGS {
@@ -59,12 +48,12 @@ critic_error_code (int code)
 	
 	if (code <= -100) {
 		switch (code) {
-			case e_Fatal:
+			case gs_error_Fatal:
 				fprintf (stderr, "(libspectre) ghostscript reports: fatal internal error %d", code);
 				return TRUE;
 				break;
 
-			case e_ExecStackUnderflow:
+			case gs_error_ExecStackUnderflow:
 				fprintf (stderr, "(libspectre) ghostscript reports: stack overflow %d", code);
 				return TRUE;
 				break;
@@ -125,9 +114,9 @@ spectre_gs_process (SpectreGS  *gs,
 		set = _spectre_strdup_printf ("%d %d translate\n", -x, -y);
 		error = gsapi_run_string_continue (ghostscript_instance, set, strlen (set),
 						   0, &exit_code);
-		error = error == e_NeedInput ? 0 : error;
+		error = error == gs_error_NeedInput ? 0 : error;
 		free (set);
-		if (error != e_NeedInput && critic_error_code (error)) {
+		if (error != gs_error_NeedInput && critic_error_code (error)) {
 			fclose (fd);
 			return FALSE;
 		}
@@ -142,7 +131,7 @@ spectre_gs_process (SpectreGS  *gs,
 		read = fread (buf, sizeof (char), to_read, fd);
 		error = gsapi_run_string_continue (ghostscript_instance,
 						   buf, read, 0, &exit_code);
-		error = error == e_NeedInput ? 0 : error;
+		error = error == gs_error_NeedInput ? 0 : error;
 		left -= read;
 	}
 	
