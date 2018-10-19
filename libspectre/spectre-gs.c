@@ -29,6 +29,11 @@
 #include <ghostscript/iapi.h>
 #include <ghostscript/ierrors.h>
 
+/* Ghostscript before version 9.24 has a critial vulnerability
+ * where -dSAFER could be escaped from.
+ */
+#define GS_MIN_VERSION (924)
+
 /* e_ macros have been removed from Ghostscript in 9.18. */
 #ifndef e_Fatal
 #define e_Fatal gs_error_Fatal
@@ -166,8 +171,13 @@ int
 spectre_gs_create_instance (SpectreGS *gs,
 			    void      *caller_handle)
 {
+        int version;
 	int error;
-	
+
+        version = spectre_gs_get_version ();
+        if (version < GS_MIN_VERSION)
+                return FALSE;
+
 	error = gsapi_new_instance (&gs->ghostscript_instance, caller_handle);
 	if (!critic_error_code (error)) {
 		gsapi_set_stdio (gs->ghostscript_instance,
