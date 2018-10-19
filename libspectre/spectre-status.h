@@ -51,6 +51,7 @@ typedef enum _SpectreStatus {
 /*! Gets a textual description of the given status
     @param status the status whose textual description will be returned
 */
+SPECTRE_PUBLIC
 const char *spectre_status_to_string (SpectreStatus status);
 
 SPECTRE_END_DECLS

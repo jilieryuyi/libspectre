@@ -29,11 +29,13 @@ SPECTRE_BEGIN_DECLS
 typedef struct SpectreRenderContext SpectreRenderContext;
 
 /*! Creates a rendering context */
+SPECTRE_PUBLIC
 SpectreRenderContext *spectre_render_context_new                    (void);
 
 /*! Frees a rendering context
     @param rc The rendering context to free
 */
+SPECTRE_PUBLIC
 void                  spectre_render_context_free                   (SpectreRenderContext *rc);
 
 /*! Sets the scale. The default is 1
@@ -41,6 +43,7 @@ void                  spectre_render_context_free                   (SpectreRend
     @param x_scale The scale factor for the X dimension to use when rendering. 2 is twice as big
     @param y_scale The scale factor for the Y dimension to use when rendering. 2 is twice as big
 */
+SPECTRE_PUBLIC
 void                  spectre_render_context_set_scale              (SpectreRenderContext *rc,
 								     double                x_scale,
 								     double                y_scale);
@@ -50,6 +53,7 @@ void                  spectre_render_context_set_scale              (SpectreRend
     @param x_scale The scale factor for the X dimension will be stored here, or NULL
     @param y_scale The scale factor for the Y dimension will be stored here, or NULL
 */
+SPECTRE_PUBLIC
 void                  spectre_render_context_get_scale              (SpectreRenderContext *rc,
 								     double               *x_scale,
 								     double               *y_scale);
@@ -58,12 +62,14 @@ void                  spectre_render_context_get_scale              (SpectreRend
     @param rc The rendering context to modify
     @param rotation The rotation to use when rendering. Usually 0, 90, 180 or 270
 */
+SPECTRE_PUBLIC
 void                  spectre_render_context_set_rotation           (SpectreRenderContext *rc,
 								     unsigned int          rotation);
 
 /*! Gets the rotation
     @param rc The rendering context to query
 */
+SPECTRE_PUBLIC
 unsigned int          spectre_render_context_get_rotation           (SpectreRenderContext *rc);
 
 /*! Sets the resolution. The default is 72 for both directions
@@ -71,6 +77,7 @@ unsigned int          spectre_render_context_get_rotation           (SpectreRend
     @param x_dpi the horizontal resolution to set
     @param y_dpi the vertical resolution to set
 */
+SPECTRE_PUBLIC
 void                  spectre_render_context_set_resolution         (SpectreRenderContext *rc,
 								     double                x_dpi,
 								     double                y_dpi);
@@ -80,6 +87,7 @@ void                  spectre_render_context_set_resolution         (SpectreRend
     @param x_dpi the horizontal resolution will be stored here, or NULL
     @param y_dpi the vertical resolution will be stored here, or NULL
 */
+SPECTRE_PUBLIC
 void                  spectre_render_context_get_resolution         (SpectreRenderContext *rc,
 								     double               *x_dpi,
 								     double               *y_dpi);
@@ -93,6 +101,7 @@ void                  spectre_render_context_get_resolution         (SpectreRend
     @param width the width of the page
     @param height the height of the page
 */
+SPECTRE_PUBLIC
 void                  spectre_render_context_set_page_size          (SpectreRenderContext *rc,
 								     int                   width,
 								     int                   height);
@@ -102,6 +111,7 @@ void                  spectre_render_context_set_page_size          (SpectreRend
     @param width the width of the page will be stored here, or NULL
     @param height the height of the page will be stored here, or NULL
 */
+SPECTRE_PUBLIC
 void                  spectre_render_context_get_page_size          (SpectreRenderContext *rc,
 								     int                  *width,
 								     int                  *height);
@@ -110,12 +120,14 @@ void                  spectre_render_context_get_page_size          (SpectreRend
     @param rc The rendering context to modify
     @param use_platform_fonts should platform fonts be used when rendering?
 */
+SPECTRE_PUBLIC
 void                  spectre_render_context_set_use_platform_fonts (SpectreRenderContext *rc,
 								     int                   use_platform_fonts);
 
 /*! Gets whether to use the platform fonts when rendering or not
     @param rc The rendering context to query
 */
+SPECTRE_PUBLIC
 int                   spectre_render_context_get_use_platform_fonts (SpectreRenderContext *rc);
 
 /*! Sets the antialias options for graphics and texts. The default is 4 for graphics and 2 for text
@@ -125,6 +137,7 @@ int                   spectre_render_context_get_use_platform_fonts (SpectreRend
     @param text_bits The number of antialias bits to use for text.
                      Typically 2 for antialias and 1 for no antialias
 */
+SPECTRE_PUBLIC
 void                  spectre_render_context_set_antialias_bits     (SpectreRenderContext *rc,
 								     int                   graphics_bits,
 								     int                   text_bits);
@@ -134,6 +147,7 @@ void                  spectre_render_context_set_antialias_bits     (SpectreRend
     @param graphics_bits The number of antialias bits to use for graphics will be stored here
     @param text_bits The number of antialias bits to use for text will be stored here
 */
+SPECTRE_PUBLIC
 void                  spectre_render_context_get_antialias_bits     (SpectreRenderContext *rc,
 								     int                  *graphics_bits,
 								     int                  *text_bits);

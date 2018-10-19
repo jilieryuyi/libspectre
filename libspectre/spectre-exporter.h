@@ -34,15 +34,19 @@ typedef enum {
 
 typedef struct SpectreExporter SpectreExporter;
 
+SPECTRE_PUBLIC
 SpectreExporter *spectre_exporter_new     (SpectreDocument      *document,
 					   SpectreExporterFormat format);
+SPECTRE_PUBLIC
 void             spectre_exporter_free    (SpectreExporter      *exporter);
+SPECTRE_PUBLIC
 SpectreStatus    spectre_exporter_begin   (SpectreExporter      *exporter,
 					   const char           *filename);
+SPECTRE_PUBLIC
 SpectreStatus    spectre_exporter_do_page (SpectreExporter      *exporter,
 					   unsigned int          page_index);
+SPECTRE_PUBLIC
 SpectreStatus    spectre_exporter_end     (SpectreExporter      *exporter);
-
 
 SPECTRE_END_DECLS
 

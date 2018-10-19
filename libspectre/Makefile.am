@@ -44,5 +44,8 @@ libspectre_la_SOURCES = 		\
 libspectre_la_CPPFLAGS = 		\
 	$(SPECTRE_CFLAGS)
 
+libspectre_la_CFLAGS = 			\
+	$(VISIBILITY_CFLAGS)
+
 libspectre_la_LIBADD = $(LIB_GS)
 libspectre_la_LDFLAGS = -version-info @VERSION_INFO@ -no-undefined

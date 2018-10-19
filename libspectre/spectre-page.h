@@ -43,26 +43,31 @@ typedef struct SpectrePage SpectrePage;
 /*! Returns the status of the given page
     @param page The page whose status will be returned
 */
+SPECTRE_PUBLIC
 SpectreStatus      spectre_page_status          (SpectrePage          *page);
 
 /*! Frees the memory of the given page
     @param page The page whose memory will be freed
 */
+SPECTRE_PUBLIC
 void               spectre_page_free            (SpectrePage          *page);
 
 /*! Returns the index of the page inside the document. First page has index 0
     @param page The page whose index will be returned
 */
+SPECTRE_PUBLIC
 unsigned int       spectre_page_get_index       (SpectrePage          *page);
 
 /*! Returns the label of the page inside the document.
     @param page The page whose label will be returned
 */
+SPECTRE_PUBLIC
 const char        *spectre_page_get_label       (SpectrePage          *page);
 
 /*! Returns the orientation of the page
     @param page The page whose orientation will be returned
 */
+SPECTRE_PUBLIC
 SpectreOrientation spectre_page_get_orientation (SpectrePage          *page);
 
 /*! Returns the size of the page. It always returns the page size according to
@@ -72,6 +77,7 @@ SpectreOrientation spectre_page_get_orientation (SpectrePage          *page);
     @param height The page height will be returned here, or NULL
     @see spectre_page_get_orientation
 */
+SPECTRE_PUBLIC
 void               spectre_page_get_size        (SpectrePage          *page,
 						 int                  *width,
 						 int                  *height);
@@ -85,6 +91,7 @@ void               spectre_page_get_size        (SpectrePage          *page,
                       happen that row_length is different than width * 4
     @see spectre_page_status
 */
+SPECTRE_PUBLIC
 void               spectre_page_render          (SpectrePage          *page,
 						 SpectreRenderContext *rc,
 						 unsigned char       **page_data,
@@ -103,6 +110,7 @@ void               spectre_page_render          (SpectrePage          *page,
                        happen that row_length is different than width * 4
      @see spectre_page_status
 */
+SPECTRE_PUBLIC
 void               spectre_page_render_slice    (SpectrePage          *page,
 						 SpectreRenderContext *rc,
 						 int                   x,

@@ -31,6 +31,7 @@ SPECTRE_BEGIN_DECLS
 typedef struct SpectreDocument SpectreDocument;
 
 /*! Creates a document */
+SPECTRE_PUBLIC
 SpectreDocument   *spectre_document_new                (void);
 
 /*! Loads a the given file into the document. This function can fail
@@ -38,29 +39,34 @@ SpectreDocument   *spectre_document_new                (void);
     @param filename the file to loa
     @see spectre_document_status
 */
+SPECTRE_PUBLIC
 void               spectre_document_load               (SpectreDocument *document,
 							const char      *filename);
 
 /*! Returns the document status 
     @param document the document whose status will be returned
 */
+SPECTRE_PUBLIC
 SpectreStatus      spectre_document_status             (SpectreDocument *document);
 
 /*! Frees the document
     @param document the document that will be freed
 */
+SPECTRE_PUBLIC
 void               spectre_document_free               (SpectreDocument *document);
 
 /*! Returns the number of pages of the document. This function can fail
     @param document the document whose pages number will be returned
     @see spectre_document_status
 */
+SPECTRE_PUBLIC
 unsigned int       spectre_document_get_n_pages        (SpectreDocument *document);
 
 /*! Returns the orientation of the document. This function can fail
     @param document the document whose orientation will be returned
     @see spectre_document_status
 */
+SPECTRE_PUBLIC
 SpectreOrientation spectre_document_get_orientation    (SpectreDocument *document);
 
 /*! Returns the title of the document. It returns a null const char * if
@@ -68,6 +74,7 @@ SpectreOrientation spectre_document_get_orientation    (SpectreDocument *documen
     @param document the document whose title will be returned
     @see spectre_document_status
 */
+SPECTRE_PUBLIC
 const char        *spectre_document_get_title          (SpectreDocument *document);
 
 /*! Returns the creator of the document. It returns a null const char * if
@@ -75,6 +82,7 @@ const char        *spectre_document_get_title          (SpectreDocument *documen
     @param document the document whose creator will be returned
     @see spectre_document_status
 */
+SPECTRE_PUBLIC
 const char        *spectre_document_get_creator        (SpectreDocument *document);
 
 /*! Returns the for of the document. It returns a null const char * if
@@ -82,6 +90,7 @@ const char        *spectre_document_get_creator        (SpectreDocument *documen
     @param document the document whose for will be returned
     @see spectre_document_status
 */
+SPECTRE_PUBLIC
 const char        *spectre_document_get_for            (SpectreDocument *document);
 
 /*! Returns the creation date of the document. The date is copied verbatim from
@@ -90,18 +99,21 @@ const char        *spectre_document_get_for            (SpectreDocument *documen
     @param document the document whose creation date will be returned
     @see spectre_document_status
 */
+SPECTRE_PUBLIC
 const char        *spectre_document_get_creation_date  (SpectreDocument *document);
 
 /*! Returns the format of the document. This function can fail
     @param document the document whose format will be returned
     @see spectre_document_status
 */
+SPECTRE_PUBLIC
 const char        *spectre_document_get_format         (SpectreDocument *document);
 
 /*! Returns if the document is a Encapsulated PostScript file. This function can fail
     @param document the document to query
     @see spectre_document_status
 */
+SPECTRE_PUBLIC
 int                spectre_document_is_eps             (SpectreDocument *document);
 
 /*! Returns the PostScript language level of the document. It returns 0 if no
@@ -109,6 +121,7 @@ int                spectre_document_is_eps             (SpectreDocument *documen
     @param document the document whose language level will be returned
     @see spectre_document_status
 */
+SPECTRE_PUBLIC
 unsigned int       spectre_document_get_language_level (SpectreDocument *document);
 
 /*! Returns a page of the document. This function can fail
@@ -116,6 +129,7 @@ unsigned int       spectre_document_get_language_level (SpectreDocument *documen
     @param page_index the page index to get. First page has index 0.
     @see spectre_document_status
 */
+SPECTRE_PUBLIC
 SpectrePage       *spectre_document_get_page           (SpectreDocument *document,
 							unsigned int     page_index);
 
@@ -124,6 +138,7 @@ SpectrePage       *spectre_document_get_page           (SpectreDocument *documen
     @param label the label of the page to get.
     @see spectre_document_status
 */
+SPECTRE_PUBLIC
 SpectrePage       *spectre_document_get_page_by_label  (SpectreDocument *document,
 							const char      *label);
 
@@ -137,6 +152,7 @@ SpectrePage       *spectre_document_get_page_by_label  (SpectreDocument *documen
     @row_length the length of an image row will be returned here
     @see spectre_document_render_full
 */
+SPECTRE_PUBLIC
 void               spectre_document_render_full        (SpectreDocument      *document,
 							SpectreRenderContext *rc,
 							unsigned char       **page_data,
@@ -153,6 +169,7 @@ void               spectre_document_render_full        (SpectreDocument      *do
     @row_length the length of an image row will be returned here
     @see spectre_document_render_full
 */
+SPECTRE_PUBLIC
 void               spectre_document_render             (SpectreDocument      *document,
 							unsigned char       **page_data,
 							int                  *row_length);
@@ -163,6 +180,7 @@ void               spectre_document_render             (SpectreDocument      *do
     @width the page width will be returned here, or NULL
     @height the page height will be returned here, or NULL
 */
+SPECTRE_PUBLIC
 void               spectre_document_get_page_size      (SpectreDocument      *document,
 							int                  *width,
 							int                  *height);
@@ -172,6 +190,7 @@ void               spectre_document_get_page_size      (SpectreDocument      *do
     @param filename the path where document will be saved
     @see spectre_document_status
 */
+SPECTRE_PUBLIC
 void               spectre_document_save               (SpectreDocument *document,
 							const char      *filename);
 /* Save document as a pdf document. This function can fail
@@ -179,6 +198,7 @@ void               spectre_document_save               (SpectreDocument *documen
    @param filename the path where document will be saved as pdf
    @see spectre_document_status
 */
+SPECTRE_PUBLIC
 void               spectre_document_save_to_pdf        (SpectreDocument *document,
 							const char      *filename);
 SPECTRE_END_DECLS

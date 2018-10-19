@@ -44,4 +44,12 @@
 #  endif /* !__cplusplus */
 #endif
 
+#if defined(_WIN32)
+#  define SPECTRE_PUBLIC __declspec(dllexport)
+#elif defined(__GNUC__)
+#  define SPECTRE_PUBLIC __attribute__((visibility("default"))) extern
+#else
+#  define SPECTRE_PUBLIC
+#endif
+
 #endif /* SPECTRE_MACROS_H */
