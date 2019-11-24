@@ -16,24 +16,24 @@ extern "C" {
 
 int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    SpectreRenderContext *rc;
-    SpectreDocument *document;
+	SpectreRenderContext *rc;
+	SpectreDocument *document;
 	unsigned int i;
 
 	int fd = open("doc", O_CREAT | O_TMPFILE | O_TRUNC);
 
-    if(fd == -1) return 0;
+	if(fd == -1) return 0;
 
-    while(write(fd, data, size) > 0);
+	while(write(fd, data, size) > 0);
 
-    close(fd);
+	close(fd);
 
 	spectre_document_load(document, "doc");
 
 	if(spectre_document_status(document))
 	{
-    	spectre_document_free(document);
-    	return 0;
+		spectre_document_free(document);
+		return 0;
 	}
 
 	spectre_document_free(document);
