@@ -14,7 +14,7 @@ cp ghostscript-9.50/bin/gs.a /usr/local/lib/libgs.a
 ./autogen.sh --enable-static --disable-shared
 make -j$(nproc)
 
-$CXX $CXXFLAGS $SRC/libspectre/test/spectre_read_fuzzer.cc -I. \
+$CXX $CXXFLAGS $SRC/libspectre/test/spectre_read_fuzzer.c -I. \
     -o $OUT/spectre_read_fuzzer \
     $LIB_FUZZING_ENGINE $SRC/libspectre/libspectre/.libs/libspectre.a \
     $SRC/libspectre/ghostscript-9.50/bin/gs.a
