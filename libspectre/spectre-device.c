@@ -371,6 +371,7 @@ spectre_device_render (SpectreDevice        *device,
 	free (dsp_handle);
 	free (args);
 	if (!success) {
+		free (device->user_image);
 		spectre_gs_free (gs);
 		return SPECTRE_STATUS_RENDER_ERROR;
 	}
@@ -379,12 +380,14 @@ spectre_device_render (SpectreDevice        *device,
 				      SPECTRE_ORIENTATION_PORTRAIT);
 	if (!spectre_gs_send_string (gs, set)) {
 		free (set);
+		free (device->user_image);
 		spectre_gs_free (gs);
 		return SPECTRE_STATUS_RENDER_ERROR;
 	}
 	free (set);
 
 	if (!spectre_gs_send_page (gs, device->doc, page, x, y)) {
+		free (device->user_image);
 		spectre_gs_free (gs);
 		return SPECTRE_STATUS_RENDER_ERROR;
 	}
