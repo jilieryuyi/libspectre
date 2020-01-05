@@ -8,6 +8,7 @@ cd ghostscript-9.50
 make -j$(nproc) soinstall
 make -j$(nproc) libgs
 cd ..
+rm /usr/local/lib/libgs.so*
 cp ghostscript-9.50/bin/gs.a /usr/local/lib/libgs.a
 
 ./autogen.sh --enable-static --disable-shared
