@@ -368,10 +368,9 @@ static Boolean scan_boundingbox(int *bb, const char *line)
 /*###########################################################*/
 
 struct document *
-psscan(const char *filename, int scanstyle)
+psscan(FILE *file, const char *filename, int scanstyle)
 {
     struct document *doc;
-    FILE *file;
     int bb_set = NONE;
     int pages_set = NONE;
     int page_order_set = NONE;
@@ -424,11 +423,6 @@ psscan(const char *filename, int scanstyle)
       return(NULL);
     }
 
-    file = fopen (filename, "rb");
-    if (!file) {
-	    return NULL;
-    }
-
     fd = ps_io_init(file);
     
     /* rjl: check for DOS EPS files and almost DSC files that start with ^D */
@@ -437,7 +431,6 @@ psscan(const char *filename, int scanstyle)
 	fprintf(stderr, "Warning: empty file.\n");
         ENDMESSAGE(psscan)
         ps_io_exit(fd);
-	fclose (file);
 	return(NULL);
     }
 
@@ -451,7 +444,6 @@ psscan(const char *filename, int scanstyle)
 	    fprintf(stderr, "psscan error: input files seems to be a PJL file.\n");
 	    ENDMESSAGE(psscan)
 	    ps_io_exit(fd);
-	    fclose (file);
 	    return (NULL);
 	}
     }
@@ -1234,7 +1226,6 @@ continuepage:
 #endif
     ENDMESSAGE(psscan)
     ps_io_exit(fd);
-    fclose (file);
     return doc;
 }
 

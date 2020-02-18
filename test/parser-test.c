@@ -58,7 +58,7 @@ int main (int argc, char **argv)
 		return 1;
 	}
 	
-	doc = psscan (argv[1], SCANSTYLE_NORMAL);
+	doc = psscan (fd, argv[1], SCANSTYLE_NORMAL);
 	if (!doc) {
 		printf ("Error parsing document\n");
 		fclose (fd);

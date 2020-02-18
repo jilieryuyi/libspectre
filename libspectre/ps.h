@@ -153,6 +153,7 @@ struct page {
 
 Document				psscan (
 #if NeedFunctionPrototypes
+    FILE *,
     const char *,
     int     /* scanstyle */
 #endif

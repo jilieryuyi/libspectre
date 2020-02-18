@@ -54,6 +54,7 @@ void
 spectre_document_load (SpectreDocument *document,
 		       const char      *filename)
 {
+	FILE *file;
 	_spectre_return_if_fail (document != NULL);
 	_spectre_return_if_fail (filename != NULL);
 	
@@ -66,10 +67,17 @@ spectre_document_load (SpectreDocument *document,
 		psdocdestroy (document->doc);
 		document->doc = NULL;
 	}
+
+	file = fopen (filename, "rb");
+	if (!file) {
+		document->status = SPECTRE_STATUS_LOAD_ERROR;
+		return;
+	}
 	
-	document->doc = psscan (filename, SCANSTYLE_NORMAL);
+	document->doc = psscan (file, filename, SCANSTYLE_NORMAL);
 	if (!document->doc) {
 		document->status = SPECTRE_STATUS_LOAD_ERROR;
+		fclose(file);
 		return;
 	}
 
@@ -77,6 +85,7 @@ spectre_document_load (SpectreDocument *document,
 		document->status = SPECTRE_STATUS_LOAD_ERROR;
 		psdocdestroy (document->doc);
 		document->doc = NULL;
+		fclose(file);
 		
 		return;
 	} else if (document->doc->numpages == 0 && !document->doc->format) {
@@ -91,6 +100,7 @@ spectre_document_load (SpectreDocument *document,
 			document->status = SPECTRE_STATUS_LOAD_ERROR;
 			psdocdestroy (document->doc);
 			document->doc = NULL;
+			fclose(file);
 
 			return;
 		}
@@ -101,6 +111,8 @@ spectre_document_load (SpectreDocument *document,
 
 	if (document->status != SPECTRE_STATUS_SUCCESS)
 		document->status = SPECTRE_STATUS_SUCCESS;
+
+	fclose(file);
 }
 
 void
