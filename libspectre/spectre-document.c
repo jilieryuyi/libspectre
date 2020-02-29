@@ -50,13 +50,26 @@ spectre_document_new (void)
 	return doc;
 }
 
-void
-spectre_document_load (SpectreDocument *document,
-		       const char      *filename)
+static void
+document_load (SpectreDocument *document,
+	       const char      *filename,
+	       void            *buffer,
+	       size_t           size)
 {
 	FILE *file;
+
 	_spectre_return_if_fail (document != NULL);
+
+#if _POSIX_C_SOURCE >= 200809L
+	if(buffer == NULL) {
+		_spectre_return_if_fail (filename != NULL);
+	} else {
+		_spectre_return_if_fail (buffer != NULL);
+	}
+#else
 	_spectre_return_if_fail (filename != NULL);
+#endif
+	
 	
 	if (document->doc && strcmp (filename, document->doc->filename) == 0) {
 		document->status = SPECTRE_STATUS_SUCCESS;
@@ -68,7 +81,16 @@ spectre_document_load (SpectreDocument *document,
 		document->doc = NULL;
 	}
 
+#if _POSIX_C_SOURCE >= 200809L
+	if(buffer == NULL) {
+		file = fopen (filename, "rb");
+	} else {
+		file = fmemopen (buffer, size, "rb");
+	}
+#else
 	file = fopen (filename, "rb");
+#endif
+
 	if (!file) {
 		document->status = SPECTRE_STATUS_LOAD_ERROR;
 		return;
@@ -77,7 +99,7 @@ spectre_document_load (SpectreDocument *document,
 	document->doc = psscan (file, filename, SCANSTYLE_NORMAL);
 	if (!document->doc) {
 		document->status = SPECTRE_STATUS_LOAD_ERROR;
-		fclose(file);
+		fclose (file);
 		return;
 	}
 
@@ -85,7 +107,7 @@ spectre_document_load (SpectreDocument *document,
 		document->status = SPECTRE_STATUS_LOAD_ERROR;
 		psdocdestroy (document->doc);
 		document->doc = NULL;
-		fclose(file);
+		fclose (file);
 		
 		return;
 	} else if (document->doc->numpages == 0 && !document->doc->format) {
@@ -100,7 +122,7 @@ spectre_document_load (SpectreDocument *document,
 			document->status = SPECTRE_STATUS_LOAD_ERROR;
 			psdocdestroy (document->doc);
 			document->doc = NULL;
-			fclose(file);
+			fclose (file);
 
 			return;
 		}
@@ -112,8 +134,25 @@ spectre_document_load (SpectreDocument *document,
 	if (document->status != SPECTRE_STATUS_SUCCESS)
 		document->status = SPECTRE_STATUS_SUCCESS;
 
-	fclose(file);
+	fclose (file);
 }
+
+void
+spectre_document_load (SpectreDocument *document,
+		       const char *filename)
+{
+	document_load (document, filename, NULL, 0);
+}
+
+#if _POSIX_C_SOURCE >= 200809L
+void
+spectre_document_load_from_data (SpectreDocument *document,
+				 void            *data,
+				 size_t           size)
+{
+	document_load (document, NULL, data, size);
+}
+#endif
 
 void
 spectre_document_free (SpectreDocument *document)

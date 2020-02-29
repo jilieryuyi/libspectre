@@ -14,24 +14,16 @@ extern "C" {
 #include "../libspectre/spectre-utils.h"
 #include "../libspectre/ps.h"
 
+int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size);
+
 int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    SpectreRenderContext *rc;
     SpectreDocument *document;
-    char path[] = "/tmp/spectre_fuzz";
-
-    int fd = creat(path, 0644);
-
-    if(fd == -1) return 0;
-
-    write(fd, data, size);
-
-    close(fd);
 
     document = spectre_document_new();
     if(document == NULL) return 0;
 
-    spectre_document_load(document, path);
+    spectre_document_load_from_data(document, (void*)data, size);
 
     if(spectre_document_status(document))
     {

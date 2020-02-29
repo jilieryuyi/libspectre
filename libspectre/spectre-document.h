@@ -43,6 +43,19 @@ SPECTRE_PUBLIC
 void               spectre_document_load               (SpectreDocument *document,
 							const char      *filename);
 
+#if _POSIX_C_SOURCE >= 200809L
+/*! Loads the given buffer into the document. This function can fail
+    @param document the document where the buffer will be loaded
+    @param buffer the buffer to load
+    @param size the size of the buffer
+    @see spectre_document_status
+*/
+SPECTRE_PUBLIC
+void               spectre_document_load_from_data     (SpectreDocument *document,
+							void      *buffer,
+                            				size_t size);
+#endif
+
 /*! Returns the document status 
     @param document the document whose status will be returned
 */
