@@ -588,11 +588,12 @@ psscan(FILE *file, const char *filename, int scanstyle)
 			// fall-through
 		    case 1:
 			if (maxpages > 0) {
+                	    PS_free(doc->pages);
 			    doc->pages = (struct page *) PS_calloc(maxpages,
 							   sizeof(struct page));
-                            if (!doc->pages)
-                                maxpages = 0;
-                            CHECK_MALLOCED(doc->pages);
+			    if (!doc->pages)
+			        maxpages = 0;
+			    CHECK_MALLOCED(doc->pages);
 			}
 		}
 	    }
