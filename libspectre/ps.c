@@ -1073,7 +1073,7 @@ continuepage:
 		     * name.  Case insensitive compares are only used for
 		     * PaperSize comments.
 		     */
-		    if (_spectre_strcasecmp(cp, dmp->name) == 0) {
+		    if (cp && _spectre_strcasecmp(cp, dmp->name) == 0) {
 			doc->pages[doc->numpages].media = dmp;
 			break;
 		    }
