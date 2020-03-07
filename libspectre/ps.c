@@ -931,7 +931,7 @@ psscan(FILE *file, const char *filename, int scanstyle)
 		     * name.  Case insensitive compares are only used for
 		     * PaperSize comments.
 		     */
-		    if (_spectre_strcasecmp(cp, dmp->name) == 0) {
+		    if (cp && _spectre_strcasecmp(cp, dmp->name) == 0) {
 			doc->default_page_media = dmp;
 			page_media_set = 1;
 			break;
