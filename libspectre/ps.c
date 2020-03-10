@@ -647,6 +647,7 @@ psscan(FILE *file, const char *filename, int scanstyle)
 	} else if (doc->nummedia == NONE &&
 		   iscomment(line+2, "DocumentPaperSizes:")) {
 
+	    PS_free(doc->media);
 	    doc->media = (Media) PS_calloc(1, sizeof (MediaStruct));
             CHECK_MALLOCED(doc->media);
 	    doc->media[0].name = ps_gettext(line+length("%%DocumentPaperSizes:"),
