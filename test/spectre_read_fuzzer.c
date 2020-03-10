@@ -18,20 +18,33 @@ int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size);
 
 int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
+    FILE *f;
     SpectreDocument *document;
 
-    document = spectre_document_new();
-    if(document == NULL) return 0;
+/* This is part of the build, it should at least compile on Windows */
+#if _POSIX_C_SOURCE >= 200809L
+    f = fmemopen((void*)data, size, "rb");
+    if(f == NULL) return 0;
+#endif
 
-    spectre_document_load_from_data(document, (void*)data, size);
+    document = spectre_document_new();
+    if(document == NULL)
+    {
+        fclose(f);
+        return 0;
+    }
+
+    spectre_document_load_from_stream(document, f);
 
     if(spectre_document_status(document))
     {
         spectre_document_free(document);
+        fclose(f);
         return 0;
     }
 
     spectre_document_free(document);
+    fclose(f);
 
     return 0;
 }

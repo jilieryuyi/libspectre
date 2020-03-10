@@ -25,6 +25,8 @@
 #include <libspectre/spectre-status.h>
 #include <libspectre/spectre-page.h>
 
+#include <stdio.h>
+
 SPECTRE_BEGIN_DECLS
 
 /*! This is the object that represents a PostScript document. */
@@ -43,18 +45,14 @@ SPECTRE_PUBLIC
 void               spectre_document_load               (SpectreDocument *document,
 							const char      *filename);
 
-#if _POSIX_C_SOURCE >= 200809L
-/*! Loads the given buffer into the document. This function can fail
-    @param document the document where the buffer will be loaded
-    @param buffer the buffer to load
-    @param size the size of the buffer
+/*! Loads the given open file into the document. This function can fail
+    @param document the document where the file will be loaded
+    @param file the file to load
     @see spectre_document_status
 */
 SPECTRE_PUBLIC
-void               spectre_document_load_from_data     (SpectreDocument *document,
-							void      *buffer,
-                            				size_t size);
-#endif
+void               spectre_document_load_from_stream     (SpectreDocument *document,
+							  FILE      *file);
 
 /*! Returns the document status 
     @param document the document whose status will be returned
