@@ -810,14 +810,16 @@ psscan(FILE *file, const char *filename, int scanstyle)
 	    } else if (page_media_set == NONE &&
 		       iscomment(line+2, "PageMedia:")) {
 		cp = ps_gettext(line+length("%%PageMedia:"), NULL);
-		for (dmp = doc->media, i=0; i<doc->nummedia; i++, dmp++) {
-		    if (strcmp(cp, dmp->name) == 0) {
-			doc->default_page_media = dmp;
-			page_media_set = 1;
-			break;
+		if (cp) {
+		    for (dmp = doc->media, i=0; i<doc->nummedia; i++, dmp++) {
+			if (strcmp(cp, dmp->name) == 0) {
+			    doc->default_page_media = dmp;
+			    page_media_set = 1;
+			    break;
+			}
 		    }
+		    PS_free(cp);
 		}
-		PS_free(cp);
 	    } else if (page_bb_set == NONE &&
 		       iscomment(line+2, "PageBoundingBox:")) {
 		if (scan_boundingbox(doc->default_page_boundingbox,
