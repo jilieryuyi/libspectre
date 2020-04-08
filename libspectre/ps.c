@@ -2213,8 +2213,8 @@ ps_read_doseps(fd,doseps)
     FileData fd;
     DOSEPS *doseps;
 {
-    fread(doseps->id, 1, 4, FD_FILE);
-    if (! ((doseps->id[0]==0xc5) && (doseps->id[1]==0xd0) 
+    const size_t read = fread(doseps->id, 1, 4, FD_FILE);
+    if (! ((read == 4) && (doseps->id[0]==0xc5) && (doseps->id[1]==0xd0)
 	   && (doseps->id[2]==0xd3) && (doseps->id[3]==0xc6)) ) {
         /* id is "EPSF" with bit 7 set */
         ps_io_rewind(fd);
