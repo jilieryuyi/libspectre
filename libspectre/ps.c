@@ -448,6 +448,10 @@ psscan(FILE *file, const char *filename, int scanstyle)
 	}
     }
 
+    // Initialize text so that all the strcmp we do after sscanf don't
+    // end up reading uninitialized memory if the sscanf fails
+    text[0] = '\0';
+
     /* Header comments */
     
     /* Header should start with "%!PS-Adobe-", but some programms omit
