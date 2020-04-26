@@ -69,6 +69,15 @@ struct document *_spectre_document_get_doc (SpectreDocument *document);
 SpectreExporter *_spectre_exporter_ps_new  (struct document *doc);
 SpectreExporter *_spectre_exporter_pdf_new (struct document *doc);
 
+/*! Loads the given open file into the document. This function can fail
+    @param document the document where the file will be loaded
+    @param file the file to load
+    @see spectre_document_status
+*/
+SPECTRE_PUBLIC
+void               spectre_document_load_from_stream     (SpectreDocument *document,
+							  FILE      *file);
+
 SPECTRE_END_DECLS
 
 #endif /* SPECTRE_PRIVATE_H */

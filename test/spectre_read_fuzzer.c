@@ -11,6 +11,7 @@ extern "C" {
 #include <unistd.h>
 
 #include "../libspectre/spectre.h"
+#include "../libspectre/spectre-private.h"
 #include "../libspectre/spectre-utils.h"
 #include "../libspectre/ps.h"
 
