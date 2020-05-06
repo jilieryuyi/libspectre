@@ -1,3 +1,20 @@
+libspectre 0.2.9 (06 May 2020)
+===============================
+
+This is another bugfix only release in the libspectre's 0.2 series.
+
+Fixed lots of crashes, memory leaks with malformed
+documents (Albert Astals Cid, Randy)
+
+Ghostscript 9.24 is now required (Christian Persch)
+
+Hide internal symbols (Christian Persch)
+
+Added "(libspectre)" to the error messages to be clear where the
+messages come from (Caolán McNamara)
+
+Fixed clang warnings (Albert Astals Cid)
+
 libspectre 0.2.8 (01 July 2016)
 ===============================
 
