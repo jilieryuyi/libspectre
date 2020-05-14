@@ -1,13 +1,13 @@
 # This script is meant to be run by
 # https://github.com/google/oss-fuzz/blob/master/projects/libspectre/Dockerfile
 
-cd ghostscript-9.50
+cd ghostscript
 ./configure
 make -j$(nproc) soinstall
 make -j$(nproc) libgs
 cd ..
 rm /usr/local/lib/libgs.so*
-cp ghostscript-9.50/bin/gs.a /usr/local/lib/libgs.a
+cp ghostscript/bin/gs.a /usr/local/lib/libgs.a
 
 ./autogen.sh --enable-static --disable-shared
 make -j$(nproc)
@@ -15,15 +15,15 @@ make -j$(nproc)
 $CXX $CXXFLAGS $SRC/libspectre/test/spectre_read_fuzzer.c -I. \
     -o $OUT/spectre_read_fuzzer \
     $LIB_FUZZING_ENGINE $SRC/libspectre/libspectre/.libs/libspectre.a \
-    $SRC/libspectre/ghostscript-9.50/bin/gs.a
+    $SRC/libspectre/ghostscript/bin/gs.a
 
-find $SRC/libspectre/ghostscript-9.50 -name "*.ps" | \
+find $SRC/libspectre/ghostscript -name "*.ps" | \
      xargs zip $OUT/spectre_read_fuzzer_seed_corpus.zip
 
 cp $SRC/libspectre/test/postscript.dict $OUT/spectre_read_fuzzer.dict
 
 # Needed for coverage builds
-cd ghostscript-9.50/obj
+cd ghostscript/obj
 
 ln -s ../jpeg/jdapistd.c jdapistd.c
 ln -s ../jpeg/jdarith.c jdarith.c
