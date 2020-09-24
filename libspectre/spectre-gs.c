@@ -26,13 +26,7 @@
 #include "spectre-utils.h"
 
 /* ghostscript stuff */
-#include <ghostscript/iapi.h>
 #include <ghostscript/ierrors.h>
-
-/* Ghostscript before version 9.24 has a critial vulnerability
- * where -dSAFER could be escaped from.
- */
-#define GS_MIN_VERSION (924)
 
 #define BUFFER_SIZE 32768
 
@@ -160,12 +154,7 @@ int
 spectre_gs_create_instance (SpectreGS *gs,
 			    void      *caller_handle)
 {
-        int version;
 	int error;
-
-        version = spectre_gs_get_version ();
-        if (version < GS_MIN_VERSION)
-                return FALSE;
 
 	error = gsapi_new_instance (&gs->ghostscript_instance, caller_handle);
 	if (!critic_error_code (error)) {
@@ -180,13 +169,12 @@ spectre_gs_create_instance (SpectreGS *gs,
 }
 
 int
-spectre_gs_set_display_callback (SpectreGS *gs,
-				 void      *callback)
+spectre_gs_register_callout (SpectreGS *gs,
+				 gs_callout      callout,void      *caller_handle)
 {
 	int error;
-	
-	error = gsapi_set_display_callback (gs->ghostscript_instance,
-					    callback);
+
+	error = gsapi_register_callout(gs->ghostscript_instance, callout, caller_handle);
 	return !critic_error_code (error);
 }
 

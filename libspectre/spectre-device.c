@@ -106,7 +106,7 @@ spectre_page (void *handle, void *device, int copies, int flush)
 
 	if (!handle)
 		return 0;
-	
+
 	sd = (SpectreDevice *)handle;
 	sd->page_called = TRUE;
 	memcpy (sd->user_image, sd->gs_image, sd->row_length * sd->height);
@@ -135,7 +135,7 @@ spectre_update (void *handle, void *device, int x, int y, int w, int h)
 	return 0;
 }
 
-static const display_callback spectre_device = {
+static display_callback spectre_device = {
 	sizeof (display_callback),
 	DISPLAY_VERSION_MAJOR,
 	DISPLAY_VERSION_MINOR,
@@ -262,6 +262,27 @@ rotate_image_to_orientation (unsigned char    **page_data,
         }
 }
 
+static int spectre_callout_handler(void *instance, void *callout_handle, const char *device_name, int id, int size, void *data)
+{
+    /* On entry, callout_handle == the value of state passed in
+     * to gsapi_register_callout. */
+    /* We are only interested in callouts from the display device. */
+    if (device_name == NULL || strcmp(device_name, "display"))
+        return -1;
+
+    if (id == DISPLAY_CALLOUT_GET_CALLBACK)
+    {
+        /* Fill in the supplied block with the details of our callback
+         * handler, and the handle to use. In this instance, the handle
+         * is the pointer to our test structure. */
+        gs_display_get_callback_t *cb = (gs_display_get_callback_t *)data;
+        cb->callback = &spectre_device;
+        cb->caller_handle = callout_handle;
+        return 0;
+    }
+    return -1;
+}
+
 SpectreStatus
 spectre_device_render (SpectreDevice        *device,
 		       unsigned int          page,
@@ -275,14 +296,13 @@ spectre_device_render (SpectreDevice        *device,
 {
 	SpectreGS *gs;
 	char     **args;
-	int        n_args = 13;
+	int        n_args = 12;
 	int        arg = 0;
 	int        success;
-	char      *fmt;
 	char      *text_alpha, *graph_alpha;
 	char      *size = NULL;
 	char      *resolution, *set;
-	char      *dsp_format, *dsp_handle;
+	char      *dsp_format;
 	char      *width_points = NULL;
 	char      *height_points = NULL;
 
@@ -297,10 +317,10 @@ spectre_device_render (SpectreDevice        *device,
 		return SPECTRE_STATUS_RENDER_ERROR;
 	}
 
-	if (!spectre_gs_set_display_callback (gs, (display_callback *)&spectre_device)) {
+	if (!spectre_gs_register_callout(gs, spectre_callout_handler, device)) {
 		spectre_gs_cleanup (gs, CLEANUP_DELETE_INSTANCE);
 		spectre_gs_free (gs);
-		
+
 		return SPECTRE_STATUS_RENDER_ERROR;
 	}
 
@@ -340,16 +360,6 @@ spectre_device_render (SpectreDevice        *device,
 							   DISPLAY_LITTLEENDIAN |
 #endif
 							   DISPLAY_TOPFIRST);
-#ifdef WIN32
-#define FMT64 "I64"
-#else
-#define FMT64 "ll"
-#endif
-	fmt = _spectre_strdup_printf ("-sDisplayHandle=16#%s",
-				      sizeof (device) == 4 ? "%lx" : "%"FMT64"x");
-	args[arg++] = dsp_handle = _spectre_strdup_printf (fmt, device);
-	free (fmt);
-#undef FMT64
 	if (rc->use_platform_fonts == FALSE)
 		args[arg++] = "-dNOPLATFONTS";
 
@@ -369,7 +379,6 @@ spectre_device_render (SpectreDevice        *device,
 	free (height_points);
 	free (resolution);
 	free (dsp_format);
-	free (dsp_handle);
 	free (args);
 	if (!success) {
 		free (device->user_image);
@@ -396,7 +405,7 @@ spectre_device_render (SpectreDevice        *device,
 	*page_data = device->user_image;
 	*row_length = device->row_length;
 
-        rotate_image_to_orientation (page_data, row_length, width, height, rc->orientation);
+	rotate_image_to_orientation (page_data, row_length, width, height, rc->orientation);
 
 	spectre_gs_free (gs);
 

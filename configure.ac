@@ -63,7 +63,7 @@ AC_CHECK_FUNC(vasprintf, [ AC_DEFINE(HAVE_VASPRINTF, 1, [Define if the 'vasprint
 
 AC_CHECK_FUNC(_vscprintf, [ AC_DEFINE(HAVE__VSCPRINTF, 1, [Define if the '_vscprintf' function is available.]) ])
 
-LIBGS_REQUIRED="9.24"
+LIBGS_REQUIRED="9.53.0"
 
 AC_CHECK_LIB(gs, gsapi_new_instance, have_libgs=yes, have_libgs=no)
 if test "x$have_libgs" = "xyes"; then
@@ -81,7 +81,7 @@ if test "x$have_libgs" = "xyes"; then
 
     if (gsapi_revision (&gsrev, sizeof (gsrev)) != 0)
         return 1;
-    if (gsrev.revision < `echo "$LIBGS_REQUIRED" | sed -e 's/\.//'`)
+    if (gsrev.revision < `echo "$LIBGS_REQUIRED" | sed -e 's/\.//g'`)
         return 1;
 ]])],
                    [have_libgs=yes],

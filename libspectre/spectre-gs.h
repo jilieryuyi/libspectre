@@ -25,6 +25,8 @@
 
 #include "ps.h"
 
+#include <ghostscript/iapi.h>
+
 SPECTRE_BEGIN_DECLS
 
 typedef enum {
@@ -37,8 +39,8 @@ typedef struct SpectreGS SpectreGS;
 SpectreGS *spectre_gs_new                  (void);
 int        spectre_gs_create_instance      (SpectreGS           *gs,
 					    void                *caller_handle);
-int        spectre_gs_set_display_callback (SpectreGS           *gs,
-					    void                *callback);
+int        spectre_gs_register_callout     (SpectreGS           *gs,
+					    gs_callout      callout, void      *caller_handle);
 int        spectre_gs_run                  (SpectreGS           *gs,
 					    int                  n_args,
 					    char               **args);
