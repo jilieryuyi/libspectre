@@ -72,6 +72,7 @@ spectre_presize (void *handle, void *device, int width, int height,
 	sd->height = height;
 	sd->row_length = raster;
 	sd->gs_image = NULL;
+	free(sd->user_image);
 	sd->user_image = malloc (sd->row_length * sd->height);
 	
 	return 0;
