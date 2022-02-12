@@ -1,3 +1,14 @@
+libspectre 0.2.10 (12 February 2022)
+===============================
+
+This is another bugfix only release in the libspectre's 0.2 series.
+
+Fix display of some EPS files (Marek Kasik)
+
+Fixed memory leak in in case spectre_presize is called multiple times (Albert Astals Cid)
+
+Use the new api to pass the callbacks to libgs. Needs ghostscript >= 9.53 (Albert Astals Cid)
+
 libspectre 0.2.9 (06 May 2020)
 ===============================
 
