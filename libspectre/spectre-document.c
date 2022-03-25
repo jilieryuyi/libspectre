@@ -118,6 +118,10 @@ spectre_document_load (SpectreDocument *document,
 	_spectre_return_if_fail (filename != NULL);
 
 	file = fopen (filename, "rb");
+	if (!file) {
+		document->status = SPECTRE_STATUS_LOAD_ERROR;
+		return;
+	}
 	document_load (document, filename, file);
 	fclose (file);
 }
