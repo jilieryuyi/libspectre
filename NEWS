@@ -1,3 +1,10 @@
+libspectre 0.2.11 (4 November 2022)
+===============================
+
+This is another bugfix only release in the libspectre's 0.2 series.
+
+Avoid possible crash when loading a document (Marek Kasik)
+
 libspectre 0.2.10 (12 February 2022)
 ===============================
 
