@@ -29,6 +29,9 @@ build_gcc_ubuntu_21_04:
   stage: build
   image: ubuntu:21.04
   before_script:
+    - sed -i -e 's/archive/old-releases/g' /etc/apt/sources.list
+    - sed -i -e 's/security.ubuntu/old-releases.ubuntu/g' /etc/apt/sources.list
+    - echo "91.189.91.124 old-releases.ubuntu.com" >> /etc/hosts
     - apt-get update
     - apt-get install --yes --no-install-recommends build-essential libgs-dev locales automake libtool pkg-config
     - echo 'en_US.UTF-8 UTF-8' >> /etc/locale.gen
